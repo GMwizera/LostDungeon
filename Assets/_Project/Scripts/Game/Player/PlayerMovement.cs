@@ -8,8 +8,7 @@ namespace LostDungeon.Game.Player
     [RequireComponent(typeof(Rigidbody2D), typeof(PlayerInputReader))]
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField] private float moveSpeed = 5f;
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private float moveSpeed = 2.5f;
 
         private Rigidbody2D body;
         private PlayerInputReader input;
@@ -26,13 +25,8 @@ namespace LostDungeon.Game.Player
         private void Update()
         {
             Vector2 move = input.Move;
-            if (move.sqrMagnitude < 0.01f)
-                return;
-
-            FacingDirection = move.normalized;
-
-            if (spriteRenderer != null && Mathf.Abs(move.x) > 0.01f)
-                spriteRenderer.flipX = move.x < 0f;
+            if (move.sqrMagnitude > 0.01f)
+                FacingDirection = move.normalized;
         }
 
         private void FixedUpdate()

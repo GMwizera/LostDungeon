@@ -1,0 +1,19 @@
+{
+    "name": "LostDungeon.Editor",
+    "rootNamespace": "LostDungeon.EditorTools",
+    "references": [
+        "LostDungeon.Game",
+        "Unity.2D.Tilemap.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
