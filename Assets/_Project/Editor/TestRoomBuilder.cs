@@ -176,7 +176,7 @@ namespace LostDungeon.EditorTools
 
             foreach (GameObject go in scene.GetRootGameObjects())
             {
-                if (go.name == "Grid" || go.name == "Player" || go.name == "Trap")
+                if (go.name == "Grid" || go.name == "Player" || go.name == "Trap" || go.name == "Breakables")
                     Object.DestroyImmediate(go);
             }
 
@@ -190,6 +190,11 @@ namespace LostDungeon.EditorTools
 
             GameObject player = CreatePlayer(grid.GetCellCenterWorld(new Vector3Int(RoomWidth / 2, RoomHeight / 2, 0)));
             CreateTrap(grid.GetCellCenterWorld(new Vector3Int(3, 4, 0)));
+            CombatSetupBuilder.SetUpPlayer(player);
+            CombatSetupBuilder.CreateBreakables(grid, new[]
+            {
+                new Vector3Int(1, 8, 0), new Vector3Int(2, 8, 0), new Vector3Int(7, 3, 0), new Vector3Int(6, 7, 0),
+            });
             SetUpCamera(player.transform);
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -259,8 +264,7 @@ namespace LostDungeon.EditorTools
                 walls.SetTile(new Vector3Int(-1, y, 0), tiles["stoneWallHalf_S"]);     // front-left
             }
 
-            // A couple of props so depth sorting is easy to see.
-            walls.SetTile(new Vector3Int(1, 8, 0), tiles["barrel_N"]);
+            // A solid prop so depth sorting is easy to see. Breakable barrels are added separately.
             walls.SetTile(new Vector3Int(8, 8, 0), tiles["woodenCrates_N"]);
         }
 

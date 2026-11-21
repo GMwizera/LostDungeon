@@ -3,7 +3,8 @@
     "rootNamespace": "LostDungeon.EditorTools",
     "references": [
         "LostDungeon.Game",
-        "Unity.2D.Tilemap.Editor"
+        "Unity.2D.Tilemap.Editor",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
     ],
     "includePlatforms": [
         "Editor"
