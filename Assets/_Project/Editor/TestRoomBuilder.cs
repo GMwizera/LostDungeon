@@ -176,7 +176,8 @@ namespace LostDungeon.EditorTools
 
             foreach (GameObject go in scene.GetRootGameObjects())
             {
-                if (go.name == "Grid" || go.name == "Player" || go.name == "Trap" || go.name == "Breakables")
+                if (go.name == "Grid" || go.name == "Player" || go.name == "Trap" || go.name == "Breakables" ||
+                    go.name == "Enemies" || go.name == "AudioManager")
                     Object.DestroyImmediate(go);
             }
 
@@ -195,6 +196,13 @@ namespace LostDungeon.EditorTools
             {
                 new Vector3Int(1, 8, 0), new Vector3Int(2, 8, 0), new Vector3Int(7, 3, 0), new Vector3Int(6, 7, 0),
             });
+            EnemySetupBuilder.SetUp(grid, floor, walls, new[]
+            {
+                ("Warrior", new Vector3Int(8, 1, 0)),
+                ("Archer", new Vector3Int(1, 1, 0)),
+                ("Guardian", new Vector3Int(7, 8, 0)),
+            });
+            AudioSetupBuilder.AddToScene();
             SetUpCamera(player.transform);
 
             EditorSceneManager.MarkSceneDirty(scene);

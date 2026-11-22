@@ -41,6 +41,10 @@ namespace LostDungeon.EditorTools
                 flash = player.AddComponent<HitFlash>();
             SetValues(player.GetComponent<PlayerHealth>(), ("hitFlash", flash));
 
+            if (!player.TryGetComponent(out Faction faction))
+                faction = player.AddComponent<Faction>();
+            SetValues(faction, ("team", (int)Team.Player));
+
             if (!player.TryGetComponent(out PlayerAbilities abilities))
                 abilities = player.AddComponent<PlayerAbilities>();
             SetValues(abilities,
@@ -155,7 +159,7 @@ namespace LostDungeon.EditorTools
 
         // ---------- Helpers ----------
 
-        private static T GetOrCreateAbility<T>(string assetName, System.Action<T> configureNew) where T : AbilityDefinition
+        internal static T GetOrCreateAbility<T>(string assetName, System.Action<T> configureNew) where T : AbilityDefinition
         {
             EnsureFolder(AbilityFolder);
             string path = $"{AbilityFolder}/{assetName}.asset";
@@ -171,16 +175,24 @@ namespace LostDungeon.EditorTools
         }
 
         /// <summary>Sets private [SerializeField] values so they are saved with the asset or scene.</summary>
-        private static void SetValues(Object target, params (string field, object value)[] values)
+        internal static void SetValues(Object target, params (string field, object value)[] values)
         {
             var serialized = new SerializedObject(target);
             foreach ((string field, object value) in values)
             {
                 SerializedProperty property = serialized.FindProperty(field);
+                if (property == null)
+                {
+                    Debug.LogError($"{target.GetType().Name} has no serialized field '{field}'.");
+                    continue;
+                }
+
                 switch (value)
                 {
                     case Object reference: property.objectReferenceValue = reference; break;
                     case float number: property.floatValue = number; break;
+                    case int whole: property.intValue = whole; break;
+                    case Color color: property.colorValue = color; break;
                     case bool flag: property.boolValue = flag; break;
                     case string text: property.stringValue = text; break;
                     case null: property.objectReferenceValue = null; break;
@@ -190,7 +202,7 @@ namespace LostDungeon.EditorTools
             EditorUtility.SetDirty(target);
         }
 
-        private static void EnsureFolder(string path)
+        internal static void EnsureFolder(string path)
         {
             if (AssetDatabase.IsValidFolder(path))
                 return;
