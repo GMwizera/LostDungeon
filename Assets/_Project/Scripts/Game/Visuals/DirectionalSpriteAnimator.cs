@@ -31,6 +31,13 @@ namespace LostDungeon.Game.Visuals
                 body = GetComponentInParent<Rigidbody2D>();
         }
 
+        /// <summary>Turns to face a direction without moving (e.g. an enemy facing the player before attacking).</summary>
+        public void FaceDirection(Vector2 direction)
+        {
+            if (direction.sqrMagnitude > 0.0001f)
+                Direction = EightWayDirection.FromVector(direction.x, direction.y);
+        }
+
         /// <summary>Plays the action frames once in the current facing direction.</summary>
         public void PlayAction()
         {

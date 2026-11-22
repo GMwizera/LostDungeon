@@ -24,6 +24,8 @@ namespace LostDungeon.Game.Visuals
         {
             if (spriteRenderer == null)
                 return;
+            if (endTime < 0f)
+                normalColor = spriteRenderer.color; // remember the current tint (enemies are tinted on spawn)
             spriteRenderer.color = flashColor;
             endTime = Time.time + duration;
         }
@@ -39,7 +41,7 @@ namespace LostDungeon.Game.Visuals
 
         private void OnDisable()
         {
-            if (spriteRenderer != null)
+            if (spriteRenderer != null && endTime > 0f)
                 spriteRenderer.color = normalColor;
             endTime = -1f;
         }

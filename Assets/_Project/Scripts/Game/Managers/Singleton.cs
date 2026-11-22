@@ -33,10 +33,14 @@ namespace LostDungeon.Game.Managers
 
         public static bool HasInstance => instance != null;
 
+        /// <summary>True on an extra copy that is about to destroy itself; subclasses should skip their setup.</summary>
+        protected bool IsDuplicate { get; private set; }
+
         protected virtual void Awake()
         {
             if (instance != null && instance != this)
             {
+                IsDuplicate = true;
                 Destroy(gameObject);
                 return;
             }

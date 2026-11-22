@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using LostDungeon.Core.Combat;
+using LostDungeon.Game.Combat;
 using UnityEngine;
 
 namespace LostDungeon.Game.Abilities
@@ -26,7 +27,8 @@ namespace LostDungeon.Game.Abilities
             foreach (Collider2D hit in hits)
             {
                 GameObject target = hit.attachedRigidbody != null ? hit.attachedRigidbody.gameObject : hit.gameObject;
-                if (target == context.Owner || !target.TryGetComponent(out IDamageable damageable))
+                if (target == context.Owner || Faction.AreAllies(target, context.Owner) ||
+                    !target.TryGetComponent(out IDamageable damageable))
                     continue;
                 if (damageable.IsDead || !damaged.Add(damageable))
                     continue; // already hit this swing (it may have several colliders)
