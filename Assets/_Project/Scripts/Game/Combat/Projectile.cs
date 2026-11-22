@@ -13,6 +13,8 @@ namespace LostDungeon.Game.Combat
     public class Projectile : MonoBehaviour, IPoolable
     {
         [SerializeField] private float lifetime = 2f;
+        [SerializeField] private Transform visual;
+        [SerializeField] private bool rotateVisualToDirection;
 
         private Rigidbody2D body;
         private GameObject owner;
@@ -28,6 +30,10 @@ namespace LostDungeon.Game.Combat
             damage = hitDamage;
             body.linearVelocity = direction.normalized * speed;
             despawnTime = Time.time + lifetime;
+
+            // Arrows point where they fly. Only the visual turns, so its height offset stays put.
+            if (rotateVisualToDirection && visual != null)
+                visual.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         }
 
         public void OnSpawned() => active = true;
@@ -51,8 +57,8 @@ namespace LostDungeon.Game.Combat
                 return; // ignore traps, pickups and other projectiles
 
             GameObject hit = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
-            if (hit == owner)
-                return;
+            if (hit == owner || Faction.AreAllies(hit, owner))
+                return; // fly past the shooter and its allies
 
             if (hit.TryGetComponent(out IDamageable target) && !target.IsDead)
                 target.TakeDamage(damage);
