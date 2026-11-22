@@ -16,6 +16,9 @@ namespace LostDungeon.Core.Events
         /// <summary>Enemy id, e.g. "Warrior".</summary>
         public static event Action<string> EnemyDefeated;
 
+        /// <summary>Enemy id of the enemy that just attacked (for sounds).</summary>
+        public static event Action<string> EnemyAttacked;
+
         /// <summary>(item id, amount)</summary>
         public static event Action<string, int> ItemCollected;
 
@@ -30,6 +33,7 @@ namespace LostDungeon.Core.Events
         public static void RaisePlayerHealthChanged(int current, int max) => PlayerHealthChanged?.Invoke(current, max);
         public static void RaisePlayerDied() => PlayerDied?.Invoke();
         public static void RaiseEnemyDefeated(string enemyId) => EnemyDefeated?.Invoke(enemyId);
+        public static void RaiseEnemyAttacked(string enemyId) => EnemyAttacked?.Invoke(enemyId);
         public static void RaiseItemCollected(string itemId, int amount) => ItemCollected?.Invoke(itemId, amount);
         public static void RaiseAbilityActivated(string abilityName, float cooldown) => AbilityActivated?.Invoke(abilityName, cooldown);
         public static void RaiseLevelCompleted(int level) => LevelCompleted?.Invoke(level);
@@ -44,6 +48,7 @@ namespace LostDungeon.Core.Events
             PlayerHealthChanged = null;
             PlayerDied = null;
             EnemyDefeated = null;
+            EnemyAttacked = null;
             ItemCollected = null;
             AbilityActivated = null;
             LevelCompleted = null;
