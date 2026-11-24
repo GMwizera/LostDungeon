@@ -30,6 +30,27 @@ namespace LostDungeon.Core.Events
 
         public static event Action<GameState> GameStateChanged;
 
+        /// <summary>(item id, new count) whenever the player's inventory changes.</summary>
+        public static event Action<string, int> InventoryChanged;
+
+        /// <summary>Text of the current level objective.</summary>
+        public static event Action<string> ObjectiveChanged;
+
+        /// <summary>Prompt for the nearest interactable, or null when there is none.</summary>
+        public static event Action<string> InteractionPromptChanged;
+
+        /// <summary>(level number, level name) once a level has finished loading.</summary>
+        public static event Action<int, string> LevelStarted;
+
+        /// <summary>Loading progress from 0 to 1.</summary>
+        public static event Action<float> LevelLoadProgress;
+
+        /// <summary>Message shown when a level could not be loaded.</summary>
+        public static event Action<string> LevelLoadFailed;
+
+        /// <summary>(title, description) of the dungeon conditions from the weather API.</summary>
+        public static event Action<string, string> ConditionsChanged;
+
         public static void RaisePlayerHealthChanged(int current, int max) => PlayerHealthChanged?.Invoke(current, max);
         public static void RaisePlayerDied() => PlayerDied?.Invoke();
         public static void RaiseEnemyDefeated(string enemyId) => EnemyDefeated?.Invoke(enemyId);
@@ -38,6 +59,13 @@ namespace LostDungeon.Core.Events
         public static void RaiseAbilityActivated(string abilityName, float cooldown) => AbilityActivated?.Invoke(abilityName, cooldown);
         public static void RaiseLevelCompleted(int level) => LevelCompleted?.Invoke(level);
         public static void RaiseGameStateChanged(GameState state) => GameStateChanged?.Invoke(state);
+        public static void RaiseInventoryChanged(string itemId, int count) => InventoryChanged?.Invoke(itemId, count);
+        public static void RaiseObjectiveChanged(string text) => ObjectiveChanged?.Invoke(text);
+        public static void RaiseInteractionPromptChanged(string prompt) => InteractionPromptChanged?.Invoke(prompt);
+        public static void RaiseLevelStarted(int level, string name) => LevelStarted?.Invoke(level, name);
+        public static void RaiseLevelLoadProgress(float progress) => LevelLoadProgress?.Invoke(progress);
+        public static void RaiseLevelLoadFailed(string message) => LevelLoadFailed?.Invoke(message);
+        public static void RaiseConditionsChanged(string title, string description) => ConditionsChanged?.Invoke(title, description);
 
         /// <summary>
         /// Removes every listener. Called when Play mode starts (the project has domain reload off,
@@ -53,6 +81,13 @@ namespace LostDungeon.Core.Events
             AbilityActivated = null;
             LevelCompleted = null;
             GameStateChanged = null;
+            InventoryChanged = null;
+            ObjectiveChanged = null;
+            InteractionPromptChanged = null;
+            LevelStarted = null;
+            LevelLoadProgress = null;
+            LevelLoadFailed = null;
+            ConditionsChanged = null;
         }
     }
 }
