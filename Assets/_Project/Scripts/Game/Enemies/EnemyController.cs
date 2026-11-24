@@ -10,6 +10,7 @@ using LostDungeon.Game.Navigation;
 using LostDungeon.Game.Player;
 using LostDungeon.Game.Pooling;
 using LostDungeon.Game.Visuals;
+using LostDungeon.Game.Weather;
 using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
@@ -60,6 +61,7 @@ namespace LostDungeon.Game.Enemies
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             colliders = GetComponents<Collider2D>();
             if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             if (spriteAnimator == null) spriteAnimator = GetComponentInChildren<DirectionalSpriteAnimator>();
@@ -143,7 +145,7 @@ namespace LostDungeon.Game.Enemies
             Vector2 offset = point - Position;
             body.linearVelocity = offset.sqrMagnitude < 0.0004f
                 ? Vector2.zero
-                : offset.normalized * (data.MoveSpeed * speedMultiplier);
+                : offset.normalized * (data.MoveSpeed * speedMultiplier * WorldModifiers.EnemySpeed);
         }
 
         public void ClearPath()

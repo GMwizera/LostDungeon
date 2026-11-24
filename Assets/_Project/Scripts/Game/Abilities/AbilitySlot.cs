@@ -7,7 +7,8 @@ namespace LostDungeon.Game.Abilities
     {
         public IAbility Ability { get; }
         public Cooldown Cooldown { get; }
-        public bool IsReady => Cooldown.IsReady;
+        public bool Unlocked { get; set; } = true;
+        public bool IsReady => Unlocked && Cooldown.IsReady;
 
         public AbilitySlot(IAbility ability)
         {

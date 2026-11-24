@@ -55,12 +55,25 @@ namespace LostDungeon.Game.Player
             interact.performed -= OnInteract;
             pause.performed -= OnPause;
             Move = Vector2.zero;
+            virtualMove = Vector2.zero;
         }
+
+        private Vector2 virtualMove;
 
         private void Update()
         {
-            Move = move.ReadValue<Vector2>();
+            Vector2 device = move.ReadValue<Vector2>();
+            Move = device.sqrMagnitude > 0.01f ? device : virtualMove;
         }
+
+        /// <summary>On-screen joystick input (mobile). Keyboard or gamepad still wins when used.</summary>
+        public void SetVirtualMove(Vector2 value) => virtualMove = Vector2.ClampMagnitude(value, 1f);
+
+        /// <summary>On-screen buttons call these, so touch goes through the same events as keys.</summary>
+        public void PressAttack() { if (isActiveAndEnabled) AttackPressed?.Invoke(); }
+        public void PressDash() { if (isActiveAndEnabled) DashPressed?.Invoke(); }
+        public void PressFireball() { if (isActiveAndEnabled) FireballPressed?.Invoke(); }
+        public void PressInteract() { if (isActiveAndEnabled) InteractPressed?.Invoke(); }
 
         private void OnAttack(InputAction.CallbackContext _) => AttackPressed?.Invoke();
         private void OnDash(InputAction.CallbackContext _) => DashPressed?.Invoke();

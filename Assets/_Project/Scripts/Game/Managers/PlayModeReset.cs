@@ -13,6 +13,8 @@ namespace LostDungeon.Game.Managers
         private static void ResetStaticState()
         {
             GameEvents.ResetAll();
+            Levels.ExitDoor.ResetStatics();
+            Weather.WorldModifiers.Reset();
         }
     }
 }

@@ -25,6 +25,7 @@ namespace LostDungeon.Game.Player
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // dashes must not pass through walls
             input = GetComponent<PlayerInputReader>();
         }
 

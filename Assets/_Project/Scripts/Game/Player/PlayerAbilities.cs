@@ -54,6 +54,13 @@ namespace LostDungeon.Game.Player
             input.FireballPressed -= OnSpecial;
         }
 
+        /// <summary>The special ability (Fireball) is a reward for finishing level 1.</summary>
+        public void SetSpecialUnlocked(bool unlocked)
+        {
+            if (specialSlot != null)
+                specialSlot.Unlocked = unlocked;
+        }
+
         private void Update()
         {
             foreach (AbilitySlot slot in slots)
@@ -66,8 +73,8 @@ namespace LostDungeon.Game.Player
 
         private void TryUse(AbilitySlot slot)
         {
-            if (slot == null || !slot.IsReady)
-                return;
+            if (slot == null || !slot.IsReady || Time.timeScale == 0f)
+                return; // no attacks while paused or on a menu screen
 
             var context = new AbilityContext(gameObject, transform.position, movement.FacingDirection);
             slot.Ability.Activate(context);

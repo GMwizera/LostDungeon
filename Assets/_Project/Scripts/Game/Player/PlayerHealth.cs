@@ -1,5 +1,6 @@
 using LostDungeon.Core.Combat;
 using LostDungeon.Core.Events;
+using LostDungeon.Game.Platform;
 using LostDungeon.Game.Visuals;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace LostDungeon.Game.Player
         [SerializeField] private HitFlash hitFlash;
 
         private float invulnerableUntil;
+        private int bonusHealth;
 
         public Health Health { get; private set; }
 
@@ -24,7 +26,7 @@ namespace LostDungeon.Game.Player
 
         private void Awake()
         {
-            Health = new Health(maxHealth);
+            Health = new Health(maxHealth + bonusHealth);
             Health.Changed += OnHealthChanged;
             Health.Died += OnDied;
             if (hitFlash == null)
@@ -52,9 +54,13 @@ namespace LostDungeon.Game.Player
             invulnerableUntil = Time.time + invulnerableSeconds;
             if (hitFlash != null)
                 hitFlash.Flash();
+            PlatformFeatures.Vibrate();
         }
 
         public void Heal(int amount) => Health.Heal(amount);
+
+        /// <summary>Extra max health from level rewards. Call before the player object is first enabled.</summary>
+        public void ConfigureMaxHealth(int bonus) => bonusHealth = Mathf.Max(0, bonus);
 
         private void OnHealthChanged(int current, int max)
         {

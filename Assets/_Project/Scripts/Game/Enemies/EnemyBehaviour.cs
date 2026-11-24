@@ -1,3 +1,4 @@
+using LostDungeon.Game.Weather;
 using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
@@ -18,6 +19,7 @@ namespace LostDungeon.Game.Enemies
             float range = enemy.CurrentState == EnemyStateId.Idle
                 ? enemy.Data.DetectionRange
                 : enemy.Data.DetectionRange * 1.5f;
+            range *= WorldModifiers.EnemyDetection; // e.g. shorter at night (weather API)
             return enemy.DistanceToTarget <= range;
         }
     }

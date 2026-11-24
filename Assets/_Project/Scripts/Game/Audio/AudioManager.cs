@@ -10,6 +10,7 @@ namespace LostDungeon.Game.Audio
     /// removing this object leaves a silent but working game.
     /// UI buttons will call Play(UIClick) when the menus are built.
     /// </summary>
+    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
     public class AudioManager : Singleton<AudioManager>
     {
         public const string UIClick = "UIClick";
@@ -21,12 +22,19 @@ namespace LostDungeon.Game.Audio
         private AudioSource[] voices;
         private int nextVoice;
         private float effectsVolume = 1f;
+        private float musicVolume = 1f;
         private int lastPlayerHealth = -1;
 
+        /// <summary>Player's music setting, 0 to 1 (multiplied by the library's base music volume).</summary>
         public float MusicVolume
         {
-            get => musicSource != null ? musicSource.volume : 0f;
-            set { if (musicSource != null) musicSource.volume = Mathf.Clamp01(value); }
+            get => musicVolume;
+            set
+            {
+                musicVolume = Mathf.Clamp01(value);
+                if (musicSource != null && library != null)
+                    musicSource.volume = musicVolume * library.MusicVolume;
+            }
         }
 
         public float EffectsVolume
@@ -58,7 +66,7 @@ namespace LostDungeon.Game.Audio
             if (!IsDuplicate && library != null && library.Music != null)
             {
                 musicSource.clip = library.Music;
-                musicSource.volume = library.MusicVolume;
+                musicSource.volume = musicVolume * library.MusicVolume;
                 musicSource.Play();
             }
         }

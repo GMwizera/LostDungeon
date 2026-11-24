@@ -12,6 +12,15 @@ namespace LostDungeon.Game.Cameras
 
         public void SetTarget(Transform newTarget) => target = newTarget;
 
+        /// <summary>Jumps straight to the target, e.g. when a level starts.</summary>
+        public void SnapToTarget()
+        {
+            if (target == null)
+                return;
+            transform.position = new Vector3(target.position.x, target.position.y, transform.position.z);
+            velocity = Vector3.zero;
+        }
+
         private void LateUpdate()
         {
             if (target == null)

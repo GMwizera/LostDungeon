@@ -9,6 +9,7 @@ namespace LostDungeon.Game.Pooling
     /// One pool per prefab, created the first time that prefab is spawned.
     /// Anything can be pooled just by spawning it through here: fireballs now, enemy arrows and hit effects later.
     /// </summary>
+    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
     public class PoolManager : Singleton<PoolManager>
     {
         [SerializeField] private int maxPooledPerPrefab = 50;
@@ -43,6 +44,22 @@ namespace LostDungeon.Game.Pooling
                 poolable.OnDespawned();
 
             pool.Release(instance);
+        }
+
+        /// <summary>
+        /// Destroys every pooled object and forgets all pools. Called when a level is released,
+        /// because its enemies were made from prefabs inside that level's Addressables bundle.
+        /// </summary>
+        public void Clear()
+        {
+            foreach (GameObject instance in poolsByInstance.Keys)
+                if (instance != null)
+                    Destroy(instance);
+            foreach (Transform container in transform)
+                Destroy(container.gameObject);
+
+            poolsByInstance.Clear();
+            poolsByPrefab.Clear();
         }
 
         /// <summary>Creates instances ahead of time, e.g. while a level loads.</summary>
