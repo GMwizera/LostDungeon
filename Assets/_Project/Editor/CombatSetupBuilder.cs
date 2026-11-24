@@ -71,6 +71,7 @@ namespace LostDungeon.EditorTools
 
                 var collider = barrel.AddComponent<CircleCollider2D>();
                 collider.radius = 0.18f;
+                collider.offset = Vector2.zero; // Unity centres a new collider on the sprite; keep it on the floor
 
                 var flash = barrel.AddComponent<HitFlash>();
                 var prop = barrel.AddComponent<BreakableProp>();
@@ -200,6 +201,25 @@ namespace LostDungeon.EditorTools
             }
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
+        }
+
+        /// <summary>
+        /// Puts every collider in a prefab back at the object's origin (its feet). Adding a collider to an
+        /// object with a sprite makes Unity centre it on the sprite, which for these tall sprites is far above the floor.
+        /// </summary>
+        internal static void ZeroColliderOffsets(string prefabPath)
+        {
+            GameObject root = PrefabUtility.LoadPrefabContents(prefabPath);
+            try
+            {
+                foreach (Collider2D collider in root.GetComponents<Collider2D>())
+                    collider.offset = Vector2.zero;
+                PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
         }
 
         internal static void EnsureFolder(string path)

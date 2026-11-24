@@ -1,0 +1,69 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LostDungeon.uss" />
+    <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
+        <ui:VisualElement class="top-left" picking-mode="Ignore">
+            <ui:VisualElement name="hearts" class="hearts" picking-mode="Ignore" />
+            <ui:Label name="level-name" class="hud-label" picking-mode="Ignore" />
+            <ui:Label name="objective" class="hud-label objective" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="top-right" picking-mode="Ignore">
+            <ui:Label name="conditions" class="hud-label conditions" picking-mode="Ignore" />
+            <ui:VisualElement name="inventory" class="inventory" picking-mode="Ignore" />
+            <ui:Button name="pause-button" text="II" class="pause-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="abilities" class="abilities" picking-mode="Ignore" />
+        <ui:Label name="prompt" class="prompt" picking-mode="Ignore" />
+
+        <ui:VisualElement name="touch" class="touch" picking-mode="Ignore">
+            <ui:VisualElement name="joystick" class="joystick">
+                <ui:VisualElement name="joystick-knob" class="joystick-knob" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="touch-buttons" picking-mode="Ignore">
+                <ui:VisualElement name="touch-attack" class="touch-button" style="right: 0; bottom: 0; width: 110px; height: 110px;" />
+                <ui:VisualElement name="touch-dash" class="touch-button" style="right: 125px; bottom: 0;" />
+                <ui:VisualElement name="touch-fireball" class="touch-button" style="right: 10px; bottom: 125px;" />
+                <ui:VisualElement name="touch-interact" class="touch-button" style="right: 125px; bottom: 110px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="pause-overlay" class="overlay">
+            <ui:VisualElement class="panel">
+                <ui:Label text="Paused" class="title" />
+                <ui:Button name="resume" text="Resume" />
+                <ui:Button name="pause-restart" text="Restart Level" />
+                <ui:Button name="pause-menu" text="Main Menu" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="complete-overlay" class="overlay">
+            <ui:VisualElement class="panel">
+                <ui:Label text="Level Complete!" class="title" />
+                <ui:Label name="complete-reward" class="subtitle" />
+                <ui:Label name="complete-stats" class="subtitle" />
+                <ui:Button name="next-level" text="Next Level" />
+                <ui:Button name="complete-menu" text="Main Menu" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="gameover-overlay" class="overlay">
+            <ui:VisualElement class="panel">
+                <ui:Label text="You Fell in the Dungeon" class="title" />
+                <ui:Button name="retry" text="Try Again" />
+                <ui:Button name="gameover-menu" text="Main Menu" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="loading-overlay" class="overlay">
+            <ui:VisualElement class="panel">
+                <ui:Label text="Entering the Dungeon" class="title" />
+                <ui:VisualElement class="loading-bar">
+                    <ui:VisualElement name="loading-fill" class="loading-fill" />
+                </ui:VisualElement>
+                <ui:Label name="loading-message" text="Loading..." class="subtitle" />
+                <ui:Button name="loading-back" text="Back to Menu" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

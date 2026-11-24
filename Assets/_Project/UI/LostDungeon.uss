@@ -1,0 +1,358 @@
+/* Shared look for every screen: dark stone panels, warm gold accents. */
+
+.screen {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(18, 14, 22);
+    -unity-font-style: normal;
+}
+
+.panel {
+    min-width: 520px;
+    padding: 28px 36px;
+    align-items: stretch;
+    background-color: rgba(38, 30, 40, 0.95);
+    border-width: 3px;
+    border-color: rgb(196, 150, 72);
+    border-radius: 14px;
+}
+
+.title {
+    font-size: 44px;
+    color: rgb(240, 200, 110);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 8px;
+    white-space: normal;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: rgb(200, 190, 210);
+    -unity-text-align: middle-center;
+    white-space: normal;
+    margin-bottom: 18px;
+}
+
+Button {
+    height: 56px;
+    margin: 6px 0;
+    font-size: 24px;
+    color: rgb(245, 235, 220);
+    background-color: rgb(78, 58, 72);
+    border-width: 2px;
+    border-color: rgb(150, 110, 70);
+    border-radius: 10px;
+    -unity-font-style: bold;
+    transition-duration: 0.08s;
+}
+
+Button:hover {
+    background-color: rgb(110, 80, 92);
+    border-color: rgb(240, 200, 110);
+    scale: 1.03 1.03;
+}
+
+Button:active {
+    background-color: rgb(140, 100, 70);
+}
+
+Button:disabled {
+    opacity: 0.4;
+}
+
+.stats {
+    position: absolute;
+    bottom: 18px;
+    font-size: 18px;
+    color: rgb(170, 160, 180);
+}
+
+Slider, Toggle {
+    margin: 10px 0;
+    font-size: 22px;
+    color: rgb(230, 220, 210);
+}
+
+Slider Label, Toggle Label {
+    min-width: 160px;
+    color: rgb(230, 220, 210);
+}
+
+/* ---------- Level select ---------- */
+
+.level-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 12px 0 18px 0;
+}
+
+.level-tile {
+    width: 150px;
+    height: 170px;
+    margin: 8px;
+    padding: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.level-tile--completed {
+    border-color: rgb(240, 200, 110);
+    background-color: rgb(70, 60, 40);
+}
+
+.level-tile--available {
+    border-color: rgb(120, 220, 140);
+    background-color: rgb(46, 74, 56);
+}
+
+.level-tile--locked {
+    background-color: rgb(40, 38, 44);
+    border-color: rgb(70, 68, 74);
+}
+
+.level-number {
+    font-size: 44px;
+    color: rgb(250, 240, 220);
+}
+
+.level-badge {
+    width: 56px;
+    height: 56px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.level-name {
+    font-size: 14px;
+    color: rgb(220, 210, 200);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+    flex-grow: 1;
+}
+
+.top-left {
+    position: absolute;
+    left: 20px;
+    top: 16px;
+}
+
+.top-right {
+    position: absolute;
+    right: 20px;
+    top: 16px;
+    align-items: flex-end;
+}
+
+.hearts {
+    flex-direction: row;
+}
+
+.heart {
+    width: 34px;
+    height: 34px;
+    margin-right: 4px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.hud-label {
+    font-size: 20px;
+    color: rgb(245, 235, 220);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: black;
+    margin-top: 6px;
+}
+
+.objective {
+    color: rgb(240, 200, 110);
+}
+
+.conditions {
+    font-size: 16px;
+    max-width: 420px;
+    white-space: normal;
+    -unity-text-align: upper-right;
+}
+
+.inventory {
+    flex-direction: row;
+    margin-top: 8px;
+}
+
+.inventory-item {
+    flex-direction: row;
+    align-items: center;
+    margin-left: 12px;
+    padding: 4px 10px;
+    background-color: rgba(0, 0, 0, 0.45);
+    border-radius: 8px;
+}
+
+.inventory-icon {
+    width: 30px;
+    height: 30px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.inventory-count {
+    font-size: 22px;
+    color: white;
+    margin-left: 4px;
+}
+
+.pause-button {
+    width: 56px;
+    height: 56px;
+    margin-top: 10px;
+    font-size: 22px;
+}
+
+.abilities {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.ability-slot {
+    width: 74px;
+    height: 74px;
+    margin: 0 8px;
+    background-color: rgba(20, 16, 24, 0.8);
+    border-width: 2px;
+    border-color: rgb(196, 150, 72);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ability-icon {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.ability-cooldown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.ability-lock {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    right: 14px;
+    bottom: 14px;
+    -unity-background-scale-mode: scale-to-fit;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.ability-key {
+    position: absolute;
+    bottom: 2px;
+    right: 6px;
+    font-size: 13px;
+    color: rgb(240, 220, 180);
+}
+
+.prompt {
+    position: absolute;
+    bottom: 110px;
+    align-self: center;
+    font-size: 22px;
+    color: white;
+    padding: 6px 16px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+}
+
+/* ---------- Overlays ---------- */
+
+.overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.loading-bar {
+    height: 22px;
+    margin: 18px 0;
+    background-color: rgb(30, 26, 34);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.loading-fill {
+    height: 100%;
+    width: 0;
+    background-color: rgb(240, 200, 110);
+}
+
+/* ---------- Touch controls ---------- */
+
+.touch {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 260px;
+}
+
+.joystick {
+    position: absolute;
+    left: 40px;
+    bottom: 40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 90px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.35);
+    align-items: center;
+    justify-content: center;
+}
+
+.joystick-knob {
+    width: 76px;
+    height: 76px;
+    border-radius: 38px;
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+.touch-buttons {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 240px;
+    height: 220px;
+}
+
+.touch-button {
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    border-radius: 46px;
+    background-color: rgba(196, 150, 72, 0.45);
+    border-width: 2px;
+    border-color: rgba(255, 230, 180, 0.7);
+    -unity-background-scale-mode: scale-to-fit;
+}

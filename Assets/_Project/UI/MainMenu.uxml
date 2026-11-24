@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="LostDungeon.uss" />
+    <ui:VisualElement name="root" class="screen">
+        <ui:VisualElement name="main-panel" class="panel">
+            <ui:Label text="Chronicles of the Lost Dungeon" class="title" />
+            <ui:Label name="conditions" text="Checking Kigali weather..." class="subtitle" />
+            <ui:Button name="start" text="Start Game" />
+            <ui:Button name="continue" text="Continue" />
+            <ui:Button name="levels" text="Level Select" />
+            <ui:Button name="settings" text="Settings" />
+            <ui:Button name="exit" text="Exit" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="levels-panel" class="panel">
+            <ui:Label text="Choose a Level" class="title" />
+            <ui:VisualElement name="level-grid" class="level-grid" />
+            <ui:Button name="levels-back" text="Back" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-panel" class="panel">
+            <ui:Label text="Settings" class="title" />
+            <ui:Slider name="music" label="Music" low-value="0" high-value="1" />
+            <ui:Slider name="effects" label="Effects" low-value="0" high-value="1" />
+            <ui:Toggle name="touch" label="Touch controls" />
+            <ui:Button name="reset" text="Reset progress" />
+            <ui:Button name="settings-back" text="Back" />
+        </ui:VisualElement>
+
+        <ui:Label name="stats" class="stats" />
+    </ui:VisualElement>
+</ui:UXML>

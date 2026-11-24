@@ -4,7 +4,12 @@
     "references": [
         "LostDungeon.Game",
         "Unity.2D.Tilemap.Editor",
-        "Unity.RenderPipelines.Universal.2D.Runtime"
+        "Unity.RenderPipelines.Universal.2D.Runtime",
+        "Unity.Addressables.Editor",
+        "Unity.Addressables",
+        "UnityEngine.UI",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [
         "Editor"

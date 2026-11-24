@@ -103,7 +103,10 @@ namespace LostDungeon.EditorTools
             string path = $"{EnemyPrefabFolder}/{name}.prefab";
             var existing = AssetDatabase.LoadAssetAtPath<EnemyController>(path);
             if (existing != null)
-                return existing;
+            {
+                ZeroColliderOffsets(path); // repairs prefabs made before the offset fix
+                return AssetDatabase.LoadAssetAtPath<EnemyController>(path);
+            }
 
             var root = new GameObject(name);
 
@@ -118,7 +121,9 @@ namespace LostDungeon.EditorTools
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
             body.interpolation = RigidbodyInterpolation2D.Interpolate;
 
-            root.AddComponent<CircleCollider2D>().radius = 0.12f;
+            var feet = root.AddComponent<CircleCollider2D>();
+            feet.radius = 0.12f;
+            feet.offset = Vector2.zero; // Unity centres a new collider on the sprite; keep it at the feet
             SetValues(root.AddComponent<Faction>(), ("team", (int)Team.Enemy));
 
             var flash = root.AddComponent<HitFlash>();

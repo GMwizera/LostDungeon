@@ -25,21 +25,21 @@ namespace LostDungeon.EditorTools
     /// </summary>
     public static class TestRoomBuilder
     {
-        private const string ArtRoot = "Assets/_Project/Art/kenney_isometric-miniature-dungeon";
-        private const string IsoFolder = ArtRoot + "/Isometric";
+        internal const string ArtRoot = "Assets/_Project/Art/kenney_isometric-miniature-dungeon";
+        internal const string IsoFolder = ArtRoot + "/Isometric";
         private const string TilesFolder = "Assets/_Project/Art/Tiles";
         private const string PaletteFolder = "Assets/_Project/Art";
         private const string PaletteName = "Dungeon";
         private const string ScenePath = "Assets/_Project/Scenes/TestRoom.unity";
         private const string SpriteSetPath = "Assets/_Project/ScriptableObjects/MaleSpriteSet.asset";
 
-        private static readonly Vector3 CellSize = new Vector3(1f, 0.5f, 1f);
+        internal static readonly Vector3 CellSize = new Vector3(1f, 0.5f, 1f);
         private const int RoomWidth = 10;
         private const int RoomHeight = 10;
 
-        private const int FloorOrder = -2;
-        private const int FloorDecalOrder = -1;
-        private const int ObjectOrder = 0; // walls, props, characters sort against each other by Y
+        internal const int FloorOrder = -2;
+        internal const int FloorDecalOrder = -1;
+        internal const int ObjectOrder = 0; // walls, props, characters sort against each other by Y
 
         // Walkable art: no collider.
         private static readonly string[] FloorNames =
@@ -55,7 +55,88 @@ namespace LostDungeon.EditorTools
             "chestClosed", "chestOpen", "tableRound", "tableShortChairs",
         };
 
-        private static readonly string[] Facings = { "N", "E", "S", "W" };
+        internal static readonly string[] Facings = { "N", "E", "S", "W" };
+
+        /// <summary>
+        /// Loads every tile again from disk. Opening or creating a scene unloads assets nothing uses,
+        /// and painting with an unloaded tile silently leaves the cell empty, so call this after any scene change.
+        /// </summary>
+        internal static Dictionary<string, Tile> ReloadTiles(Dictionary<string, Tile> tiles)
+        {
+            var fresh = new Dictionary<string, Tile>();
+            foreach (string name in tiles.Keys)
+            {
+                var tile = AssetDatabase.LoadAssetAtPath<Tile>($"{TilesFolder}/{name}.asset");
+                if (tile == null)
+                    throw new System.InvalidOperationException($"Tile asset {name} is missing.");
+                fresh[name] = tile;
+            }
+            return fresh;
+        }
+
+        /// <summary>
+        /// Gives every wall cell a solid diamond in one PolygonCollider2D. Unity's automatic tile colliders
+        /// (TilemapCollider2D with Grid shapes) could be found by raycasts on this isometric grid but did not
+        /// stop the player, so the shape is computed here instead. Paths are counter-clockwise, as 2D physics expects.
+        /// </summary>
+        internal static void BuildWallCollider(Tilemap walls)
+        {
+            var collider = walls.GetComponent<PolygonCollider2D>();
+            var paths = new List<Vector2[]>();
+            Vector3 size = walls.layoutGrid.cellSize;
+            float halfWidth = size.x * 0.5f, halfHeight = size.y * 0.5f;
+
+            walls.CompressBounds();
+            foreach (Vector3Int cell in walls.cellBounds.allPositionsWithin)
+            {
+                if (!walls.HasTile(cell))
+                    continue;
+                Vector2 c = walls.transform.InverseTransformPoint(walls.GetCellCenterWorld(cell));
+                paths.Add(new[]
+                {
+                    new Vector2(c.x, c.y - halfHeight), // bottom
+                    new Vector2(c.x + halfWidth, c.y),  // right
+                    new Vector2(c.x, c.y + halfHeight), // top
+                    new Vector2(c.x - halfWidth, c.y),  // left
+                });
+            }
+
+            collider.pathCount = paths.Count;
+            for (int i = 0; i < paths.Count; i++)
+                collider.SetPath(i, paths[i]);
+        }
+
+        /// <summary>Invisible tile that only blocks movement (room corners, behind doors).</summary>
+        internal const string BlockerTile = "Blocker";
+
+        private static Tile CreateBlockerTile()
+        {
+            string path = $"{TilesFolder}/{BlockerTile}.asset";
+            var tile = AssetDatabase.LoadAssetAtPath<Tile>(path);
+            if (tile == null)
+            {
+                tile = ScriptableObject.CreateInstance<Tile>();
+                AssetDatabase.CreateAsset(tile, path);
+            }
+            tile.sprite = null;
+            tile.colliderType = Tile.ColliderType.Grid;
+            EditorUtility.SetDirty(tile);
+            return tile;
+        }
+
+        /// <summary>Reimports the art, builds the character sprite set, the tiles and the palette.</summary>
+        internal static Dictionary<string, Tile> PrepareAssets()
+        {
+            AssetDatabase.ImportAsset(IsoFolder, ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+            AssetDatabase.ImportAsset(ArtRoot + "/Characters", ImportAssetOptions.ImportRecursive | ImportAssetOptions.ForceUpdate);
+            CharacterSpriteSetBuilder.Build();
+            Dictionary<string, Tile> tiles = CreateTiles();
+            CreatePalette(tiles);
+            return tiles;
+        }
+
+        /// <summary>Rebuilds only the TestRoom scene (and the shared combat, enemy and audio assets).</summary>
+        internal static void BuildSceneOnly(Dictionary<string, Tile> tiles) => BuildScene(tiles);
 
         [MenuItem("Tools/Lost Dungeon/Build Test Room")]
         public static void BuildAll()
@@ -98,6 +179,7 @@ namespace LostDungeon.EditorTools
                 CreateTileSet(name, Tile.ColliderType.None, tiles);
             foreach (string name in SolidNames)
                 CreateTileSet(name, Tile.ColliderType.Grid, tiles);
+            tiles[BlockerTile] = CreateBlockerTile();
 
             AssetDatabase.SaveAssets();
             return tiles;
@@ -173,6 +255,7 @@ namespace LostDungeon.EditorTools
             Scene scene = SceneManager.GetActiveScene();
             if (scene.path != ScenePath)
                 scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            tiles = ReloadTiles(tiles); // the scene change may have unloaded them
 
             foreach (GameObject go in scene.GetRootGameObjects())
             {
@@ -182,12 +265,13 @@ namespace LostDungeon.EditorTools
             }
 
             Grid grid = CreateGrid();
-            Tilemap floor = CreateTilemap(grid, "Floor", FloorOrder, TilemapRenderer.Mode.Chunk);
+            Tilemap floor = CreateTilemap(grid, "Floor", FloorOrder, TilemapRenderer.Mode.Individual);
             Tilemap walls = CreateTilemap(grid, "Walls", ObjectOrder, TilemapRenderer.Mode.Individual);
             AddWallCollision(walls.gameObject);
 
             PaintFloor(floor, tiles);
             PaintWalls(walls, tiles);
+            BuildWallCollider(walls);
 
             GameObject player = CreatePlayer(grid.GetCellCenterWorld(new Vector3Int(RoomWidth / 2, RoomHeight / 2, 0)));
             CreateTrap(grid.GetCellCenterWorld(new Vector3Int(3, 4, 0)));
@@ -210,7 +294,7 @@ namespace LostDungeon.EditorTools
             Selection.activeGameObject = player;
         }
 
-        private static Grid CreateGrid()
+        internal static Grid CreateGrid()
         {
             var go = new GameObject("Grid");
             var grid = go.AddComponent<Grid>();
@@ -219,7 +303,7 @@ namespace LostDungeon.EditorTools
             return grid;
         }
 
-        private static Tilemap CreateTilemap(Grid grid, string name, int order, TilemapRenderer.Mode mode)
+        internal static Tilemap CreateTilemap(Grid grid, string name, int order, TilemapRenderer.Mode mode)
         {
             var go = new GameObject(name);
             go.transform.SetParent(grid.transform, false);
@@ -230,15 +314,10 @@ namespace LostDungeon.EditorTools
             return tilemap;
         }
 
-        private static void AddWallCollision(GameObject walls)
+        internal static void AddWallCollision(GameObject walls)
         {
-            var body = walls.AddComponent<Rigidbody2D>();
-            body.bodyType = RigidbodyType2D.Static;
-
-            var tileCollider = walls.AddComponent<TilemapCollider2D>();
-            tileCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
-
-            walls.AddComponent<CompositeCollider2D>();
+            // The shape itself is added by BuildWallCollider once the walls are painted.
+            walls.AddComponent<PolygonCollider2D>().pathCount = 0;
         }
 
         private static void PaintFloor(Tilemap floor, Dictionary<string, Tile> tiles)
@@ -272,11 +351,15 @@ namespace LostDungeon.EditorTools
                 walls.SetTile(new Vector3Int(-1, y, 0), tiles["stoneWallHalf_S"]);     // front-left
             }
 
+            foreach (var corner in new[] { new Vector3Int(-1, -1, 0), new Vector3Int(RoomWidth, -1, 0),
+                         new Vector3Int(-1, RoomHeight, 0), new Vector3Int(RoomWidth, RoomHeight, 0) })
+                walls.SetTile(corner, tiles[BlockerTile]);
+
             // A solid prop so depth sorting is easy to see. Breakable barrels are added separately.
             walls.SetTile(new Vector3Int(8, 8, 0), tiles["woodenCrates_N"]);
         }
 
-        private static GameObject CreatePlayer(Vector3 position)
+        internal static GameObject CreatePlayer(Vector3 position)
         {
             var player = new GameObject("Player");
             player.transform.position = position;
@@ -289,13 +372,17 @@ namespace LostDungeon.EditorTools
             body.gravityScale = 0f;
             body.constraints = RigidbodyConstraints2D.FreezeRotation;
             body.interpolation = RigidbodyInterpolation2D.Interpolate;
+            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
             var circle = player.AddComponent<CircleCollider2D>();
             circle.radius = 0.12f;
+            circle.offset = Vector2.zero; // Unity centres a new collider on the sprite; keep it at the feet
 
             player.AddComponent<PlayerInputReader>();
             player.AddComponent<PlayerMovement>();
             player.AddComponent<PlayerHealth>();
+            player.AddComponent<LostDungeon.Game.Inventory.PlayerInventory>();
+            player.AddComponent<LostDungeon.Game.Interaction.PlayerInteractor>();
 
             var animator = player.AddComponent<DirectionalSpriteAnimator>();
             SetField(animator, "sprites", AssetDatabase.LoadAssetAtPath<CharacterSpriteSet>(SpriteSetPath));
@@ -304,7 +391,7 @@ namespace LostDungeon.EditorTools
             return player;
         }
 
-        private static void CreateTrap(Vector3 position)
+        internal static void CreateTrap(Vector3 position)
         {
             var trap = new GameObject("Trap");
             trap.transform.position = position;
