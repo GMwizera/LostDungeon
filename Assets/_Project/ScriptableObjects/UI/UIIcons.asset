@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7a9c717dca3a4d54b9f5da1c01f54da, type: 3}
+  m_Name: UIIcons
+  m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.UI.UIIcons
+  heartFull: {fileID: 7628381673963040024, guid: f7f90b372732948119dfd331bd0fee74, type: 3}
+  heartEmpty: {fileID: -3170424875405864017, guid: 781f088eb3ab74ee1b3537359d55cda5, type: 3}
+  locked: {fileID: -5620155193319629329, guid: c4ff78868499242eaa8466d0c2cd18e9, type: 3}
+  completed: {fileID: -6415649246072548017, guid: 0d6d0e200aeab4136b02ae81f3d24e49, type: 3}
+  available: {fileID: 6208176927266180224, guid: 31457521cf8414c6cb17f732826947cc, type: 3}
+  gold: {fileID: -3338749442709606003, guid: a9ee0df123c5a4f8f8230617287846a8, type: 3}
+  key: {fileID: 1694913177206695654, guid: 771420387a0ac4412ac66235aabfa500, type: 3}
+  potion: {fileID: -2880734798192188640, guid: 015aad81a37914e49a29c5101559110f, type: 3}
+  sword: {fileID: 712035800519618848, guid: e92adb14a8b96428cab8e021d699056f, type: 3}
+  dash: {fileID: -7848039375673857549, guid: 506413368c16941c081a88ca257db683, type: 3}
+  fireball: {fileID: -6607481912129624618, guid: c3b2cb3369c0e4eb3845943667a7ea01, type: 3}

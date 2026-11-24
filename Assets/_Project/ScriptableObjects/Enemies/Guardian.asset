@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88820e82500954be48118e6e1e666b5a, type: 3}
+  m_Name: Guardian
+  m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Enemies.EnemyData
+  id: Guardian
+  tint: {r: 0.55, g: 0.7, b: 1, a: 1}
+  scale: 1.2
+  maxHealth: 8
+  armor: 1
+  moveSpeed: 1.1
+  detectionRange: 3
+  attackRange: 0.45
+  preferredDistance: 2
+  guardRadius: 1.8
+  behaviour: {fileID: 11400000, guid: 30cf5689eb6274852927069bd0030e6a, type: 2}
+  attack: {fileID: 11400000, guid: 3ad66908e429b4e5ab03a499fb77264f, type: 2}

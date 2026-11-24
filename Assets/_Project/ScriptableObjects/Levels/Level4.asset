@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4159a66563f5c44bf87d85728b6fb81c, type: 3}
+  m_Name: Level4
+  m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Levels.LevelDefinition
+  number: 4
+  displayName: Collapsed Halls
+  addressKey: Level4
+  rewardUnlock: 
+  rewardDescription: The halls are clear. One vault remains.

@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a9e2a72c96ab46abbda51a2d0837d04, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Audio.SoundLibrary
+  music: {fileID: 8300000, guid: e357bbcae0f744ce8b8add683783e7f1, type: 3}
+  musicVolume: 0.35
+  sounds:
+  - id: Sword
+    clips:
+    - {fileID: 8300000, guid: 9a5b863defa5e448c82f4aa3e9e18f4e, type: 3}
+    volume: 0.7
+    pitchVariation: 0.08
+  - id: Dash
+    clips:
+    - {fileID: 8300000, guid: 08f145243bdca4d4099cde180b1b363b, type: 3}
+    volume: 0.5
+    pitchVariation: 0.08
+  - id: Fireball
+    clips:
+    - {fileID: 8300000, guid: aae58cf926c3f4c6bbc11d268f6e200f, type: 3}
+    volume: 0.6
+    pitchVariation: 0.08
+  - id: EnemyAttack
+    clips:
+    - {fileID: 8300000, guid: 540b40517e78749c58f0fce5bf7c7d37, type: 3}
+    volume: 0.5
+    pitchVariation: 0.08
+  - id: EnemyAttack.Archer
+    clips:
+    - {fileID: 8300000, guid: 9ac69eb11c3744f95801ed3e08bad9a4, type: 3}
+    volume: 0.6
+    pitchVariation: 0.08
+  - id: EnemyDefeated
+    clips:
+    - {fileID: 8300000, guid: 273b19241b4394230b3a1e5e3d0a479f, type: 3}
+    volume: 0.6
+    pitchVariation: 0.08
+  - id: PlayerHurt
+    clips:
+    - {fileID: 8300000, guid: e5f31efab110540bc9dae179e7c8fa1b, type: 3}
+    volume: 0.7
+    pitchVariation: 0.08
+  - id: PlayerDied
+    clips:
+    - {fileID: 8300000, guid: 66779962d30d64c62afe9aabda672def, type: 3}
+    volume: 0.7
+    pitchVariation: 0.08
+  - id: ItemCollected
+    clips:
+    - {fileID: 8300000, guid: c7d912047f9644fdd841da16dcabdc0c, type: 3}
+    volume: 0.6
+    pitchVariation: 0.08
+  - id: LevelComplete
+    clips:
+    - {fileID: 8300000, guid: ed819475c255043fb97be7390c114944, type: 3}
+    volume: 0.7
+    pitchVariation: 0.08
+  - id: UIClick
+    clips:
+    - {fileID: 8300000, guid: cce649ddcecae41d48cd8b545b81f17d, type: 3}
+    volume: 0.5
+    pitchVariation: 0.08
