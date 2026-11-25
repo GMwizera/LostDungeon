@@ -27,7 +27,7 @@ An isometric dungeon crawler made in Unity 6 for the Advanced C# summative. Figh
 2. Run **Tools > Lost Dungeon > Build Game** once. It generates the levels, scenes, icons, sounds and Addressables entries.
 3. Open `Assets/_Project/Scenes/MainMenu.unity` and press Play.
 
-Tests: **Window > General > Test Runner**. EditMode has 71 unit tests; PlayMode has 4 tests that run the real game.
+Tests: **Window > General > Test Runner**. EditMode has 74 unit tests; PlayMode has 5 tests that run the real game.
 
 ## Features
 
@@ -41,6 +41,27 @@ Tests: **Window > General > Test Runner**. EditMode has 71 unit tests; PlayMode 
 - **Interaction**: chests, a locked exit door, keys, gold, healing potions, breakable barrels and floor traps.
 - **UI**: main menu, level select, settings (music, effects, touch controls, reset progress), HUD (hearts, ability cooldowns, inventory, objective, level name, dungeon conditions), pause, level complete and game over screens.
 - **Audio**: music, combat, enemy, UI and level-complete sounds.
+
+## UI design (Google Stitch)
+
+The interface was designed in **Google Stitch** and then rebuilt in Unity UI Toolkit. The Stitch screens and the design system are in [`Docs/stitch`](Docs/stitch).
+
+The design system, "Abyssal Crypt", uses pure black panels, square corners and 1px borders, with one colour per meaning:
+
+| Colour | Meaning |
+|---|---|
+| Amber gold `#f59e0b` | Loot, keys, main buttons |
+| Frost cyan `#38bdf8` | Weather, dash, completed rooms |
+| Crimson `#ef4444` | Health, enemies, danger |
+| Jade `#10b981` | Rewards earned, exit open |
+
+Screens taken from the designs:
+- **Dungeon Hub** (main menu): live Kigali weather card, hero status (hearts, arsenal, pouch) and the menu.
+- **Dungeon Chamber Matrix** (level select): one card per room with a status icon, enemies and reward.
+- **Combat HUD**: hearts, key counter, gate chip, objective bar with foe count, weather banner, ability slots, touch controls.
+- **Expedition Debrief** (level complete): progress track, weather link, spoils list and the next-level button.
+
+The dungeon tiles are tinted darker and cooler to match the obsidian mood, with a warm torch light around the player.
 
 ## Architecture
 
@@ -170,7 +191,7 @@ Input uses the Input System with keyboard/mouse, gamepad and on-screen touch con
 
 ## Tests
 
-71 EditMode unit tests (NUnit) and 4 PlayMode tests. The PlayMode tests start the real game from the main menu, load every level through Addressables, check with real physics that walls and room corners are solid, and push the player into every wall while dashing to make sure it can't leave the room. The unit tests cover: damage calculation, health, inventory logic, level unlocking, save/load (including corrupt saves), state machine transitions, A* correctness, the min-heap, object pool behaviour, cooldowns, events, direction maths and weather rules.
+74 EditMode unit tests (NUnit) and 5 PlayMode tests. The PlayMode tests start the real game from the main menu, play level 1 to the end (save, unlock and debrief screen), load every level through Addressables, check with real physics that walls and room corners are solid, and push the player into every wall while dashing to make sure it can't leave the room. The unit tests cover: damage calculation, health, inventory logic, level unlocking, save/load (including corrupt saves), state machine transitions, A* correctness, the min-heap, object pool behaviour, cooldowns, events, direction maths and weather rules.
 
 ## Credits
 
