@@ -12,6 +12,7 @@ namespace LostDungeon.Game.Managers
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStaticState()
         {
+            AppQuitting.Value = false;
             GameEvents.ResetAll();
             Levels.ExitDoor.ResetStatics();
             Weather.WorldModifiers.Reset();

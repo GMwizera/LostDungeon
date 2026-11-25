@@ -190,7 +190,7 @@ namespace LostDungeon.Game.UI
             time.AddToClassList("fe-ability-time");
             button.Add(time);
 
-            if (!PlatformFeatures.IsMobile)
+            if (ShowKeyHints)
             {
                 var key = new Label(keyHint) { pickingMode = PickingMode.Ignore };
                 key.AddToClassList("fe-ability-key");
@@ -209,6 +209,9 @@ namespace LostDungeon.Game.UI
             bar.Add(button);
             abilities[abilityName] = new AbilityView { Root = button, Ring = ring, Time = time, Lock = lockIcon };
         }
+
+        /// <summary>Key letters like Q or E only help on a keyboard, so hide them on touch screens.</summary>
+        private static bool ShowKeyHints => !PlatformFeatures.IsMobile && Touchscreen.current == null;
 
         private void BindButtons()
         {
@@ -339,7 +342,7 @@ namespace LostDungeon.Game.UI
         private void OnPromptChanged(string text)
         {
             UISounds.Show(prompt, !string.IsNullOrEmpty(text));
-            prompt.text = PlatformFeatures.IsMobile ? text?.ToUpperInvariant() : $"[E]  {text?.ToUpperInvariant()}";
+            prompt.text = !ShowKeyHints ? text?.ToUpperInvariant() : $"[E]  {text?.ToUpperInvariant()}";
         }
 
         private void OnAbilityActivated(string abilityName, float cooldown)

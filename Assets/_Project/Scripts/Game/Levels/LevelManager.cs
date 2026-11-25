@@ -147,7 +147,7 @@ namespace LostDungeon.Game.Levels
         /// </summary>
         private void ReleaseLevel()
         {
-            if (PoolManager.HasInstance)
+            if (PoolManager.HasInstance && PoolManager.Instance != null)
                 PoolManager.Instance.Clear();
 
             if (levelHandle.IsValid())

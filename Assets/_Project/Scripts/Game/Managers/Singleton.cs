@@ -9,13 +9,12 @@ namespace LostDungeon.Game.Managers
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
         private static T instance;
-        private static bool quitting;
 
         public static T Instance
         {
             get
             {
-                if (quitting)
+                if (AppQuitting.Value)
                     return null;
 
                 if (instance == null)
@@ -44,18 +43,26 @@ namespace LostDungeon.Game.Managers
             }
 
             instance = (T)this;
-            quitting = false;
 
             if (transform.parent == null)
                 DontDestroyOnLoad(gameObject);
         }
 
-        protected virtual void OnApplicationQuit() => quitting = true;
+        protected virtual void OnApplicationQuit() => AppQuitting.Value = true;
 
         protected virtual void OnDestroy()
         {
             if (instance == this)
                 instance = null;
         }
+    }
+
+    /// <summary>
+    /// True while the game is closing, so managers don't get made again.
+    /// One shared flag, so PlayModeReset can clear it before the next Play.
+    /// </summary>
+    internal static class AppQuitting
+    {
+        public static bool Value;
     }
 }

@@ -9,7 +9,23 @@ A 3D dungeon game in Unity 6. Clear 5 rooms of skeletons, find keys and escape. 
 | Android | [LostDungeon.apk](https://github.com/GMwizera/LostDungeon/releases/download/v1.0/LostDungeon.apk) |
 | Videos | _add link_ |
 
-## Run it
+## Install and play
+
+**Web:** open the Unity Play link and click Play. Nothing to install.
+
+**Windows:**
+1. Download `LostDungeon-Windows.zip`.
+2. Right-click it, choose **Extract All**, and open the new folder.
+3. Double-click `LostDungeon.exe`.
+4. If Windows says "Windows protected your PC", click **More info**, then **Run anyway**. It shows because the game is not signed.
+
+**Android:**
+1. On your phone, open the `LostDungeon.apk` link in Chrome and download it.
+2. Open the file. If Android asks, allow **Install unknown apps** for Chrome, then go back.
+3. Tap **Install**, then **Open**. If Play Protect warns you, tap **Install anyway**.
+4. Hold the phone sideways. Drag the left side to move, tap the round buttons to fight.
+
+## Run it in Unity
 
 Open in Unity **6000.6.7f1**, click **Tools > Lost Dungeon > Build Game**, open `Scenes/MainMenu` and press Play.
 

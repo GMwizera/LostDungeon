@@ -23,11 +23,19 @@ namespace LostDungeon.EditorTools
         [MenuItem("Tools/Lost Dungeon/Build/WebGL")]
         public static void BuildWebGL() => Build(BuildTarget.WebGL, "WebGL");
 
+        // For showing desktop play on a Mac. Same desktop code as the Windows build.
+        [MenuItem("Tools/Lost Dungeon/Build/macOS")]
+        public static void BuildMac() => Build(BuildTarget.StandaloneOSX, "macOS/LostDungeon.app");
+
         [MenuItem("Tools/Lost Dungeon/Build/Android")]
         public static void BuildAndroid() => Build(BuildTarget.Android, "Android/LostDungeon.apk");
 
         private static void Build(BuildTarget target, string relativePath)
         {
+            // Addressables content is built for the active platform, so switch to the target first.
+            if (EditorUserBuildSettings.activeBuildTarget != target)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildPipeline.GetBuildTargetGroup(target), target);
+
             ConfigurePlayer();
             BuildAddressables();
 
@@ -76,6 +84,12 @@ namespace LostDungeon.EditorTools
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.giselemwizera.lostdungeon");
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+
+            // OpenGL ES 3 first, Vulkan as backup. Every modern phone has GLES 3,
+            // and Android emulators crash on Vulkan, so this works on both.
+            PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.Android, false);
+            PlayerSettings.SetGraphicsAPIs(BuildTarget.Android,
+                new[] { UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3, UnityEngine.Rendering.GraphicsDeviceType.Vulkan });
 
             // The fallback lets the web build load on sites like Unity Play.
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
