@@ -4,9 +4,8 @@ using System.Collections.Generic;
 namespace LostDungeon.Core.Navigation
 {
     /// <summary>
-    /// Binary min-heap: always hands back the item with the lowest priority in O(log n).
-    /// A* uses it to pick the most promising cell next. Equal priorities come out in insertion order,
-    /// so paths are the same every run.
+    /// Min-heap: quickly gives back the item with the lowest score, in O(log n).
+    /// A* uses it to pick the best next cell. Ties come out in the order added, so paths never change.
     /// </summary>
     public class MinHeap<T>
     {

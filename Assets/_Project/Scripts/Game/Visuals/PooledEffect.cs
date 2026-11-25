@@ -3,17 +3,14 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Visuals
 {
-    /// <summary>
-    /// A short visual effect (sword slash, wind burst, hit sparks). Spawned from the pool, it restarts
-    /// its particles and fades its lights and meshes, then returns itself to the pool when finished.
-    /// </summary>
+    /// <summary>A short pooled effect, like a slash or sparks. It goes back to the pool when done.</summary>
     public class PooledEffect : MonoBehaviour, IPoolable
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
         [SerializeField] private float lifetime = 0.6f;
         [SerializeField] private bool fadeMeshes = true;
-        [SerializeField] private float spin; // degrees per second around the vertical axis (wind)
+        [SerializeField] private float spin; // spin speed in degrees per second
 
         private ParticleSystem[] particles;
         private Light[] lights;

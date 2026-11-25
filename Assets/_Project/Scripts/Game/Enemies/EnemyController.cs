@@ -18,10 +18,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Enemies
 {
     /// <summary>
-    /// Shared body for every enemy type. Each frame the EnemyData's behaviour picks a state,
-    /// and the state machine runs it. The controller only offers basic actions (move, follow a path,
-    /// attack, die) that states use, so it never needs to change when a new enemy type is added.
-    /// Pooled: spawned and removed through PoolManager.
+    /// The body every enemy shares. Each frame the brain picks a state and the state machine runs it.
+    /// New enemy types don't need changes here. Enemies come from the pool.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class EnemyController : MonoBehaviour, IDamageable, IPoolable
@@ -47,7 +45,7 @@ namespace LostDungeon.Game.Enemies
         private float repathTimer;
         private bool initialised;
         private Vector2 wantedVelocity;
-        private float windUpLeft = -1f; // below zero = not winding up
+        private float windUpLeft = -1f; // below zero means no attack coming
         private float stuckTime;
         private float retargetTimer;
 
@@ -64,13 +62,10 @@ namespace LostDungeon.Game.Enemies
         public bool AttackReady => attackCooldown != null && attackCooldown.IsReady;
         public bool IsDead => health == null || health.IsDead;
 
-        /// <summary>
-        /// True when the enemy has been trying to move but a wall or obstacle has held it in place
-        /// for a moment (e.g. an archer backed into a corner).
-        /// </summary>
+        /// <summary>True when a wall keeps the enemy from moving, like an archer in a corner.</summary>
         public bool IsStuck => stuckTime > 0.35f;
 
-        /// <summary>For the HUD's name plate: 0 to 1.</summary>
+        /// <summary>Health from 0 to 1, for the bar over its head.</summary>
         public float HealthFraction => health == null ? 0f : (float)health.Current / health.Max;
 
         private void Awake()
@@ -95,7 +90,7 @@ namespace LostDungeon.Game.Enemies
             };
         }
 
-        // Placed straight into a scene (not spawned from a pool): set up on Start.
+        // For enemies put in the scene by hand, not from the pool.
         private void Start()
         {
             if (!initialised)
@@ -140,8 +135,7 @@ namespace LostDungeon.Game.Enemies
         }
 
         /// <summary>
-        /// Looks for the player. A room's enemies spawn while the level is still loading, before the player
-        /// has been placed and switched on, so this is retried until the player is found.
+        /// Finds the player. Enemies spawn before the player is placed, so we keep looking.
         /// </summary>
         private void FindTarget()
         {
@@ -197,7 +191,7 @@ namespace LostDungeon.Game.Enemies
             stateMachine.ChangeState(states[next]);
         }
 
-        // ---------- Actions used by states ----------
+        // ---------- Actions the states use ----------
 
         public void Stop()
         {
@@ -223,13 +217,13 @@ namespace LostDungeon.Game.Enemies
             repathTimer = 0f;
         }
 
-        /// <summary>Walks along an A* path to the destination, recalculating it a few times per second.</summary>
+        /// <summary>Walks an A* path to a spot, redoing the path often.</summary>
         public void FollowPathTo(Vector2 destination, float deltaTime)
         {
             LevelNavigationGrid grid = LevelNavigationGrid.Current;
             if (grid == null)
             {
-                MoveTowards(destination); // no level grid: walk straight
+                MoveTowards(destination); // no grid, so walk straight
                 return;
             }
 
@@ -245,7 +239,7 @@ namespace LostDungeon.Game.Enemies
                    Vector2.Distance(Position, grid.CellToWorld(path[pathIndex])) < WaypointReachedDistance)
                 pathIndex++;
 
-            // Same cell as the destination (or no path): head straight for it.
+            // Already close or no path, so go straight there.
             Vector2 next = pathIndex < path.Count ? grid.CellToWorld(path[pathIndex]) : destination;
             MoveTowards(next);
         }
@@ -257,8 +251,7 @@ namespace LostDungeon.Game.Enemies
         }
 
         /// <summary>
-        /// Starts an attack: the swing animation plays straight away and the hit lands after the wind-up,
-        /// in step with the weapon coming down. A quick dash during the wind-up avoids it.
+        /// Starts a swing. The hit lands a moment later, so the player can dash away.
         /// </summary>
         public void PerformAttack()
         {
@@ -282,14 +275,14 @@ namespace LostDungeon.Game.Enemies
             GameEvents.RaiseEnemyAttacked(data.Id);
         }
 
-        /// <summary>After the death animation the body sinks into the floor (0 = standing, 1 = gone).</summary>
+        /// <summary>Sinks the dead body into the floor, from 0 to 1.</summary>
         public void SetSink(float amount)
         {
             if (characterAnimator != null && characterAnimator.Model != null)
                 characterAnimator.Model.localPosition = modelRestPosition + Vector3.down * (Mathf.Clamp01(amount) * 1.2f);
         }
 
-        /// <summary>Back to the pool (or destroyed if it was placed by hand).</summary>
+        /// <summary>Sends it back to the pool.</summary>
         public void Remove() => PoolManager.Instance.Despawn(gameObject);
 
         // ---------- Damage ----------
@@ -311,11 +304,11 @@ namespace LostDungeon.Game.Enemies
 
         private void Die()
         {
-            windUpLeft = -1f; // a dying enemy doesn't finish its swing
+            windUpLeft = -1f; // dead enemies don't finish a swing
             foreach (Collider c in colliders)
                 c.enabled = false;
             Stop();
-            body.isKinematic = true; // the body stays where it fell
+            body.isKinematic = true; // stay where it fell
             if (characterAnimator != null)
                 characterAnimator.SetDead(true);
             SetState(EnemyStateId.Dead);

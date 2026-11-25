@@ -4,13 +4,12 @@ using UnityEngine;
 namespace LostDungeon.Game.Combat
 {
     /// <summary>
-    /// Observer channel for "something got hit here". Attacks raise it; the HUD shows a floating
-    /// damage number and the effects presenter spawns sparks. Neither side knows about the other.
-    /// Lives in the Game layer (not Core) because it carries a world position.
+    /// An event for "something got hit here" (Observer).
+    /// Attacks fire it, and the HUD and sparks listen without knowing each other.
     /// </summary>
     public static class CombatFeedback
     {
-        /// <summary>World position, damage, critical hit, and whether the player was the one hurt.</summary>
+        /// <summary>Where, how much, was it a crit, and was it the player.</summary>
         public static event Action<Vector3, int, bool, bool> Hit;
 
         public static void RaiseHit(GameObject target, int amount, bool critical)
@@ -22,7 +21,7 @@ namespace LostDungeon.Game.Combat
             Hit?.Invoke(position, amount, critical, playerHurt);
         }
 
-        /// <summary>Cleared when Play mode starts, because domain reload is off.</summary>
+        /// <summary>Cleared on Play because domain reload is off.</summary>
         public static void Reset() => Hit = null;
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
 {
-    /// <summary>Guardian: defends a spot. Only fights players inside its guard radius, then walks back.</summary>
+    /// <summary>Guardian: guards one spot, fights close by, then walks back.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Enemies/Guardian Behaviour")]
     public class GuardianEnemyBehaviour : EnemyBehaviour
     {

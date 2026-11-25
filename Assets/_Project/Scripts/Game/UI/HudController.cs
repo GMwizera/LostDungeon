@@ -13,9 +13,8 @@ using UnityEngine.UIElements;
 namespace LostDungeon.Game.UI
 {
     /// <summary>
-    /// In-game HUD and overlays (pause, Expedition Debrief, defeat, loading), styled after the Stitch designs.
-    /// It only listens to GameEvents and calls GameManager for button actions, so gameplay code never
-    /// references the UI: the HUD could be replaced or removed without touching combat or levels.
+    /// The in-game HUD plus the pause, win, lose and loading screens.
+    /// It only listens to events, so gameplay code never knows about the UI.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class HudController : MonoBehaviour
@@ -134,7 +133,7 @@ namespace LostDungeon.Game.UI
 
         private void Update()
         {
-            // Cooldown rings count down locally from the AbilityActivated event (no reference to the player).
+            // Count down the rings here, so the HUD doesn't need the player.
             foreach (AbilityView view in abilities.Values)
             {
                 if (view.Remaining <= 0f)
@@ -154,7 +153,7 @@ namespace LostDungeon.Game.UI
                 element.style.backgroundImage = new StyleBackground(sprite);
         }
 
-        /// <summary>Round ability buttons with cooldown rings. Tapping or clicking one uses the ability.</summary>
+        /// <summary>Ability buttons with rings. Tap or click one to use it.</summary>
         private void CreateAbilitySlots()
         {
             VisualElement bar = root.Q("abilities");
@@ -226,8 +225,7 @@ namespace LostDungeon.Game.UI
         }
 
         /// <summary>
-        /// On-screen joystick (the round ability buttons are always shown). Shown on phones (and on touch screens in the browser)
-        /// unless turned off in Settings.
+        /// Touch joystick for phones and touch screens, unless turned off in Settings.
         /// </summary>
         private void SetUpTouchControls()
         {
@@ -269,7 +267,7 @@ namespace LostDungeon.Game.UI
                 var offset = new Vector2(local.x - radius, local.y - radius);
                 offset = Vector2.ClampMagnitude(offset, radius);
                 knob.style.translate = new Translate(offset.x, offset.y);
-                playerInput.SetVirtualMove(new Vector2(offset.x, -offset.y) / radius); // UI y points down
+                playerInput.SetVirtualMove(new Vector2(offset.x, -offset.y) / radius); // UI y goes down, so flip it
             }
 
         }
@@ -284,7 +282,7 @@ namespace LostDungeon.Game.UI
             vitalityText.text = $"{current}/{max}  {Mathf.RoundToInt(fraction * 100f)}%";
         }
 
-        /// <summary>Gold pill plus the pouch strip: one slot per item the hero carries (gold, key, potions drunk).</summary>
+        /// <summary>Updates the gold count and one slot per item.</summary>
         private void OnInventoryChanged(string itemId, int count)
         {
             if (itemId == ItemIds.Gold)
@@ -317,7 +315,7 @@ namespace LostDungeon.Game.UI
 
         private void OnObjectiveChanged(string text) => objective.text = text?.ToUpperInvariant();
 
-        /// <summary>Key orb, enemies-remaining dots, and the banner turning green when the exit opens.</summary>
+        /// <summary>Shows the key, enemies left, and a green banner when the exit opens.</summary>
         private void OnObjectiveStatusChanged(int defeated, int total, bool requiresKey, bool hasKey, bool exitOpen)
         {
             levelNeedsKey = requiresKey;
@@ -357,7 +355,7 @@ namespace LostDungeon.Game.UI
             levelName.text = displayName.ToUpperInvariant();
             GameManager game = GameManager.Instance;
             roomCount.text = $"ROOM {number} / {(game.Catalog != null ? game.Catalog.Count : 5)}";
-            SetPouchSlot(ItemIds.Potion, 0); // potions are counted per level
+            SetPouchSlot(ItemIds.Potion, 0); // potions restart each level
             enemiesThisLevel = 0;
             goldThisLevel = 0;
             potionsThisLevel = 0;
@@ -392,7 +390,7 @@ namespace LostDungeon.Game.UI
             UISounds.Show(gameOverOverlay, state == GameState.GameOver);
             UISounds.Show(loadingOverlay, state == GameState.Loading);
 
-            // Menus get the screen to themselves: hide the gameplay HUD behind them.
+            // Hide the game HUD when a menu is open.
             bool playing = state == GameState.Playing;
             foreach (string name in new[] { "fe-top", "fe-banner", "prompt", "fe-abilities", "fe-joystick-area", "world-layer" })
                 foreach (VisualElement element in root.Query(className: name).ToList())
@@ -407,7 +405,7 @@ namespace LostDungeon.Game.UI
                 root.Q<Label>("gameover-text").text = $"You fell in Room {GameManager.Instance.CurrentLevel}. The dungeon keeps your progress; try again.";
         }
 
-        /// <summary>The level complete screen: what you cleared, what you earned, and where you are in the dungeon.</summary>
+        /// <summary>Fills the level complete screen with what you got.</summary>
         private void FillDebrief()
         {
             GameManager game = GameManager.Instance;
@@ -467,7 +465,7 @@ namespace LostDungeon.Game.UI
             }
         }
 
-        /// <summary>A small chip: an icon and a number (gold found, potions drunk, key, enemies defeated).</summary>
+        /// <summary>A small box with an icon and a number.</summary>
         private static VisualElement Spoil(Sprite icon, string amount)
         {
             var chip = new VisualElement();

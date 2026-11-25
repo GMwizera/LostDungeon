@@ -19,9 +19,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Tools > Lost Dungeon > Build Game: sets up 3D rendering, imports the KayKit art, builds the effects,
-    /// characters and the five Addressable 3D levels, then the MainMenu and Game scenes and the build settings.
-    /// Safe to run again: everything it makes is regenerated.
+    /// Builds the whole game in one click, from the art to the scenes.
+    /// You can run it again, it just remakes everything.
     /// </summary>
     public static class GameBuilder
     {
@@ -83,8 +82,7 @@ namespace LostDungeon.EditorTools
         }
 
         /// <summary>
-        /// Loads the assets the scenes reference. Must run AFTER NewScene: creating a scene unloads assets
-        /// nothing is using, which turns earlier references into dead ones that save as "None".
+        /// Loads the assets after NewScene, or they save as None.
         /// </summary>
         private static (LevelCatalog, UIIcons, PanelSettings) LoadSharedAssets()
         {
@@ -104,7 +102,7 @@ namespace LostDungeon.EditorTools
 
             panel = ScriptableObject.CreateInstance<PanelSettings>();
             panel.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>($"{UIFolder}/LostDungeonTheme.tss");
-            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize; // same layout on phones, browsers and monitors
+            panel.scaleMode = PanelScaleMode.ScaleWithScreenSize; // looks the same on any screen size
             panel.referenceResolution = new Vector2Int(1280, 720);
             panel.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
             panel.match = 0.5f;
@@ -134,8 +132,7 @@ namespace LostDungeon.EditorTools
         }
 
         /// <summary>
-        /// A small torch-lit temple behind the main menu: the hero stands in a swirl of wind,
-        /// skeletons wait in the shadows and treasure glows. Framed so the hero sits between the two UI columns.
+        /// The small 3D room you see behind the main menu.
         /// </summary>
         private static void BuildMenuBackdrop(Camera camera)
         {
@@ -213,7 +210,7 @@ namespace LostDungeon.EditorTools
                 enemy.name = $"Menu {prefab}";
                 foreach (MonoBehaviour behaviour in enemy.GetComponents<MonoBehaviour>())
                     if (!(behaviour is CharacterAnimator))
-                        Object.DestroyImmediate(behaviour); // scenery only: no AI
+                        Object.DestroyImmediate(behaviour); // just for show, so no AI
                 enemy.GetComponent<Rigidbody>().isKinematic = true;
                 enemy.transform.position = at;
                 if (prefab == "Guardian")
@@ -228,7 +225,7 @@ namespace LostDungeon.EditorTools
             Quaternion view = Quaternion.Euler(24f, 30f, 0f);
             Vector3 focus = hero.transform.position + Vector3.up * 1.0f;
             camera.transform.rotation = view;
-            // Shift the shot so the hero stands in the gap between the two menu columns.
+            // Move the camera so the hero shows between the two menus.
             camera.transform.position = focus - view * Vector3.forward * 7f + view * Vector3.right * 0.35f;
         }
 
@@ -267,7 +264,7 @@ namespace LostDungeon.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             (LevelCatalog catalog, UIIcons icons, PanelSettings panel) = LoadSharedAssets();
 
-            // Atmosphere: a dim, cool ambient, fog that swallows the far edges, and no sky reflections.
+            // Dim light and fog to make it feel dark and spooky.
             ApplyAtmosphere();
 
             Camera camera = CreateCamera(new Color(0.02f, 0.02f, 0.035f));
@@ -279,12 +276,12 @@ namespace LostDungeon.EditorTools
             var follow = camera.gameObject.AddComponent<CameraFollow>();
             CreateEventSystem();
 
-            // Cool moonlight from the upper left casts the soft shadows; torches add the warm light.
+            // Soft blue moonlight makes the shadows, torches add warm light.
             AddMoonAndPostFX(out Light moon);
 
             GameObject player = CreatePlayer(Vector3.zero);
             SetValues(follow, ("target", player.transform));
-            player.SetActive(false); // the LevelManager enables it once the level has loaded
+            player.SetActive(false); // turned on when the level finishes loading
 
             var levelManager = new GameObject("LevelManager").AddComponent<LevelManager>();
             SetValues(levelManager, ("catalog", catalog), ("player", player), ("cameraFollow", follow), ("moonLight", moon));
@@ -308,7 +305,7 @@ namespace LostDungeon.EditorTools
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = background;
             go.AddComponent<UniversalAdditionalCameraData>();
-            go.AddComponent<AudioListener>(); // without one, nothing is heard
+            go.AddComponent<AudioListener>(); // without this there is no sound
             return camera;
         }
 

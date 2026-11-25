@@ -5,10 +5,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Abilities
 {
-    /// <summary>
-    /// Fires a pooled projectile in the facing direction. The Fireball and the skeleton archer's
-    /// arrow both use this class: a different projectile prefab and numbers make a different ability.
-    /// </summary>
+    /// <summary>Shoots a pooled projectile forward. The fireball and the arrow both use it.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Abilities/Projectile")]
     public class ProjectileAbility : AbilityDefinition
     {

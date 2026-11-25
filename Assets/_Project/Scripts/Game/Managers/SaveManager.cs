@@ -10,10 +10,10 @@ using UnityEngine;
 namespace LostDungeon.Game.Managers
 {
     /// <summary>
-    /// Owns the save data (Singleton): level progress, stats, inventory, settings and unlocks, stored as JSON.
-    /// Stats update by listening to GameEvents, so gameplay code never calls the save system for them.
+    /// Keeps the save data as JSON (Singleton).
+    /// It listens to events for stats, so gameplay code never calls it.
     /// </summary>
-    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
+    [DefaultExecutionOrder(-100)] // runs before other scripts need it
     public class SaveManager : Singleton<SaveManager>
     {
         private const string FileName = "lostdungeon_save.json";
@@ -27,7 +27,7 @@ namespace LostDungeon.Game.Managers
         public SaveData Data { get { EnsureLoaded(); return data; } }
         public LevelProgress Progress { get { EnsureLoaded(); return progress; } }
 
-        /// <summary>True when there is progress worth continuing.</summary>
+        /// <summary>True if there is a game to continue.</summary>
         public bool HasProgress => Progress.CompletedLevels.Count > 0;
 
         protected override void Awake()
@@ -39,7 +39,7 @@ namespace LostDungeon.Game.Managers
             EnsureLoaded();
         }
 
-        /// <summary>Loads on first use, so it works even if another script asks before this Awake ran.</summary>
+        /// <summary>Loads the first time it is needed, even before Awake.</summary>
         private void EnsureLoaded()
         {
             if (service != null)
@@ -49,8 +49,8 @@ namespace LostDungeon.Game.Managers
         }
 
         /// <summary>
-        /// Conditional compilation: WebGL keeps saves in browser storage, every other platform uses a file.
-        /// Decided at compile time because each build only ever needs one of them.
+        /// Conditional compilation: WebGL saves in the browser, others save to a file.
+        /// Each build only needs one, so we pick it at build time.
         /// </summary>
         private static ISaveStorage CreateStorage()
         {
@@ -105,7 +105,7 @@ namespace LostDungeon.Game.Managers
             Save();
         }
 
-        /// <summary>Wipes progress, stats and items but keeps the player's settings.</summary>
+        /// <summary>Clears progress and items but keeps the settings.</summary>
         public void ResetProgress()
         {
             GameSettings settings = Data.settings;
@@ -132,7 +132,7 @@ namespace LostDungeon.Game.Managers
         private void OnApplicationPause(bool paused)
         {
             if (paused)
-                Save(); // mobile apps can be killed while in the background
+                Save(); // phones can close the app in the background
         }
 
         protected override void OnApplicationQuit()

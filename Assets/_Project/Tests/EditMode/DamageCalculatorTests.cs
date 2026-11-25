@@ -33,7 +33,7 @@ namespace LostDungeon.Tests
 
         [TestCase(5, 2, 3)]
         [TestCase(2, 5, 1)]  // armour can't block a hit completely
-        [TestCase(4, -3, 4)] // negative armour is treated as zero
+        [TestCase(4, -3, 4)] // negative armour counts as zero
         [TestCase(0, 0, 0)]  // no damage stays no damage
         public void ApplyArmor_ReducesDamage(int incoming, int armor, int expected)
         {

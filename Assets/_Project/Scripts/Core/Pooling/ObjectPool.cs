@@ -4,10 +4,8 @@ using System.Collections.Generic;
 namespace LostDungeon.Core.Pooling
 {
     /// <summary>
-    /// Generic object pool (Object Pooling pattern).
-    /// Reuses objects instead of creating and destroying them, which avoids garbage collection
-    /// spikes when many projectiles or effects are fired. Has no Unity code, so it is unit tested;
-    /// PoolManager wraps it for GameObjects.
+    /// Object Pool pattern. Reuses objects so lots of shots don't cause lag.
+    /// No Unity code here, so it can be tested. PoolManager uses it for GameObjects.
     /// </summary>
     public class ObjectPool<T> where T : class
     {
@@ -23,11 +21,11 @@ namespace LostDungeon.Core.Pooling
         public int CountInactive => available.Count;
         public int CountAll => CountActive + CountInactive;
 
-        /// <param name="create">Makes a new object when the pool is empty.</param>
-        /// <param name="onGet">Runs when an object is taken out.</param>
-        /// <param name="onRelease">Runs when an object is put back.</param>
-        /// <param name="onDestroy">Runs when an object is returned but the pool is already full.</param>
-        /// <param name="maxSize">Most inactive objects kept for reuse.</param>
+        /// <param name="create">Makes a new one when the pool is empty.</param>
+        /// <param name="onGet">Runs when one is taken out.</param>
+        /// <param name="onRelease">Runs when one is put back.</param>
+        /// <param name="onDestroy">Runs when one comes back but the pool is full.</param>
+        /// <param name="maxSize">How many spare objects we keep.</param>
         public ObjectPool(Func<T> create, Action<T> onGet = null, Action<T> onRelease = null,
             Action<T> onDestroy = null, int maxSize = 100)
         {
@@ -64,7 +62,7 @@ namespace LostDungeon.Core.Pooling
                 onDestroy?.Invoke(item);
         }
 
-        /// <summary>Creates objects ahead of time so the first shots don't cause a hitch.</summary>
+        /// <summary>Makes objects early so the first shots don't lag.</summary>
         public void Prewarm(int count)
         {
             var created = new List<T>(count);

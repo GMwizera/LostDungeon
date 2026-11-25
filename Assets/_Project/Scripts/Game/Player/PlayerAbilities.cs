@@ -8,8 +8,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Player
 {
     /// <summary>
-    /// Connects the player's buttons to three ability slots. It never knows what an ability does:
-    /// it checks the cooldown, calls Activate, and announces it through GameEvents.
+    /// Links the player's buttons to three abilities.
+    /// It doesn't know what they do, it just calls Activate and sends an event.
     /// </summary>
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerMovement))]
     public class PlayerAbilities : MonoBehaviour
@@ -26,7 +26,7 @@ namespace LostDungeon.Game.Player
         private AbilitySlot dashSlot;
         private AbilitySlot specialSlot;
 
-        /// <summary>For the HUD's ability indicators (Day 5).</summary>
+        /// <summary>The ability slots, for the HUD.</summary>
         public IReadOnlyList<AbilitySlot> Slots => slots;
 
         private void Awake()
@@ -55,7 +55,7 @@ namespace LostDungeon.Game.Player
             input.FireballPressed -= OnSpecial;
         }
 
-        /// <summary>The special ability (Fireball) is a reward for finishing level 1.</summary>
+        /// <summary>You get the Fireball for beating level 1.</summary>
         public void SetSpecialUnlocked(bool unlocked)
         {
             if (specialSlot != null)
@@ -75,7 +75,7 @@ namespace LostDungeon.Game.Player
         private void TryUse(AbilitySlot slot)
         {
             if (slot == null || !slot.IsReady || Time.timeScale == 0f)
-                return; // no attacks while paused or on a menu screen
+                return; // no attacks while paused or in a menu
 
             var context = new AbilityContext(gameObject, Ground.ToFloor(transform.position), movement.FacingDirection);
             slot.Ability.Activate(context);

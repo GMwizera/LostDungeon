@@ -11,9 +11,8 @@ using UnityEngine.TestTools;
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Uses the enemies the room spawns itself (not ones a test adds later). Written after a bug where
-    /// a room's enemies looked for the player before the player had been placed, found nobody,
-    /// and then ignored the player for the whole level.
+    /// Uses the room's own enemies. Added after a bug where enemies looked for the player
+    /// too early, found nobody, and then ignored the player all level.
     /// </summary>
     public class RoomEnemyTests
     {

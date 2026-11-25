@@ -3,10 +3,9 @@ using System.Collections.Generic;
 namespace LostDungeon.Core.Navigation
 {
     /// <summary>
-    /// A* search on the level grid, used by enemies to walk around walls to the player.
-    /// Moves in 4 directions (each step crosses a shared tile edge, so enemies never cut wall corners).
-    /// Cost per step is 1 and the heuristic is Manhattan distance, which never overestimates,
-    /// so the path found is always a shortest one.
+    /// A* search so enemies can walk around walls to the player.
+    /// Only 4 directions, so enemies never cut through wall corners.
+    /// Manhattan distance never guesses too high, so we always get a shortest path.
     /// </summary>
     public static class AStarPathfinder
     {
@@ -16,8 +15,8 @@ namespace LostDungeon.Core.Navigation
         };
 
         /// <summary>
-        /// Returns the cells to walk through, from the first step after start up to and including goal.
-        /// Empty if start == goal, the goal is blocked, or no path exists within maxSearchedCells.
+        /// Gives the steps from start to goal (start not included).
+        /// Empty if already there, the goal is blocked, or no path is found in time.
         /// </summary>
         public static List<GridPoint> FindPath(INavigationGrid grid, GridPoint start, GridPoint goal, int maxSearchedCells = 2000)
         {
@@ -39,9 +38,9 @@ namespace LostDungeon.Core.Navigation
                     return BuildPath(cameFrom, start, goal);
 
                 if (!closed.Add(current))
-                    continue; // an older, more expensive copy of a cell we already finished
+                    continue; // old, worse copy of a cell we already did
                 if (closed.Count > maxSearchedCells)
-                    break; // give up on huge searches instead of freezing the game
+                    break; // stop big searches so the game doesn't freeze
 
                 foreach (GridPoint step in Steps)
                 {

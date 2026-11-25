@@ -2,7 +2,7 @@ using System;
 
 namespace LostDungeon.Core.Abilities
 {
-    /// <summary>Counts down after an ability is used. The HUD reads Progress01 for its fill.</summary>
+    /// <summary>Wait time after using an ability. The HUD shows Progress01.</summary>
     public class Cooldown
     {
         public float Duration { get; }

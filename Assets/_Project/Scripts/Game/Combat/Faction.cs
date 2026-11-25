@@ -9,14 +9,14 @@ namespace LostDungeon.Game.Combat
         Enemy,
     }
 
-    /// <summary>Marks which side something is on, so attacks don't hurt allies.</summary>
+    /// <summary>Says which team something is on, so friends don't hurt friends.</summary>
     public class Faction : MonoBehaviour
     {
         [SerializeField] private Team team = Team.Neutral;
 
         public Team Team => team;
 
-        /// <summary>True when both objects are on the same (non-neutral) team.</summary>
+        /// <summary>True if both are on the same team (not neutral).</summary>
         public static bool AreAllies(GameObject a, GameObject b)
         {
             if (a == null || b == null)

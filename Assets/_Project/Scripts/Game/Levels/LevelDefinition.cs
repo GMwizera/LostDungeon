@@ -3,8 +3,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Levels
 {
     /// <summary>
-    /// One level: its number, name, the Addressables key of its content, and the reward for finishing it.
-    /// Adding a sixth level = one new prefab marked Addressable + one new LevelDefinition in the catalog.
+    /// One level: its number, name, Addressables key and reward.
+    /// A new level is just a new prefab and a new one of these.
     /// </summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Levels/Level Definition")]
     public class LevelDefinition : ScriptableObject
@@ -21,15 +21,15 @@ namespace LostDungeon.Game.Levels
         public string DisplayName => displayName;
         public string AddressKey => addressKey;
 
-        /// <summary>Unlock id saved when the level is completed, e.g. "ability.fireball". Empty for none.</summary>
+        /// <summary>What you unlock for beating it, or empty for nothing.</summary>
         public string RewardUnlock => rewardUnlock;
 
         public string RewardDescription => rewardDescription;
 
-        /// <summary>Short label for the level card, e.g. "FIREBALL GRANTED".</summary>
+        /// <summary>Short reward label for the level card.</summary>
         public string RewardTag => rewardTag;
 
-        /// <summary>Which enemies the level has, shown on the level card.</summary>
+        /// <summary>The enemies in this level, for the level card.</summary>
         public string Hostiles => hostiles;
     }
 }

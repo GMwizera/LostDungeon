@@ -7,9 +7,7 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Switches the project from the 2D renderer to a 3D Universal renderer with real-time shadows,
-    /// HDR and anti-aliasing, and builds the post-processing profile (bloom, vignette, tone mapping,
-    /// colour grading) that gives the dungeon its cinematic look.
+    /// Sets up 3D graphics with shadows, plus effects like glow and colour.
     /// </summary>
     public static class RenderSetup
     {
@@ -18,7 +16,7 @@ namespace LostDungeon.EditorTools
         private const string PipelinePath = Folder + "/Dungeon3DPipeline.asset";
         private const string MobilePipelinePath = Folder + "/Dungeon3DPipeline_Mobile.asset";
         public const string ProfilePath = Folder + "/DungeonPostFX.asset";
-        private const string PostProcessDataGuid = "41439944d30ece34e96484bdb6645b55"; // URP's default PostProcessData
+        private const string PostProcessDataGuid = "41439944d30ece34e96484bdb6645b55"; // Unity's built-in effects data
 
         public static void Apply()
         {
@@ -26,8 +24,7 @@ namespace LostDungeon.EditorTools
             UniversalRenderPipelineAsset pipeline = GetOrCreatePipeline(PipelinePath, mobile: false);
             UniversalRenderPipelineAsset mobilePipeline = GetOrCreatePipeline(MobilePipelinePath, mobile: true);
 
-            // Quality level 0 is the phone profile: PlatformFeatures switches to it on Android/iOS
-            // with conditional compilation. Every other level uses the full desktop pipeline.
+            // Level 0 is for phones, all other levels are for computers.
             GraphicsSettings.defaultRenderPipeline = pipeline;
             int current = QualitySettings.GetQualityLevel();
             for (int i = 0; i < QualitySettings.count; i++)
@@ -66,8 +63,7 @@ namespace LostDungeon.EditorTools
                 AssetDatabase.CreateAsset(pipeline, path);
             }
 
-            // Phones get a lighter profile for battery, heat and frame rate: no MSAA, fewer lights per
-            // object, hard and smaller shadows over a shorter distance, and a slightly lower resolution.
+            // Phones get lighter settings so they run smooth and stay cool.
             var settings = new SerializedObject(pipeline);
             Set(settings, "m_SupportsHDR", 1);
             Set(settings, "m_MSAA", mobile ? 1 : 4);
@@ -134,7 +130,7 @@ namespace LostDungeon.EditorTools
 
             ShadowsMidtonesHighlights tones = Get<ShadowsMidtonesHighlights>(profile);
             tones.shadows.Override(new Vector4(0.86f, 0.95f, 1.08f, 0f)); // cool shadows
-            tones.highlights.Override(new Vector4(1.08f, 1f, 0.9f, 0f));  // warm torchlight
+            tones.highlights.Override(new Vector4(1.08f, 1f, 0.9f, 0f));  // warm bright parts
 
             foreach (VolumeComponent component in profile.components)
             {

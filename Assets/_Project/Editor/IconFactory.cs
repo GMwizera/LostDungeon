@@ -8,8 +8,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Draws the UI and pickup icons as PNGs from simple shapes, and collects them in a UIIcons asset.
-    /// Existing PNGs are kept, so they can be replaced with hand-made art.
+    /// Draws the game icons as PNG files from simple shapes.
+    /// Old PNGs are kept, so you can swap in your own art.
     /// </summary>
     public static class IconFactory
     {
@@ -17,12 +17,12 @@ namespace LostDungeon.EditorTools
         public const string IconsAssetPath = "Assets/_Project/ScriptableObjects/UI/UIIcons.asset";
         private const int Size = 64;
 
-        // Abyssal Crypt palette (Stitch design system).
+        // The game's colours, taken from the design.
         private static readonly Color Gold = new Color(0.96f, 0.62f, 0.04f);      // #f59e0b
         private static readonly Color Red = new Color(0.94f, 0.27f, 0.27f);       // #ef4444
         private static readonly Color Grey = new Color(0.25f, 0.25f, 0.27f);      // #3f3f46
         private static readonly Color Light = new Color(0.63f, 0.63f, 0.67f);     // #a1a1aa
-        private static readonly Color Dark = new Color(0.16f, 0.09f, 0f);         // #2a1700, sits on gold
+        private static readonly Color Dark = new Color(0.16f, 0.09f, 0f);         // #2a1700, used on top of gold
         private static readonly Color Blue = new Color(0.22f, 0.74f, 0.97f);      // #38bdf8
 
         public static UIIcons Build()
@@ -56,7 +56,7 @@ namespace LostDungeon.EditorTools
             return icons;
         }
 
-        // ---------- Shapes (x and y run from -1 to 1, y up) ----------
+        // ---------- Shapes (x and y go from -1 to 1) ----------
 
         private static bool Heart(float x, float y)
         {
@@ -164,7 +164,7 @@ namespace LostDungeon.EditorTools
 
         // ---------- Rendering ----------
 
-        /// <summary>Renders a shape with 4x4 supersampling for smooth edges and imports it as a sprite.</summary>
+        /// <summary>Draws a shape with smooth edges and saves it as a sprite.</summary>
         private static Sprite Icon(string name, Func<float, float, Color?> shape)
         {
             string path = $"{Folder}/{name}.png";
@@ -205,7 +205,7 @@ namespace LostDungeon.EditorTools
 
                 var importer = (TextureImporter)AssetImporter.GetAtPath(path);
                 importer.textureType = TextureImporterType.Sprite;
-                importer.spritePixelsPerUnit = 256f; // a quarter tile wide when used as a world pickup
+                importer.spritePixelsPerUnit = 256f; // makes pickups a quarter of a tile wide
                 importer.alphaIsTransparency = true;
                 importer.mipmapEnabled = false;
                 importer.SaveAndReimport();

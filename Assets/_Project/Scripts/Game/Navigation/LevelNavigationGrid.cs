@@ -5,10 +5,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Navigation
 {
     /// <summary>
-    /// Answers "can I walk here?" for the A* pathfinder. The level builder marks every floor cell
-    /// as open or blocked (walls, pillars, crates) when it builds the room, and saves that map here.
-    /// Each cell is one world unit; cell (0, 0) starts at the level's origin.
-    /// Enemies find the active level's grid through Current.
+    /// Tells the A* pathfinder which floor cells you can walk on.
+    /// Each cell is one unit wide. Enemies use Current to find it.
     /// </summary>
     public class LevelNavigationGrid : MonoBehaviour, INavigationGrid
     {
@@ -29,7 +27,7 @@ namespace LostDungeon.Game.Navigation
                 Current = null;
         }
 
-        /// <summary>Used by the level builder in the Editor.</summary>
+        /// <summary>The level builder calls this in the Editor.</summary>
         public void Configure(int columns, int rows, IList<bool> open)
         {
             width = columns;

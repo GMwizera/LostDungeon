@@ -4,10 +4,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Interaction
 {
-    /// <summary>
-    /// Finds the nearest usable IInteractable around the player, shows its prompt on the HUD,
-    /// and uses it when Interact is pressed.
-    /// </summary>
+    /// <summary>Finds the closest thing to use, shows its hint and uses it on Interact.</summary>
     [RequireComponent(typeof(PlayerInputReader))]
     public class PlayerInteractor : MonoBehaviour
     {
@@ -43,13 +40,13 @@ namespace LostDungeon.Game.Interaction
             if (target != null)
             {
                 target.Interact(gameObject);
-                SetCurrent(FindNearest()); // its prompt may have changed (e.g. chest now open)
+                SetCurrent(FindNearest()); // the hint may change, like an open chest
             }
         }
 
         /// <summary>
-        /// Searching algorithm: one pass over the colliders in range, keeping the closest
-        /// interactable that can be used right now (squared distance avoids a square root per item).
+        /// Search: checks each nearby thing once and keeps the closest usable one.
+        /// Squared distance skips a slow square root.
         /// </summary>
         private IInteractable FindNearest()
         {

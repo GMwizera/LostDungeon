@@ -4,10 +4,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Hazards
 {
-    /// <summary>
-    /// Floor spikes that rise and fall. While they are up they hurt anything that implements IDamageable
-    /// standing on them, whether that is the player or an enemy. Needs a trigger Collider.
-    /// </summary>
+    /// <summary>Spikes that go up and down and hurt anyone standing on them.</summary>
     [RequireComponent(typeof(Collider))]
     public class SpikeTrap : MonoBehaviour
     {
@@ -28,7 +25,7 @@ namespace LostDungeon.Game.Hazards
         {
             if (spikes != null)
                 spikesUp = spikes.localPosition;
-            offset = transform.position.x * 0.37f + transform.position.z * 0.61f; // traps don't all move together
+            offset = transform.position.x * 0.37f + transform.position.z * 0.61f; // so traps don't all move at once
         }
 
         private void Update()
@@ -49,7 +46,7 @@ namespace LostDungeon.Game.Hazards
             if (!who.TryGetComponent(out IDamageable target) || target.IsDead)
                 return;
             if (nextHit.TryGetValue(target, out float time) && Time.time < time)
-                return; // each victim is hurt at most twice a second
+                return; // hurt each one at most twice a second
             nextHit[target] = Time.time + 0.5f;
             target.TakeDamage(damage);
             CombatFeedback.RaiseHit(who, damage, false);

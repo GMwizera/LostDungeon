@@ -4,8 +4,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Enemies
 {
     /// <summary>
-    /// Everything that makes one enemy type different, as an asset.
-    /// To add an enemy type: make a new EnemyData, pick a behaviour and an attack ability. No code changes.
+    /// The settings for one enemy type.
+    /// A new enemy is just a new asset, no new code.
     /// </summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Enemies/Enemy Data")]
     public class EnemyData : ScriptableObject

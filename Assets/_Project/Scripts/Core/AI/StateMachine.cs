@@ -3,8 +3,8 @@ using System;
 namespace LostDungeon.Core.AI
 {
     /// <summary>
-    /// Runs one state at a time and handles switching: Exit the old state, then Enter the new one.
-    /// Generic over the owner type, so enemies (and later the game flow) can reuse it.
+    /// Runs one state at a time. On a switch it exits the old one, then enters the new one.
+    /// Generic, so enemies and other things can reuse it.
     /// </summary>
     public class StateMachine<TContext>
     {

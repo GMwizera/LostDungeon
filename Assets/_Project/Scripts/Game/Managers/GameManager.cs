@@ -8,11 +8,10 @@ using UnityEngine.SceneManagement;
 namespace LostDungeon.Game.Managers
 {
     /// <summary>
-    /// Game flow (Singleton): which level is being played, the game state (menu, loading, playing,
-    /// paused, complete, game over) and scene changes. Menus and the HUD call these methods;
-    /// everything else learns about state changes through GameEvents.GameStateChanged.
+    /// Runs the game flow (Singleton): the current level, the game state and scene changes.
+    /// Other systems hear about state changes through an event.
     /// </summary>
-    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
+    [DefaultExecutionOrder(-100)] // runs before other scripts need it
     public class GameManager : Singleton<GameManager>
     {
         public const string MenuScene = "MainMenu";
@@ -39,7 +38,7 @@ namespace LostDungeon.Game.Managers
         public void PlayLevel(int level)
         {
             if (!SaveManager.Instance.Progress.IsPlayable(level))
-                return; // locked levels can't be started, even from code
+                return; // can't start a locked level
             CurrentLevel = level;
             SetState(GameState.Loading);
             SceneManager.LoadScene(GameScene);

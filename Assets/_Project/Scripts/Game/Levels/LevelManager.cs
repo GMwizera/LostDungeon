@@ -14,10 +14,9 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 namespace LostDungeon.Game.Levels
 {
     /// <summary>
-    /// Loads the current level's content with Addressables and releases it when the level ends.
-    /// Each level is an Addressable prefab (address "Level1" ... "Level5") built into its own asset bundle,
-    /// so only the level being played is in memory. Shows loading progress and handles a failed load
-    /// by reporting it to the UI instead of freezing.
+    /// Loads each level with Addressables and releases it when the level ends.
+    /// Each level has its own bundle, so only one is in memory at a time.
+    /// If loading fails, it tells the UI instead of freezing.
     /// </summary>
     public class LevelManager : MonoBehaviour
     {
@@ -39,7 +38,7 @@ namespace LostDungeon.Game.Levels
 
         private void Awake()
         {
-            // The dungeon's normal darkness, as set in the scene. The weather scales it.
+            // Remember the normal light, so the weather can change it.
             if (moonLight != null)
                 baseLightIntensity = moonLight.intensity;
             baseAmbient = RenderSettings.ambientLight;
@@ -100,7 +99,7 @@ namespace LostDungeon.Game.Levels
             var root = levelHandle.Result.GetComponent<LevelRoot>();
             PlacePlayer(root != null && root.PlayerSpawn != null ? root.PlayerSpawn.position : Vector3.zero);
 
-            // Darker at night in Kigali (live weather API).
+            // Darker when it is night in Kigali, from the weather API.
             if (moonLight != null)
                 moonLight.intensity = baseLightIntensity * WorldModifiers.LightIntensity;
             RenderSettings.ambientLight = baseAmbient * Mathf.Lerp(0.6f, 1f, WorldModifiers.LightIntensity);
@@ -112,7 +111,7 @@ namespace LostDungeon.Game.Levels
                 root.Objective.Publish();
         }
 
-        /// <summary>Applies saved rewards (unlocked fireball, extra health) and items, then drops the player in.</summary>
+        /// <summary>Gives back saved rewards and items, then puts the player in.</summary>
         private void PlacePlayer(Vector3 position)
         {
             SaveManager save = SaveManager.Instance;
@@ -143,9 +142,8 @@ namespace LostDungeon.Game.Levels
         private void OnPausePressed(InputAction.CallbackContext _) => GameManager.Instance.TogglePause();
 
         /// <summary>
-        /// Releases the level through Addressables (destroys the instance and lets its bundle unload).
-        /// Pooled enemies and arrows are cleared first: they were created from prefabs inside the
-        /// level's bundle, so they must not outlive it.
+        /// Releases the level with Addressables so its bundle can unload.
+        /// Clear the pool first, because pooled enemies came from that bundle.
         /// </summary>
         private void ReleaseLevel()
         {

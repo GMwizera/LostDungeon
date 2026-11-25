@@ -1,8 +1,8 @@
 namespace LostDungeon.Game.Pooling
 {
     /// <summary>
-    /// Implemented by components on pooled objects that need to reset themselves.
-    /// PoolManager calls these instead of Start/OnDestroy, because pooled objects are reused, not recreated.
+    /// For pooled objects that need to reset.
+    /// Pooled things are reused, so these run instead of Start and OnDestroy.
     /// </summary>
     public interface IPoolable
     {

@@ -5,10 +5,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Combat
 {
-    /// <summary>
-    /// A barrel or crate that breaks after a few hits. Implements IDamageable,
-    /// so the staff, fireballs and traps can all hurt it without knowing what it is.
-    /// </summary>
+    /// <summary>A barrel or crate that breaks after a few hits. Anything can hurt it.</summary>
     public class BreakableProp : MonoBehaviour, IDamageable
     {
         [SerializeField] private int maxHealth = 3;

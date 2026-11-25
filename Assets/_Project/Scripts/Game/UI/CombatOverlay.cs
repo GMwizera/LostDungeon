@@ -7,9 +7,8 @@ using UnityEngine.UIElements;
 namespace LostDungeon.Game.UI
 {
     /// <summary>
-    /// Draws UI that follows things in the 3D world: a name plate with a health bar over every enemy,
-    /// and floating damage numbers ("-2", "-4 CRIT!") where hits land. Uses the HUD's UI Toolkit panel,
-    /// converting world positions to panel positions each frame.
+    /// Shows health bars over enemies and damage numbers where hits land.
+    /// It listens to the hit event and follows them in the 3D world.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class CombatOverlay : MonoBehaviour
@@ -45,7 +44,7 @@ namespace LostDungeon.Game.UI
             VisualElement root = GetComponent<UIDocument>().rootVisualElement;
             layer = new VisualElement { name = "world-layer", pickingMode = PickingMode.Ignore };
             layer.AddToClassList("world-layer");
-            root.Insert(0, layer); // under every HUD panel and menu
+            root.Insert(0, layer); // sits below the HUD and menus
             hurtFlash = new VisualElement { pickingMode = PickingMode.Ignore };
             hurtFlash.AddToClassList("hurt-flash");
             hurtFlash.style.opacity = 0f;
@@ -130,7 +129,7 @@ namespace LostDungeon.Game.UI
             }
         }
 
-        /// <summary>Moves a UI element so it is centred on a world point. False when the point is behind the camera.</summary>
+        /// <summary>Puts a UI piece over a world point. False if it is behind the camera.</summary>
         private bool Place(VisualElement element, Vector3 world)
         {
             if (view.WorldToViewportPoint(world).z < 0f)
@@ -163,7 +162,7 @@ namespace LostDungeon.Game.UI
             if (layer == null)
                 return;
             if (playerHurt)
-                hurtFlashLeft = 0.35f; // red glow around the screen edges
+                hurtFlashLeft = 0.35f; // red glow on the screen edges
             var label = new Label(critical ? $"-{amount} CRIT!" : $"-{amount}") { pickingMode = PickingMode.Ignore };
             label.AddToClassList("damage-number");
             if (critical) label.AddToClassList("damage-number--crit");

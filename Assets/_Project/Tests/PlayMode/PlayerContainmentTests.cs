@@ -11,8 +11,8 @@ using UnityEngine.TestTools;
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Pushes the player into the walls and corners in every direction, dashing as it goes,
-    /// and checks it never leaves the room. Written after a real bug where the player could walk out.
+    /// Runs and dashes the player into every wall and corner and checks it stays inside.
+    /// Added after a bug where the player could walk out.
     /// </summary>
     public class PlayerContainmentTests
     {

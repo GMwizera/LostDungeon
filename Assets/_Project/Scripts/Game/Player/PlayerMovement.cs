@@ -6,9 +6,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Player
 {
     /// <summary>
-    /// Moves the hero across the 3D floor with physics, so walls stop them.
-    /// Input is turned to match the camera angle, so "up" always walks up the screen.
-    /// Implements IDashable so the Dash ability can push it without knowing it is the player.
+    /// Moves the hero with physics, so walls stop them.
+    /// Input follows the camera, so "up" always goes up the screen.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(PlayerInputReader))]
     public class PlayerMovement : MonoBehaviour, IDashable
@@ -20,18 +19,18 @@ namespace LostDungeon.Game.Player
         private Vector2 dashVelocity;
         private float dashTimeLeft;
 
-        /// <summary>Last floor direction the player moved in. Abilities aim with this.</summary>
+        /// <summary>The last way the player moved. Abilities aim this way.</summary>
         public Vector2 FacingDirection { get; private set; } = Vector2.down;
 
         public bool IsDashing => dashTimeLeft > 0f;
 
-        /// <summary>Current movement on the floor, used by the character animator.</summary>
+        /// <summary>How fast the player moves, for the animations.</summary>
         public Vector2 FloorVelocity => Ground.ToFloor(body.linearVelocity);
 
         private void Awake()
         {
             body = GetComponent<Rigidbody>();
-            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // dashes must not pass through walls
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // so fast dashes don't go through walls
             input = GetComponent<PlayerInputReader>();
         }
 

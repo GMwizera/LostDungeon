@@ -3,9 +3,8 @@ using System;
 namespace LostDungeon.Core.Events
 {
     /// <summary>
-    /// Central event hub (Observer pattern).
-    /// Gameplay systems raise events here; UI, audio, saving and objectives listen.
-    /// Neither side holds a reference to the other, so either can be replaced or removed.
+    /// All game events in one place (Observer pattern).
+    /// Gameplay sends events and UI, sound and saving listen. They never know about each other.
     /// </summary>
     public static class GameEvents
     {
@@ -16,7 +15,7 @@ namespace LostDungeon.Core.Events
         /// <summary>Enemy id, e.g. "Warrior".</summary>
         public static event Action<string> EnemyDefeated;
 
-        /// <summary>Enemy id of the enemy that just attacked (for sounds).</summary>
+        /// <summary>Id of the enemy that just attacked, for sounds.</summary>
         public static event Action<string> EnemyAttacked;
 
         /// <summary>(item id, amount)</summary>
@@ -25,33 +24,33 @@ namespace LostDungeon.Core.Events
         /// <summary>(ability name, cooldown seconds)</summary>
         public static event Action<string, float> AbilityActivated;
 
-        /// <summary>Level number, starting at 1.</summary>
+        /// <summary>Level number, from 1.</summary>
         public static event Action<int> LevelCompleted;
 
         public static event Action<GameState> GameStateChanged;
 
-        /// <summary>(item id, new count) whenever the player's inventory changes.</summary>
+        /// <summary>(item id, new count) when the inventory changes.</summary>
         public static event Action<string, int> InventoryChanged;
 
-        /// <summary>Text of the current level objective.</summary>
+        /// <summary>The current goal text.</summary>
         public static event Action<string> ObjectiveChanged;
 
-        /// <summary>(enemies defeated, enemies total, key required, key held, exit open) for the HUD chips.</summary>
+        /// <summary>(defeated, total enemies, key needed, key held, exit open) for the HUD.</summary>
         public static event Action<int, int, bool, bool, bool> ObjectiveStatusChanged;
 
-        /// <summary>Prompt for the nearest interactable, or null when there is none.</summary>
+        /// <summary>Hint for the closest thing you can use, or null.</summary>
         public static event Action<string> InteractionPromptChanged;
 
-        /// <summary>(level number, level name) once a level has finished loading.</summary>
+        /// <summary>(level number, level name) when a level is loaded.</summary>
         public static event Action<int, string> LevelStarted;
 
         /// <summary>Loading progress from 0 to 1.</summary>
         public static event Action<float> LevelLoadProgress;
 
-        /// <summary>Message shown when a level could not be loaded.</summary>
+        /// <summary>Error text when a level fails to load.</summary>
         public static event Action<string> LevelLoadFailed;
 
-        /// <summary>(title, description) of the dungeon conditions from the weather API.</summary>
+        /// <summary>(title, description) of today's weather effects.</summary>
         public static event Action<string, string> ConditionsChanged;
 
         public static void RaisePlayerHealthChanged(int current, int max) => PlayerHealthChanged?.Invoke(current, max);
@@ -73,8 +72,8 @@ namespace LostDungeon.Core.Events
         public static void RaiseConditionsChanged(string title, string description) => ConditionsChanged?.Invoke(title, description);
 
         /// <summary>
-        /// Removes every listener. Called when Play mode starts (the project has domain reload off,
-        /// so static events would otherwise keep listeners from the last session) and by tests.
+        /// Removes all listeners. Runs when Play starts and in tests.
+        /// Domain reload is off, so old listeners would stay around otherwise.
         /// </summary>
         public static void ResetAll()
         {

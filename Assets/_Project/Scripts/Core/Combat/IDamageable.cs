@@ -1,9 +1,6 @@
 namespace LostDungeon.Core.Combat
 {
-    /// <summary>
-    /// Anything that can be hurt: the player, enemies, breakable objects.
-    /// Attackers only know this interface, never the concrete class.
-    /// </summary>
+    /// <summary>Anything that can get hurt. Attackers only know this, not the real class.</summary>
     public interface IDamageable
     {
         bool IsDead { get; }

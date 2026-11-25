@@ -9,9 +9,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Generates simple placeholder sounds and music as WAV files, fills a SoundLibrary with them,
-    /// and puts an AudioManager in the scene. Replace any clip later by dragging a real sound into
-    /// the SoundLibrary asset; existing WAVs and the library are never overwritten.
+    /// Makes simple stand-in sounds and music as WAV files and adds an AudioManager.
+    /// It never overwrites old files, so you can swap in real sounds later.
     /// </summary>
     public static class AudioSetupBuilder
     {
@@ -149,7 +148,7 @@ namespace LostDungeon.EditorTools
         private static float[] UIClick() =>
             Make(0.05f, (t, p) => Sine(1200f, t) * 0.5f * (1f - p));
 
-        /// <summary>16-second loop in A minor: soft bass chords and a plucked melody.</summary>
+        /// <summary>A 16 second music loop with soft bass and a simple tune.</summary>
         private static float[] Music()
         {
             float[] bass = { 110f, 87.31f, 130.81f, 98f }; // A2, F2, C3, G2
@@ -157,7 +156,7 @@ namespace LostDungeon.EditorTools
             var picker = new System.Random(3);
             var melody = new float[32];
             for (int i = 0; i < melody.Length; i++)
-                melody[i] = picker.Next(4) == 0 ? 0f : scale[picker.Next(scale.Length)]; // 0 = rest
+                melody[i] = picker.Next(4) == 0 ? 0f : scale[picker.Next(scale.Length)]; // 0 means a silent beat
 
             const float length = 16f;
             return Make(length, (t, p) =>
@@ -170,7 +169,7 @@ namespace LostDungeon.EditorTools
                     sample += Sine(melody[step], t) * Mathf.Exp(-(t % 0.5f) * 6f) * 0.12f;
 
                 float edge = Mathf.Min(t, length - t);
-                return sample * Mathf.Clamp01(edge / 0.02f); // tiny fade so the loop point doesn't click
+                return sample * Mathf.Clamp01(edge / 0.02f); // tiny fade so the loop does not click
             });
         }
 
@@ -188,7 +187,7 @@ namespace LostDungeon.EditorTools
         private static float Square(float frequency, float t) => Mathf.Sign(Sine(frequency, t));
         private static float Noise() => (float)(noiseSource.NextDouble() * 2.0 - 1.0);
 
-        /// <summary>Quick rise over the first part of the sound, then a fade to silence.</summary>
+        /// <summary>Gets loud fast, then fades out.</summary>
         private static float Envelope(float progress, float attack) =>
             progress < attack ? progress / attack : Mathf.Pow(1f - (progress - attack) / (1f - attack), 2f);
 
@@ -210,8 +209,8 @@ namespace LostDungeon.EditorTools
             writer.Write(Encoding.ASCII.GetBytes("RIFF"));
             writer.Write(36 + dataBytes);
             writer.Write(Encoding.ASCII.GetBytes("WAVEfmt "));
-            writer.Write(16);          // fmt chunk size
-            writer.Write((short)1);    // PCM
+            writer.Write(16);          // size of the format part
+            writer.Write((short)1);    // plain PCM sound
             writer.Write((short)1);    // mono
             writer.Write(Rate);
             writer.Write(Rate * 2);    // bytes per second

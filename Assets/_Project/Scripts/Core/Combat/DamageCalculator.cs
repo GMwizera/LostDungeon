@@ -14,14 +14,11 @@ namespace LostDungeon.Core.Combat
         }
     }
 
-    /// <summary>
-    /// Damage rules in one place. The random roll is passed in instead of generated here,
-    /// so tests can force a critical hit or a normal hit.
-    /// </summary>
+    /// <summary>All damage rules. The random roll is passed in so tests can pick it.</summary>
     public static class DamageCalculator
     {
-        /// <summary>Damage an attacker deals before the target's armour.</summary>
-        /// <param name="roll">A random number from 0 (inclusive) to 1 (exclusive).</param>
+        /// <summary>Damage before armour.</summary>
+        /// <param name="roll">Random number from 0 up to (not including) 1.</param>
         public static DamageResult Roll(int baseDamage, float critChance, float critMultiplier, double roll)
         {
             if (baseDamage <= 0)
@@ -32,7 +29,7 @@ namespace LostDungeon.Core.Combat
             return new DamageResult(amount, critical);
         }
 
-        /// <summary>Damage after armour. Any hit that lands does at least 1 damage.</summary>
+        /// <summary>Damage after armour. A hit always does at least 1.</summary>
         public static int ApplyArmor(int incoming, int armor)
         {
             if (incoming <= 0)

@@ -11,9 +11,7 @@ using UnityEngine;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Tools > Lost Dungeon > Capture Level Previews: renders each level through the game camera,
-    /// with the hero and enemies posed in their idle animation, to Builds/Previews/LevelN.png.
-    /// Handy for checking the look without pressing Play, and for screenshots in the README.
+    /// Saves a picture of each level, so you can check it without pressing Play.
     /// </summary>
     public static class PreviewCapture
     {
@@ -58,7 +56,7 @@ namespace LostDungeon.EditorTools
             var serialized = new SerializedObject(follow);
             float yaw = serialized.FindProperty("yaw").floatValue, pitch = serialized.FindProperty("pitch").floatValue;
             float distance = serialized.FindProperty("distance").floatValue;
-            // Same framing as in play: centred on the hero.
+            // Point the camera at the hero, like in the game.
             Vector3 focus = player.transform.position + Vector3.up * serialized.FindProperty("lookHeight").floatValue;
             camera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
             camera.transform.position = focus - camera.transform.forward * distance;
@@ -68,7 +66,7 @@ namespace LostDungeon.EditorTools
             camera.targetTexture = target;
             camera.aspect = width / (float)height;
             camera.Render();
-            camera.Render(); // second frame: post-processing history settles
+            camera.Render(); // render twice so the effects look right
 
             RenderTexture.active = target;
             var image = new Texture2D(width, height, TextureFormat.RGB24, false);

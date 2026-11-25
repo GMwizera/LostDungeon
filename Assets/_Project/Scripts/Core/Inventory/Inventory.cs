@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LostDungeon.Core.Inventory
 {
-    /// <summary>Item id and how many of it the player holds.</summary>
+    /// <summary>An item and how many the player has.</summary>
     public readonly struct ItemStack
     {
         public string Id { get; }
@@ -16,10 +16,7 @@ namespace LostDungeon.Core.Inventory
         }
     }
 
-    /// <summary>
-    /// Stackable inventory: each item id has a count (gold, keys, potions).
-    /// Plain C# so it can be unit tested and saved as data.
-    /// </summary>
+    /// <summary>Counts each item, like gold, keys and potions. Easy to test and save.</summary>
     public class Inventory
     {
         private readonly Dictionary<string, int> counts = new Dictionary<string, int>();
@@ -42,7 +39,7 @@ namespace LostDungeon.Core.Inventory
             Changed?.Invoke(id, counts[id]);
         }
 
-        /// <summary>Removes items if there are enough. Returns false and changes nothing otherwise.</summary>
+        /// <summary>Takes items if there are enough. If not, returns false.</summary>
         public bool TryRemove(string id, int amount = 1)
         {
             if (amount <= 0 || !Has(id, amount))
@@ -66,14 +63,14 @@ namespace LostDungeon.Core.Inventory
                 Changed?.Invoke(id, 0);
         }
 
-        /// <summary>All stacks, largest first (ties in alphabetical order), for the HUD and saving.</summary>
+        /// <summary>All items, biggest count first, ties A to Z.</summary>
         public List<ItemStack> GetSortedStacks()
         {
             var stacks = new List<ItemStack>(counts.Count);
             foreach (KeyValuePair<string, int> pair in counts)
                 stacks.Add(new ItemStack(pair.Key, pair.Value));
 
-            // Insertion sort: the inventory only ever holds a handful of item types.
+            // Insertion sort is fine because there are only a few item types.
             for (int i = 1; i < stacks.Count; i++)
             {
                 ItemStack current = stacks[i];

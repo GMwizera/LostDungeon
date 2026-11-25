@@ -3,13 +3,13 @@ using UnityEngine;
 namespace LostDungeon.Game.Platform
 {
     /// <summary>
-    /// Platform-specific behaviour in one place, chosen with Unity conditional compilation.
-    /// Each build only contains the code for its own platform, so there are no runtime platform checks
-    /// spread around the game and no calls to APIs that don't exist on that platform.
+    /// All platform differences in one place, using conditional compilation.
+    /// Each build only gets its own code, so no platform checks while playing
+    /// and no calls to things that platform doesn't have.
     /// </summary>
     public static class PlatformFeatures
     {
-        /// <summary>Phones and tablets: show touch controls by default.</summary>
+        /// <summary>Phones and tablets show touch controls.</summary>
         public static bool IsMobile
         {
             get
@@ -22,7 +22,7 @@ namespace LostDungeon.Game.Platform
             }
         }
 
-        /// <summary>A browser tab can't be closed by the game, so WebGL hides the Exit button.</summary>
+        /// <summary>A game can't close a browser tab, so WebGL hides Exit.</summary>
         public static bool CanQuit
         {
             get
@@ -57,21 +57,20 @@ namespace LostDungeon.Game.Platform
         private static void ApplyPerformanceSettings()
         {
 #if UNITY_ANDROID || UNITY_IOS
-            // Phones: steady 60 fps, keep the screen on, and quality level 0, which uses the lighter
-            // mobile render pipeline (no MSAA, 4 lights per object, hard shorter shadows, 85% resolution).
+            // Phones: 60 fps, screen stays on, and the lighter mobile graphics.
             Application.targetFrameRate = 60;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             QualitySettings.SetQualityLevel(0, true);
 #elif UNITY_WEBGL
-            // Browser: let requestAnimationFrame pace the game.
+            // Browser: let the browser set the frame rate.
             Application.targetFrameRate = -1;
 #elif UNITY_STANDALONE
-            // Desktop: match the monitor's refresh rate.
+            // Desktop: match the screen's speed.
             QualitySettings.vSyncCount = 1;
 #endif
         }
 
-        /// <summary>Short buzz when the player is hurt. Only phones have a vibration motor.</summary>
+        /// <summary>Buzzes when the player is hurt. Only phones can vibrate.</summary>
         public static void Vibrate()
         {
 #if UNITY_ANDROID || UNITY_IOS

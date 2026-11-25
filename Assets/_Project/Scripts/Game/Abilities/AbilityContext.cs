@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Abilities
 {
-    /// <summary>Everything an ability needs to know about who used it and where they are aiming.</summary>
+    /// <summary>Who used the ability and where they are aiming.</summary>
     public readonly struct AbilityContext
     {
         public GameObject Owner { get; }

@@ -6,7 +6,7 @@ namespace LostDungeon.Tests
 {
     public class SaveServiceTests
     {
-        /// <summary>Keeps the "file" in memory so tests don't touch the disk.</summary>
+        /// <summary>Keeps the save in memory so tests don't touch the disk.</summary>
         private class MemoryStorage : ISaveStorage
         {
             public string Text;

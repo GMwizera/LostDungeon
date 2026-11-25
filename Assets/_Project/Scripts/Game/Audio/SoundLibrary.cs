@@ -4,10 +4,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Audio
 {
-    /// <summary>
-    /// Maps sound ids (like "Sword" or "EnemyDefeated") to clips. Swapping sounds means editing
-    /// this asset, never code. Several clips per id give variety.
-    /// </summary>
+    /// <summary>Links sound names to clips, so I change sounds here and not in code.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Audio/Sound Library")]
     public class SoundLibrary : ScriptableObject
     {

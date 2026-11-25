@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Visuals
 {
-    /// <summary>Makes a light flicker like a flame, using smooth noise so it never strobes.</summary>
+    /// <summary>Makes a light flicker softly like a real flame.</summary>
     [RequireComponent(typeof(Light))]
     public class TorchFlicker : MonoBehaviour
     {

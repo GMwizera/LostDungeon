@@ -10,9 +10,7 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Creates the three enemy types as data (attacks, behaviours, EnemyData) and as 3D prefabs:
-    /// a skeleton warrior, a skeleton archer with a crossbow, and a large armoured skeleton guardian.
-    /// Their numbers are written every build so they match the 3D scale.
+    /// Makes the 3 skeleton enemies: a warrior, an archer and a big guardian.
     /// </summary>
     public static class EnemySetupBuilder
     {
@@ -21,7 +19,7 @@ namespace LostDungeon.EditorTools
 
         public static Dictionary<string, EnemyController> BuildAll()
         {
-            // Attacks reuse the player's ability classes: same code, different numbers.
+            // Enemies use the same attack code as the hero, just other numbers.
             var warriorStrike = GetOrCreateAbility<MeleeAttackAbility>("WarriorStrike");
             SetValues(warriorStrike, ("displayName", "WarriorStrike"), ("cooldownSeconds", 0.9f), ("animationTrigger", "Attack"),
                 ("damage", 1), ("reach", 0.45f), ("radius", 0.45f), ("critChance", 0f),

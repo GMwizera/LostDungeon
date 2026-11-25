@@ -9,12 +9,11 @@ using UnityEngine.Networking;
 namespace LostDungeon.Game.Weather
 {
     /// <summary>
-    /// REST API integration: gets the current weather in Kigali from Open-Meteo (free, no API key,
-    /// HTTPS, and allows browser requests, so it also works in the WebGL build) and turns it into
-    /// dungeon conditions. If the request fails or times out, the game keeps working with normal
-    /// conditions and the HUD says the weather is unavailable.
+    /// Gets Kigali's weather from the Open-Meteo REST API and turns it into dungeon conditions.
+    /// It needs no key and works in WebGL too.
+    /// If the request fails, the game just uses normal conditions.
     /// </summary>
-    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
+    [DefaultExecutionOrder(-100)] // runs before other scripts need it
     public class WeatherService : Singleton<WeatherService>
     {
         private const string Url =
@@ -41,10 +40,10 @@ namespace LostDungeon.Game.Weather
         public bool IsFetching { get; private set; }
         public string Summary { get; private set; } = "Checking Kigali weather...";
 
-        /// <summary>Temperature in Celsius, or null when there is no live data.</summary>
+        /// <summary>Temperature in Celsius, or null if we have no data.</summary>
         public float? Temperature { get; private set; }
 
-        /// <summary>Readable weather name, e.g. "Overcast & Rain".</summary>
+        /// <summary>The weather in words, like "Overcast".</summary>
         public string WeatherName { get; private set; } = "Checking...";
 
         public bool IsNight { get; private set; }
@@ -104,7 +103,7 @@ namespace LostDungeon.Game.Weather
             }
             catch (ArgumentException)
             {
-                // Malformed JSON: treated the same as no data.
+                // Bad JSON counts as no data.
             }
             return weather != null;
         }

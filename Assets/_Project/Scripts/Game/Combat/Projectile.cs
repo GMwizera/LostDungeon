@@ -6,11 +6,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Combat
 {
-    /// <summary>
-    /// A pooled projectile (fireball, arrow). Flies straight across the floor at chest height,
-    /// damages the first IDamageable it touches (never its owner or the owner's allies),
-    /// and goes back to the pool on hit or when its lifetime runs out.
-    /// </summary>
+    /// <summary>A pooled fireball or arrow. It flies straight and hurts the first thing it hits.</summary>
     [RequireComponent(typeof(Rigidbody))]
     public class Projectile : MonoBehaviour, IPoolable
     {
@@ -43,7 +39,7 @@ namespace LostDungeon.Game.Combat
         {
             active = true;
             foreach (TrailRenderer trail in trails)
-                trail.Clear(); // don't draw a streak from where it was last used
+                trail.Clear(); // no old trail from its last use
         }
 
         public void OnDespawned()
@@ -62,11 +58,11 @@ namespace LostDungeon.Game.Combat
         private void OnTriggerEnter(Collider other)
         {
             if (!active || other.isTrigger)
-                return; // ignore traps, pickups and other projectiles
+                return; // skip traps, pickups and other shots
 
             GameObject hit = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
             if (hit == owner || Faction.AreAllies(hit, owner))
-                return; // fly past the shooter and its allies
+                return; // don't hit the shooter or its team
 
             if (hit.TryGetComponent(out IDamageable target) && !target.IsDead)
             {
@@ -76,12 +72,12 @@ namespace LostDungeon.Game.Combat
 
             if (impactEffect != null)
                 PoolManager.Instance.Spawn(impactEffect, transform.position + Vector3.up * Ground.BodyHeight, Quaternion.identity);
-            ReturnToPool(); // hit something solid: a wall, a prop or a character
+            ReturnToPool(); // hit a wall, a prop or a character
         }
 
         private void ReturnToPool()
         {
-            active = false; // guards against a hit and a timeout in the same frame
+            active = false; // so a hit and a timeout can't both happen
             PoolManager.Instance.Despawn(gameObject);
         }
     }

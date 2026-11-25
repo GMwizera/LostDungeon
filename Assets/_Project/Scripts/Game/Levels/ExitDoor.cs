@@ -5,8 +5,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Levels
 {
     /// <summary>
-    /// The way out. The door stays shut until the objective is done, then swings open and light pours in;
-    /// using it finishes the level. It reports "exit reached" to the LevelManager through an event, not by calling it.
+    /// The way out. It opens when the goal is done, and using it ends the level.
+    /// It tells the LevelManager with an event, not a direct call.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class ExitDoor : MonoBehaviour, IInteractable
@@ -49,7 +49,7 @@ namespace LostDungeon.Game.Levels
         {
             if (objective != null && !objective.ExitUnlocked)
             {
-                objective.Publish(); // remind the player what is still missing
+                objective.Publish(); // tell the player what is left to do
                 return;
             }
 
@@ -59,7 +59,7 @@ namespace LostDungeon.Game.Levels
             ExitReached?.Invoke();
         }
 
-        /// <summary>Static event: cleared when Play mode starts, because domain reload is off.</summary>
+        /// <summary>Cleared on Play because domain reload is off.</summary>
         internal static void ResetStatics() => ExitReached = null;
     }
 }

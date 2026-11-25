@@ -1,6 +1,6 @@
 namespace LostDungeon.Game.Inventory
 {
-    /// <summary>Item ids in one place so a typo can't create a second kind of "gold".</summary>
+    /// <summary>All item names in one place, so typos can't happen.</summary>
     public static class ItemIds
     {
         public const string Gold = "gold";

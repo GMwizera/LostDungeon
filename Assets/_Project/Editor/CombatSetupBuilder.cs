@@ -11,9 +11,7 @@ using UnityEngine;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Creates the hero's three abilities (Strategy assets with their visual effects)
-    /// and the 3D player: an elemental mage with a staff, a torch light, and all the player scripts.
-    /// Also holds the small helpers every builder uses.
+    /// Makes the hero, their 3 attacks, and small helpers the other builders use.
     /// </summary>
     public static class CombatSetupBuilder
     {
@@ -33,7 +31,7 @@ namespace LostDungeon.EditorTools
             });
             player.transform.position = position;
 
-            // No hat: the hero's face and hair show from the high camera, like a monk rather than a wizard.
+            // Hide the hat so you can see the hero's face from above.
             Transform hat = KayKitSetup.FindBone(player.transform, "Mage_Hat");
             if (hat != null)
                 hat.gameObject.SetActive(false);
@@ -52,7 +50,7 @@ namespace LostDungeon.EditorTools
                 ("attack", sword), ("dash", dash), ("special", fireball),
                 ("characterAnimator", player.GetComponent<CharacterAnimator>()));
 
-            // A warm light that travels with the hero, so the dark dungeon is lit where they walk.
+            // A light that follows the hero so the dark dungeon is not too dark.
             var torch = new GameObject("Torch");
             torch.transform.SetParent(player.transform, false);
             torch.transform.localPosition = new Vector3(0f, 2.4f, -0.4f);
@@ -66,7 +64,7 @@ namespace LostDungeon.EditorTools
             return player;
         }
 
-        /// <summary>The hero's Strategy assets. Values are written every build so the numbers match the 3D scale.</summary>
+        /// <summary>Makes the hero's 3 attacks and sets their numbers.</summary>
         public static (AbilityDefinition, AbilityDefinition, AbilityDefinition) CreateHeroAbilities()
         {
             var sword = GetOrCreateAbility<MeleeAttackAbility>("Sword");
@@ -103,7 +101,7 @@ namespace LostDungeon.EditorTools
             return ability;
         }
 
-        /// <summary>Sets private [SerializeField] values so they are saved with the asset or scene.</summary>
+        /// <summary>Sets private fields so Unity saves them.</summary>
         internal static void SetValues(Object target, params (string field, object value)[] values)
         {
             var serialized = new SerializedObject(target);

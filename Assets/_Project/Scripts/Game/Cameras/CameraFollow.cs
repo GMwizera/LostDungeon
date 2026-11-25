@@ -3,11 +3,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Cameras
 {
-    /// <summary>
-    /// Isometric-style 3D camera: looks down at the hero from a fixed angle (45 degrees around, pitched down)
-    /// and smoothly follows them across the floor. Movement input is turned by the same angle,
-    /// so pressing "up" always walks up the screen.
-    /// </summary>
+    /// <summary>Looks down at the hero from an angle and follows them smoothly.</summary>
     public class CameraFollow : MonoBehaviour
     {
         [SerializeField] private Transform target;
@@ -25,7 +21,7 @@ namespace LostDungeon.Game.Cameras
         private float shakeLeft;
         private int lastHealth = -1;
 
-        /// <summary>The camera's turn around the vertical axis. Player input uses it.</summary>
+        /// <summary>How far the camera is turned. Player input uses it.</summary>
         public static float Yaw { get; private set; } = 45f;
 
         private void Awake()
@@ -38,7 +34,7 @@ namespace LostDungeon.Game.Cameras
         private void OnEnable() => GameEvents.PlayerHealthChanged += OnPlayerHealthChanged;
         private void OnDisable() => GameEvents.PlayerHealthChanged -= OnPlayerHealthChanged;
 
-        /// <summary>A short shake whenever the hero loses health, so every hit is felt.</summary>
+        /// <summary>Shakes a little when the hero gets hurt.</summary>
         private void OnPlayerHealthChanged(int current, int max)
         {
             if (lastHealth >= 0 && current < lastHealth)
@@ -48,7 +44,7 @@ namespace LostDungeon.Game.Cameras
 
         public void SetTarget(Transform newTarget) => target = newTarget;
 
-        /// <summary>Jumps straight to the target, e.g. when a level starts.</summary>
+        /// <summary>Jumps right to the target, like when a level starts.</summary>
         public void SnapToTarget()
         {
             if (target == null)

@@ -18,11 +18,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Builds the five 3D level prefabs from the layouts below, marks each one Addressable
-    /// (address "Level1" ... "Level5", one bundle per level) and creates the LevelCatalog.
-    /// Every cell is one world unit. The room covers cells (0,0) to (Width-1, Height-1);
-    /// tall walls stand on the far sides (north and east) and low barriers on the near sides,
-    /// so the 45 degree camera can always see in.
+    /// Builds the 5 levels and makes each one Addressable.
+    /// Near walls are low so the camera can always see in.
     /// </summary>
     public static class LevelBuilder
     {
@@ -207,7 +204,7 @@ namespace LostDungeon.EditorTools
                     typeof(BundledAssetGroupSchema), typeof(ContentUpdateGroupSchema));
             }
 
-            // One bundle per level: only the level being played is loaded into memory.
+            // One bundle per level, so only the current level uses memory.
             var schema = group.GetSchema<BundledAssetGroupSchema>();
             schema.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackSeparately;
 
@@ -275,7 +272,7 @@ namespace LostDungeon.EditorTools
 
         private static Vector3 Cell(Vector2Int cell) => new Vector3(cell.x + 0.5f, 0f, cell.y + 0.5f);
 
-        /// <summary>Places a KayKit dungeon model (already imported at the 1 tile = 1 unit scale).</summary>
+        /// <summary>Puts one dungeon model into the level.</summary>
         internal static GameObject Place(Transform parent, string model, Vector3 position, float yaw = 0f, float scale = 1f)
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(KayKitSetup.Model($"{KayKitSetup.DungeonFolder}/{model}.fbx"));
@@ -302,20 +299,20 @@ namespace LostDungeon.EditorTools
                     return roll < 45 ? "floor_tile_small" : roll < 65 ? "floor_tile_small_broken_A" : roll < 85 ? "floor_tile_small_broken_B" : "floor_tile_small_weeds_A";
                 case Theme.Vault:
                     return roll < 80 ? "floor_tile_small" : "floor_tile_small_weeds_B";
-                default: // Temple: mossy stone, like the reference art
+                default: // Temple uses mossy stone
                     return roll < 60 ? "floor_tile_small" : roll < 80 ? "floor_tile_small_weeds_A" : roll < 95 ? "floor_tile_small_weeds_B" : "floor_tile_small_decorated";
             }
         }
 
         private static void BuildFloor(Transform parent, Layout layout, HashSet<Vector2Int> trapCells, System.Random random)
         {
-            // One ring of extra floor under the walls, so they never stand over the void.
+            // Extra floor under the walls so they never float over nothing.
             for (int x = -1; x <= layout.Width; x++)
             {
                 for (int y = -1; y <= layout.Height; y++)
                 {
                     if (trapCells.Contains(new Vector2Int(x, y)))
-                        continue; // the trap has its own floor plate
+                        continue; // the trap brings its own floor
                     GameObject tile = Place(parent, FloorTile(layout.Theme, random), Cell(new Vector2Int(x, y)), 90f * random.Next(4));
                     foreach (Renderer r in tile.GetComponentsInChildren<Renderer>())
                         r.shadowCastingMode = ShadowCastingMode.Off;
@@ -330,12 +327,12 @@ namespace LostDungeon.EditorTools
             int w = layout.Width, h = layout.Height;
             int doorSegment = layout.DoorX / 2;
 
-            // North (far) wall, along X. Segments are 2 cells long.
+            // Back wall. Each piece is 2 cells long.
             for (int k = 0; k < w / 2; k++)
             {
                 float x = 2 * k + 1;
                 if (k == doorSegment)
-                    continue; // the exit door is built separately
+                    continue; // leave a gap, the exit door goes here
                 Place(parent, WallPiece(random), new Vector3(x, 0f, h + 0.25f));
                 if (k % 2 == 0)
                     AddTorch(parent, new Vector3(x, 0f, h), 180f, layout.Theme);
@@ -343,7 +340,7 @@ namespace LostDungeon.EditorTools
                     AddBanner(parent, new Vector3(x, 0f, h), 180f, random);
             }
 
-            // East (far) wall, along Z.
+            // Right side wall.
             for (int k = 0; k < h / 2; k++)
             {
                 float z = 2 * k + 1;
@@ -352,12 +349,12 @@ namespace LostDungeon.EditorTools
                     AddTorch(parent, new Vector3(w, 0f, z), 270f, layout.Theme);
             }
 
-            // Corner and end pillars.
+            // Pillars at the corners and ends.
             Place(parent, "pillar", new Vector3(w + 0.25f, 0f, h + 0.25f));
             Place(parent, "pillar", new Vector3(-0.25f, 0f, h + 0.25f));
             Place(parent, "pillar", new Vector3(w + 0.25f, 0f, -0.25f));
 
-            // South and west (near) sides: knee-high barriers, so the camera sees over them.
+            // Front sides get low walls so the camera can see over.
             for (int k = 0; k < w / 2; k++)
                 Place(parent, "barrier", new Vector3(2 * k + 1, 0f, -0.15f));
             for (int k = 0; k < h / 2; k++)
@@ -397,8 +394,7 @@ namespace LostDungeon.EditorTools
         }
 
         /// <summary>
-        /// Invisible solid boxes around the room. The visible barriers on the near side are low,
-        /// but the collision is a full wall on every side, so nothing can leave the room.
+        /// Invisible walls all around, so nothing can leave the room.
         /// </summary>
         private static void BuildCollision(Transform parent, Layout layout)
         {
@@ -442,7 +438,7 @@ namespace LostDungeon.EditorTools
             blocker.center = new Vector3(0f, WallHeight / 2f, 0f);
             blocker.size = new Vector3(2f, WallHeight, 0.5f);
 
-            // Warm light beyond the doorway: faint while sealed, bright once the way out is open.
+            // Light behind the door gets bright once the exit opens.
             var glow = new GameObject("Exit Glow");
             glow.transform.SetParent(doorway.transform, false);
             glow.transform.localPosition = new Vector3(0f, 1.2f, 0.9f);
@@ -537,12 +533,12 @@ namespace LostDungeon.EditorTools
 
         private static void CreateTrap(Transform parent, Vector2Int cell)
         {
-            GameObject trap = Place(parent, "floor_tile_big_spikes", Cell(cell), 0f, 0.5f); // the plate is 2x2 cells: halve it
+            GameObject trap = Place(parent, "floor_tile_big_spikes", Cell(cell), 0f, 0.5f); // the trap is 2 cells wide, so shrink it by half
             trap.name = "Spike Trap";
             var trigger = trap.AddComponent<BoxCollider>();
             trigger.isTrigger = true;
             trigger.center = new Vector3(0f, 0.5f, 0f);
-            trigger.size = new Vector3(1.7f, 1f, 1.7f); // in the trap's own (halved) scale: about one cell
+            trigger.size = new Vector3(1.7f, 1f, 1.7f); // about one cell, since the trap is half size
             SetValues(trap.AddComponent<SpikeTrap>(), ("spikes", trap.transform.Find("spikes")), ("hiddenDepth", 0.9f));
         }
 

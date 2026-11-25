@@ -21,7 +21,7 @@ namespace LostDungeon.Tests
         [Test]
         public void FromVector_SnapsToNearestDirection()
         {
-            // Mostly right, slightly up: should still count as "right".
+            // Mostly right and a bit up still counts as "right".
             Assert.AreEqual(5, EightWayDirection.FromVector(1f, 0.2f));
         }
     }

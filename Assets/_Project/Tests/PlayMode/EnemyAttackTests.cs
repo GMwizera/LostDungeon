@@ -12,8 +12,8 @@ using UnityEngine.TestTools;
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Puts each enemy type right next to the player and checks it really hurts them.
-    /// Written after a bug where an archer backed into a corner kept trying to retreat and never shot.
+    /// Puts each enemy next to the player and checks it does damage.
+    /// Added after a bug where a cornered archer kept backing up and never shot.
     /// </summary>
     public class EnemyAttackTests
     {
@@ -32,7 +32,7 @@ namespace LostDungeon.PlayModeTests
         [UnityTest]
         public IEnumerator Archer_SeesPlayerFarAway_WalksIntoRange() => EnemyApproaches("Archer", 5.5f);
 
-        /// <summary>Spawns an enemy a few tiles away and checks it moves closer (chasing works, not just attacking).</summary>
+        /// <summary>Spawns an enemy a bit away and checks it walks closer.</summary>
         private static IEnumerator EnemyApproaches(string enemyName, float distance = 3f)
         {
 #if UNITY_EDITOR

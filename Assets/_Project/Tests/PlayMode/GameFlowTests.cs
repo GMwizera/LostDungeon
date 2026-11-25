@@ -13,9 +13,7 @@ using UnityEngine.TestTools;
 
 namespace LostDungeon.PlayModeTests
 {
-    /// <summary>
-    /// Smoke tests that run the real game: any error logged during them fails the test.
-    /// </summary>
+    /// <summary>Runs the real game. Any error in the log fails the test.</summary>
     public class GameFlowTests
     {
         [UnityTest]
@@ -38,7 +36,7 @@ namespace LostDungeon.PlayModeTests
             Assert.IsNotNull(Object.FindAnyObjectByType<LevelRoot>(), "Level content was not instantiated.");
             Assert.IsNotNull(Object.FindAnyObjectByType<PlayerHealth>(), "Player is not active.");
 
-            yield return new WaitForSeconds(3f); // let enemies think, path-find and attack
+            yield return new WaitForSeconds(3f); // give enemies time to move and attack
             Assert.Greater(Object.FindObjectsByType<EnemyController>(FindObjectsInactive.Exclude).Length, 0, "No enemies spawned.");
         }
 

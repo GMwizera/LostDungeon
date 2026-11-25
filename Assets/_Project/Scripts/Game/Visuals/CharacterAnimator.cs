@@ -3,11 +3,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Visuals
 {
-    /// <summary>
-    /// Drives a rigged 3D character: turns the model to face where it moves (or attacks),
-    /// blends idle and run from the body's speed, and plays attack, cast, hit and death animations on request.
-    /// Works for the hero and every enemy, because it only reads the Rigidbody, not who is controlling it.
-    /// </summary>
+    /// <summary>Plays the 3D character's animations and turns it to face where it goes.</summary>
     public class CharacterAnimator : MonoBehaviour
     {
         public const string AttackTrigger = "Attack";
@@ -36,18 +32,18 @@ namespace LostDungeon.Game.Visuals
             if (model != null) wantedRotation = model.rotation;
         }
 
-        /// <summary>Turns to face a floor direction, e.g. an enemy turning to the player before it strikes.</summary>
+        /// <summary>Turns to face a direction, like an enemy facing the player.</summary>
         public void FaceDirection(Vector2 direction, bool instant = false)
         {
             if (direction.sqrMagnitude < 0.0001f || model == null)
                 return;
             wantedRotation = Ground.Facing(direction);
-            lockFacingUntil = Time.time + 0.25f; // keep facing the target briefly even if the body slides
+            lockFacingUntil = Time.time + 0.25f; // keep facing it for a moment, even if it slides
             if (instant)
                 model.rotation = wantedRotation;
         }
 
-        /// <summary>Plays a one-shot action ("Attack" or "Cast").</summary>
+        /// <summary>Plays an action once, like "Attack" or "Cast".</summary>
         public void PlayAction(string trigger)
         {
             if (animator != null && !string.IsNullOrEmpty(trigger))
@@ -67,7 +63,7 @@ namespace LostDungeon.Game.Visuals
             animator.SetBool(DeadId, dead);
             if (!dead)
             {
-                // Back from the pool: start again from idle.
+                // Back from the pool, so start from idle again.
                 animator.Rebind();
                 animator.Update(0f);
             }

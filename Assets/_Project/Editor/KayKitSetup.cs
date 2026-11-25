@@ -8,10 +8,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Prepares the KayKit 3D art (CC0, Kay Lousberg): imports every model at half size so one floor tile
-    /// is one world unit, sets up the shared "Rig_Medium" skeleton so one set of animations drives the hero
-    /// and every skeleton enemy, swaps the imported materials for URP ones, and builds an Animator Controller
-    /// per character type (idle/run blend, attack, cast, hit, death).
+    /// Sets up the KayKit 3D art (CC0, by Kay Lousberg) and the character animations.
+    /// Models are half size so one floor tile is one unit.
     /// </summary>
     public static class KayKitSetup
     {
@@ -55,7 +53,7 @@ namespace LostDungeon.EditorTools
             MakeLit("KayKit_Knight", Texture($"{Root}/Characters/knight_texture.png"), Color.white, 0.3f);
             MakeLit("KayKit_Skeleton", Texture($"{Root}/Skeletons/skeleton_texture.png"), new Color(0.92f, 0.9f, 0.86f), 0.2f);
             Material glow = MakeLit("KayKit_Glow", null, new Color(0.3f, 0.9f, 1f), 0.5f);
-            glow.SetColor("_EmissionColor", new Color(0.3f, 0.9f, 1f) * 4f); // skeleton eyes glow cyan (bloom)
+            glow.SetColor("_EmissionColor", new Color(0.3f, 0.9f, 1f) * 4f); // makes skeleton eyes glow blue
             EditorUtility.SetDirty(glow);
         }
 
@@ -63,7 +61,7 @@ namespace LostDungeon.EditorTools
 
         public static Material LoadMaterial(string name) => AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/{name}.mat");
 
-        /// <summary>A URP Lit material. Emission is switched on (black) so hit flashes can make it glow.</summary>
+        /// <summary>A normal material with glow on, so hits can flash it.</summary>
         public static Material MakeLit(string name, Texture2D texture, Color tint, float smoothness)
         {
             EnsureFolder(MaterialFolder);
@@ -94,7 +92,7 @@ namespace LostDungeon.EditorTools
             if (n.Contains("skeleton")) return Skeleton;
             if (n.Contains("mage")) return Mage;
             if (n.Contains("knight")) return LoadMaterial("KayKit_Knight");
-            return Dungeon; // "texture": the dungeon atlas
+            return Dungeon; // everything else uses the dungeon texture
         }
 
         // ---------- Import settings ----------
@@ -116,7 +114,7 @@ namespace LostDungeon.EditorTools
                 importer.animationType = ModelImporterAnimationType.Generic;
                 importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
                 importer.importAnimation = animations;
-                importer.optimizeGameObjects = false; // keep the hand bones so weapons can be attached
+                importer.optimizeGameObjects = false; // keep the hand bones so we can add weapons
             }
             else
             {
@@ -126,7 +124,7 @@ namespace LostDungeon.EditorTools
 
             importer.SaveAndReimport();
 
-            // Point every embedded material at our URP materials.
+            // Swap the model's own materials for ours.
             foreach (Material embedded in AssetDatabase.LoadAllAssetsAtPath(path).OfType<Material>())
                 importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), embedded.name), MaterialFor(embedded.name));
 
@@ -157,8 +155,7 @@ namespace LostDungeon.EditorTools
         }
 
         /// <summary>
-        /// One controller per character type: an idle/walk/run blend tree driven by Speed, and one-shot
-        /// Attack, Cast and Hit states that return to it. Dead plays the fall and stays down.
+        /// Makes the animation setup for one kind of character: move, attack, cast, hit and die.
         /// </summary>
         public static AnimatorController BuildController(string name, string idle, string walk, string run,
             string attack, string cast, string hit, string death, float attackSpeed = 1.6f)
@@ -222,7 +219,7 @@ namespace LostDungeon.EditorTools
             return state;
         }
 
-        /// <summary>Finds a bone by name anywhere under a model (e.g. "handslot.r").</summary>
+        /// <summary>Finds a bone in the model by its name.</summary>
         public static Transform FindBone(Transform root, params string[] names)
         {
             foreach (string name in names)

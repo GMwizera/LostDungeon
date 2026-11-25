@@ -4,10 +4,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Visuals
 {
-    /// <summary>
-    /// Listens for hits (Observer) and spawns pooled spark effects where they land:
-    /// gold sparks for the hero's hits, bigger ones for critical hits, red ones when the hero is hurt.
-    /// </summary>
+    /// <summary>Listens for hits (Observer) and shows pooled sparks where they land.</summary>
     public class CombatEffectsPresenter : MonoBehaviour
     {
         [SerializeField] private PooledEffect hitSparks;

@@ -10,8 +10,8 @@ using UnityEngine.TestTools;
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Loads every level and checks with real 3D physics that the room is sealed on all four sides
-    /// (including the low barriers on the near side) and that the player's spawn point is open floor.
+    /// Loads each level and uses real physics to check all 4 walls are solid
+    /// and the player spawns on open floor.
     /// </summary>
     public class LevelCollisionTests
     {
@@ -41,7 +41,7 @@ namespace LostDungeon.PlayModeTests
                 }
 
                 Transform spawn = handle.Result.GetComponent<LevelRoot>().PlayerSpawn;
-                // Only the level's own colliders count (an earlier test may leave the hero standing here).
+                // Ignore the hero, an earlier test may have left it here.
                 Collider[] blockers = System.Array.FindAll(
                     Physics.OverlapSphere(spawn.position + Vector3.up * 0.6f, 0.2f, Physics.AllLayers, QueryTriggerInteraction.Ignore),
                     c => c.transform.IsChildOf(handle.Result.transform));

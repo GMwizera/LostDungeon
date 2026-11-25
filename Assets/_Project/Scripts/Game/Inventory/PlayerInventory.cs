@@ -8,8 +8,8 @@ using CoreInventory = LostDungeon.Core.Inventory.Inventory;
 namespace LostDungeon.Game.Inventory
 {
     /// <summary>
-    /// The player's items. Wraps the tested Core Inventory and announces every change through
-    /// GameEvents, so the HUD, audio and save system update without the inventory knowing about them.
+    /// The player's items. It sends an event on every change,
+    /// so the HUD, sound and saving update without it knowing them.
     /// </summary>
     public class PlayerInventory : MonoBehaviour
     {
@@ -28,12 +28,12 @@ namespace LostDungeon.Game.Inventory
 
         public bool TryUse(string id, int amount = 1) => items.TryRemove(id, amount);
 
-        /// <summary>Restores saved items at the start of a level. Raises InventoryChanged, not ItemCollected.</summary>
+        /// <summary>Puts saved items back when a level starts.</summary>
         public void Load(IEnumerable<InventoryEntry> saved)
         {
             items.Clear();
             foreach (InventoryEntry entry in saved)
-                if (entry.count > 0 && entry.id != ItemIds.Key) // keys belong to one level only
+                if (entry.count > 0 && entry.id != ItemIds.Key) // a key only works in its own level
                     items.Add(entry.id, entry.count);
         }
 

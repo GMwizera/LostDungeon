@@ -8,9 +8,7 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Assembles a 3D character: a physics root (Rigidbody + capsule) that gameplay scripts live on,
-    /// and a child "Model" with the rigged KayKit mesh, its Animator, a weapon in its hand,
-    /// and a glowing ring on the floor under its feet.
+    /// Puts a 3D character together: a body for physics, the model, a weapon and a floor ring.
     /// </summary>
     public static class CharacterBuilder
     {
@@ -18,8 +16,8 @@ namespace LostDungeon.EditorTools
         {
             public string ModelPath;
             public AnimatorController Controller;
-            public string RightHand;   // weapon model path, or null
-            public string LeftHand;    // shield or book, or null
+            public string RightHand;   // weapon, can be empty
+            public string LeftHand;    // shield or book, can be empty
             public Material Ring;
             public float Radius = 0.25f;
             public float RunSpeed = 2.8f;
@@ -46,7 +44,7 @@ namespace LostDungeon.EditorTools
             PrefabUtility.UnpackPrefabInstance(model, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
             model.name = "Model";
             model.transform.SetParent(root.transform, false);
-            model.transform.localScale = Vector3.one * 1.15f; // a little larger than the props, so heroes read clearly
+            model.transform.localScale = Vector3.one * 1.15f; // a bit bigger so characters are easy to see
 
             if (!model.TryGetComponent(out Animator animator))
                 animator = model.AddComponent<Animator>();
@@ -59,7 +57,7 @@ namespace LostDungeon.EditorTools
             {
                 r.shadowCastingMode = ShadowCastingMode.On;
                 if (r is SkinnedMeshRenderer skinned)
-                    skinned.updateWhenOffscreen = true; // animated bounds: avoid popping at the screen edge
+                    skinned.updateWhenOffscreen = true; // stops the model vanishing at the screen edge
             }
 
             Attach(model.transform, look.RightHand, "handslot.r", "hand.r", "wrist.r");
@@ -93,7 +91,7 @@ namespace LostDungeon.EditorTools
             item.transform.localScale = Vector3.one;
         }
 
-        /// <summary>A flat glowing ring on the floor: cyan under the hero, red under enemies.</summary>
+        /// <summary>A glowing ring on the floor under a character.</summary>
         public static void AddRing(Transform parent, Material material, float size)
         {
             var ring = GameObject.CreatePrimitive(PrimitiveType.Quad);

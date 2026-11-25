@@ -9,9 +9,8 @@ using static LostDungeon.EditorTools.CombatSetupBuilder;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Builds every visual effect from code: glow, ring and slash textures, additive URP materials,
-    /// particle effects (sword slash, wind burst, sparks, dust), the fireball and the arrow.
-    /// Everything is regenerated on each build, so tweaks belong here.
+    /// Makes all the visual effects in code, like sparks, the fireball and the arrow.
+    /// They are remade on every build, so change them here.
     /// </summary>
     public static class EffectsBuilder
     {
@@ -53,7 +52,7 @@ namespace LostDungeon.EditorTools
             Texture2D slash = MakeTexture("FX_Slash", 128, (u, v) =>
             {
                 float d = Radius(u, v);
-                float angle = Mathf.Atan2(v - 0.5f, u - 0.5f); // crescent on the far side (+v)
+                float angle = Mathf.Atan2(v - 0.5f, u - 0.5f); // moon shape on the far side
                 float sweep = Mathf.Clamp01(Mathf.Sin(angle));
                 float band = Mathf.Clamp01(1f - Mathf.Abs(d - 0.78f) / 0.16f);
                 return new Color(1, 1, 1, Mathf.Pow(band * sweep, 1.4f));
@@ -81,7 +80,7 @@ namespace LostDungeon.EditorTools
                 velocity.orbitalY = new ParticleSystem.MinMaxCurve(11f);
                 velocity.y = new ParticleSystem.MinMaxCurve(1.4f, 3.2f);
                 velocity.radial = new ParticleSystem.MinMaxCurve(0.4f);
-                velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // same mode as y (random between two constants)
+                velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // must use the same mode as y or Unity complains
                 AddLight(root, new Color(0.4f, 0.9f, 1f), 1.8f, 2.5f);
             });
             SaveEffect("CastFlash", 0.35f, 0f, root =>
@@ -117,7 +116,7 @@ namespace LostDungeon.EditorTools
             AssetDatabase.SaveAssets();
         }
 
-        /// <summary>A looping elemental aura: cyan wind circling upward and a few rising embers (menu hero).</summary>
+        /// <summary>A looping glow around the hero on the menu.</summary>
         public static void AddAura(Transform parent)
         {
             Material additive = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/FX_Additive.mat");
@@ -137,7 +136,7 @@ namespace LostDungeon.EditorTools
             velocity.orbitalY = new ParticleSystem.MinMaxCurve(3.5f);
             velocity.radial = new ParticleSystem.MinMaxCurve(-0.25f);
             velocity.y = new ParticleSystem.MinMaxCurve(0.7f, 1.4f);
-            velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // same mode as y (random between two constants)
+            velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // must use the same mode as y or Unity complains
 
             ParticleSystem embers = AddContinuous(go.transform, additive, new Color(1f, 0.55f, 0.2f), 0.06f, 1.8f, 12f);
             var emberMain = embers.main;
@@ -193,7 +192,7 @@ namespace LostDungeon.EditorTools
             model.name = "Visual";
             model.transform.SetParent(root.transform, false);
             model.transform.localPosition = new Vector3(0f, 0.6f, 0f);
-            model.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // the model is modelled pointing up
+            model.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // the model points up, so lay it flat
             model.transform.localScale = Vector3.one * 1.4f;
             AddTrail(model, additive, new Color(0.5f, 1f, 0.9f), 0.05f, 0.18f);
 
@@ -240,7 +239,7 @@ namespace LostDungeon.EditorTools
             quad.name = "Slash";
             quad.transform.SetParent(root.transform, false);
             quad.transform.localPosition = offset;
-            quad.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // flat, arc facing forward
+            quad.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); // lie flat and face forward
             quad.transform.localScale = Vector3.one * size;
             var renderer = quad.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = material;
@@ -391,7 +390,7 @@ namespace LostDungeon.EditorTools
             return material;
         }
 
-        /// <summary>Soft additive particles (sparks, flames, wind). Additive blending makes overlaps glow.</summary>
+        /// <summary>Soft particles that glow brighter where they overlap.</summary>
         private static Material Particle(string name, Texture2D texture, bool additive)
         {
             Material material = GetMaterial(name, "Universal Render Pipeline/Particles/Unlit");
@@ -402,7 +401,7 @@ namespace LostDungeon.EditorTools
             return material;
         }
 
-        /// <summary>A transparent unlit surface (ground rings, the slash arc).</summary>
+        /// <summary>A see-through surface for rings and the slash.</summary>
         private static Material Transparent(string name, Texture2D texture, Color color, bool additive)
         {
             Material material = GetMaterial(name, "Universal Render Pipeline/Unlit");
@@ -413,7 +412,7 @@ namespace LostDungeon.EditorTools
             return material;
         }
 
-        /// <summary>Bright solid colour that bloom turns into a glow (the fireball's core).</summary>
+        /// <summary>A bright colour that glows, used for the fireball.</summary>
         private static Material Unlit(string name, Color color)
         {
             Material material = GetMaterial(name, "Universal Render Pipeline/Unlit");

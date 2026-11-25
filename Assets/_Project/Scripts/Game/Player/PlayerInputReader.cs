@@ -5,9 +5,8 @@ using UnityEngine.InputSystem;
 namespace LostDungeon.Game.Player
 {
     /// <summary>
-    /// The only player script that talks to the Input System.
-    /// Other scripts read Move or listen to the events, so changing controls
-    /// (keyboard, gamepad, touch joystick) never touches gameplay code.
+    /// The only script that reads the Input System.
+    /// Others use its events, so new controls don't change gameplay code.
     /// </summary>
     public class PlayerInputReader : MonoBehaviour
     {
@@ -28,7 +27,7 @@ namespace LostDungeon.Game.Player
 
         private void Awake()
         {
-            // Project-wide actions: Assets/Settings/InputSystem_Actions.inputactions
+            // Actions come from Assets/Settings/InputSystem_Actions.inputactions
             InputActionMap map = InputSystem.actions.FindActionMap("Player", throwIfNotFound: true);
             move = map.FindAction("Move", throwIfNotFound: true);
             attack = map.FindAction("Attack", throwIfNotFound: true);
@@ -66,10 +65,10 @@ namespace LostDungeon.Game.Player
             Move = device.sqrMagnitude > 0.01f ? device : virtualMove;
         }
 
-        /// <summary>On-screen joystick input (mobile). Keyboard or gamepad still wins when used.</summary>
+        /// <summary>Touch joystick input. Keys or a gamepad win if used.</summary>
         public void SetVirtualMove(Vector2 value) => virtualMove = Vector2.ClampMagnitude(value, 1f);
 
-        /// <summary>On-screen buttons call these, so touch goes through the same events as keys.</summary>
+        /// <summary>Touch buttons call these, so they work just like keys.</summary>
         public void PressAttack() { if (isActiveAndEnabled) AttackPressed?.Invoke(); }
         public void PressDash() { if (isActiveAndEnabled) DashPressed?.Invoke(); }
         public void PressFireball() { if (isActiveAndEnabled) FireballPressed?.Invoke(); }

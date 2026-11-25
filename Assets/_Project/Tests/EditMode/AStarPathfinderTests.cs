@@ -6,7 +6,7 @@ namespace LostDungeon.Tests
 {
     public class AStarPathfinderTests
     {
-        /// <summary>Builds a grid from text: '#' is a wall, anything else is floor. Row 0 is the bottom.</summary>
+        /// <summary>Makes a grid from text. '#' is a wall. Row 0 is the bottom.</summary>
         private class TextGrid : INavigationGrid
         {
             private readonly string[] rows;

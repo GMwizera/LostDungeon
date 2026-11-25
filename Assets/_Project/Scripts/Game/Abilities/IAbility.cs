@@ -3,9 +3,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Abilities
 {
     /// <summary>
-    /// One interchangeable ability (Strategy pattern).
-    /// The player and enemies only call Activate; how the ability works is hidden inside it.
-    /// Adding a new ability means writing one new class, with no changes to the player.
+    /// One swappable ability (Strategy pattern).
+    /// Users just call Activate, so a new ability is one new class.
     /// </summary>
     public interface IAbility
     {
@@ -13,7 +12,7 @@ namespace LostDungeon.Game.Abilities
         float CooldownSeconds { get; }
         Sprite Icon { get; }
 
-        /// <summary>Animator trigger the user plays ("Attack", "Cast"), or empty for none.</summary>
+        /// <summary>Animation to play, like "Attack", or empty for none.</summary>
         string AnimationTrigger { get; }
 
         void Activate(in AbilityContext context);

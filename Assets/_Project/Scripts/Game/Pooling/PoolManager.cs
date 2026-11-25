@@ -6,10 +6,10 @@ using UnityEngine;
 namespace LostDungeon.Game.Pooling
 {
     /// <summary>
-    /// One pool per prefab, created the first time that prefab is spawned.
-    /// Anything can be pooled just by spawning it through here: fireballs now, enemy arrows and hit effects later.
+    /// Object Pool: reuses objects instead of making new ones.
+    /// Each prefab gets its own pool the first time it spawns.
     /// </summary>
-    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
+    [DefaultExecutionOrder(-100)] // runs before other scripts need it
     public class PoolManager : Singleton<PoolManager>
     {
         [SerializeField] private int maxPooledPerPrefab = 50;
@@ -47,8 +47,8 @@ namespace LostDungeon.Game.Pooling
         }
 
         /// <summary>
-        /// Destroys every pooled object and forgets all pools. Called when a level is released,
-        /// because its enemies were made from prefabs inside that level's Addressables bundle.
+        /// Deletes all pooled objects when a level unloads.
+        /// Its enemies came from that level's Addressables bundle.
         /// </summary>
         public void Clear()
         {
@@ -62,7 +62,7 @@ namespace LostDungeon.Game.Pooling
             poolsByPrefab.Clear();
         }
 
-        /// <summary>Creates instances ahead of time, e.g. while a level loads.</summary>
+        /// <summary>Makes some copies early, like while a level loads.</summary>
         public void Prewarm(GameObject prefab, int count) => GetPool(prefab).Prewarm(count);
 
         private ObjectPool<GameObject> GetPool(GameObject prefab)

@@ -10,10 +10,7 @@ namespace LostDungeon.Core.Progress
         Completed,
     }
 
-    /// <summary>
-    /// Level unlocking rules: level 1 is always open, and finishing a level opens the next one.
-    /// Levels are numbered from 1.
-    /// </summary>
+    /// <summary>Level 1 is always open. Beating a level opens the next one.</summary>
     public class LevelProgress
     {
         private readonly HashSet<int> completed = new HashSet<int>();
@@ -46,7 +43,7 @@ namespace LostDungeon.Core.Progress
 
         public bool IsPlayable(int level) => GetStatus(level) != LevelStatus.Locked;
 
-        /// <summary>Marks a level done. Returns false if the level was locked or doesn't exist.</summary>
+        /// <summary>Marks a level done. False if it is locked or missing.</summary>
         public bool Complete(int level)
         {
             if (!IsPlayable(level))
@@ -55,7 +52,7 @@ namespace LostDungeon.Core.Progress
             return true;
         }
 
-        /// <summary>The level "Continue" should start: the first one not yet completed, or the last level.</summary>
+        /// <summary>Level for "Continue": the first unfinished one, or the last.</summary>
         public int NextLevelToPlay()
         {
             for (int level = 1; level <= LevelCount; level++)

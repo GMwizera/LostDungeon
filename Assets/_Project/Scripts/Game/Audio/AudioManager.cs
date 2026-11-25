@@ -5,12 +5,10 @@ using UnityEngine;
 namespace LostDungeon.Game.Audio
 {
     /// <summary>
-    /// Plays music and sound effects (Singleton + Observer).
-    /// It listens to GameEvents, so combat, enemies and levels never reference audio at all:
-    /// removing this object leaves a silent but working game.
-    /// UI buttons will call Play(UIClick) when the menus are built.
+    /// Plays music and sounds (Singleton and Observer).
+    /// It listens to events, so the rest of the game never talks to audio.
     /// </summary>
-    [DefaultExecutionOrder(-100)] // set up before menus and gameplay scripts ask for it
+    [DefaultExecutionOrder(-100)] // runs before other scripts need it
     public class AudioManager : Singleton<AudioManager>
     {
         public const string UIClick = "UIClick";
@@ -25,7 +23,7 @@ namespace LostDungeon.Game.Audio
         private float musicVolume = 1f;
         private int lastPlayerHealth = -1;
 
-        /// <summary>Player's music setting, 0 to 1 (multiplied by the library's base music volume).</summary>
+        /// <summary>Music volume from settings, from 0 to 1.</summary>
         public float MusicVolume
         {
             get => musicVolume;
@@ -93,7 +91,7 @@ namespace LostDungeon.Game.Audio
             GameEvents.LevelCompleted -= OnLevelCompleted;
         }
 
-        /// <summary>Plays a sound by id. Unknown ids are ignored, so missing clips never break the game.</summary>
+        /// <summary>Plays a sound by name. Missing sounds are just skipped.</summary>
         public void Play(string soundId)
         {
             if (IsDuplicate || library == null || !library.TryGet(soundId, out SoundLibrary.Sound sound))
@@ -110,7 +108,7 @@ namespace LostDungeon.Game.Audio
 
         private void OnEnemyAttacked(string enemyId)
         {
-            // A specific sound per enemy type if there is one, otherwise the shared one.
+            // Use this enemy's own sound if it has one, else the shared one.
             if (library != null && library.TryGet($"EnemyAttack.{enemyId}", out _))
                 Play($"EnemyAttack.{enemyId}");
             else

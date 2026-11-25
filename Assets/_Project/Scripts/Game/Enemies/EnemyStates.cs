@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
 {
-    // Each state is a small class with one job (State pattern). Every enemy gets its own instances,
-    // so a state can keep its own timers.
+    // State pattern: each state is a small class with one job.
+    // Every enemy gets its own copies, so each can keep its own timers.
 
     public class IdleState : IState<EnemyController>
     {
@@ -58,7 +58,7 @@ namespace LostDungeon.Game.Enemies
     public class DeadState : IState<EnemyController>
     {
         private const float FallSeconds = 1.1f; // death animation
-        private const float SinkSeconds = 0.8f; // then the bones sink into the floor
+        private const float SinkSeconds = 0.8f; // then it sinks into the floor
         private float elapsed;
 
         public void Enter(EnemyController enemy)

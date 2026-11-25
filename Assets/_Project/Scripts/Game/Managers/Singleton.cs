@@ -3,10 +3,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Managers
 {
     /// <summary>
-    /// Base class for global managers (Singleton pattern): one instance that lives across scenes
-    /// and is reachable from anywhere as T.Instance. Used for systems that must exist exactly once,
-    /// such as PoolManager, and later GameManager, AudioManager and SaveManager.
-    /// A second copy (for example from loading a scene twice) destroys itself.
+    /// Base for managers (Singleton pattern): only one copy, reached with T.Instance.
+    /// It stays across scenes. A second copy deletes itself.
     /// </summary>
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
@@ -33,7 +31,7 @@ namespace LostDungeon.Game.Managers
 
         public static bool HasInstance => instance != null;
 
-        /// <summary>True on an extra copy that is about to destroy itself; subclasses should skip their setup.</summary>
+        /// <summary>True on an extra copy. Child classes should skip their setup.</summary>
         protected bool IsDuplicate { get; private set; }
 
         protected virtual void Awake()

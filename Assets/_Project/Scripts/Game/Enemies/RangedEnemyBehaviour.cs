@@ -3,9 +3,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Enemies
 {
     /// <summary>
-    /// Archer: keeps its distance, backs off if the player gets close, shoots from range.
-    /// If the player is right on top of it, or it is backed into a wall and cannot retreat,
-    /// it stands and fires point-blank instead of running in place.
+    /// Archer: stays back and shoots from far away.
+    /// If it is stuck or the player is too close, it just shoots.
     /// </summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Enemies/Ranged Behaviour")]
     public class RangedEnemyBehaviour : EnemyBehaviour

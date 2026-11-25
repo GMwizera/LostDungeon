@@ -2,20 +2,17 @@ using System;
 
 namespace LostDungeon.Core.Combat
 {
-    /// <summary>
-    /// Plain C# health model shared by the player and enemies.
-    /// It has no Unity code, so it can be unit tested directly.
-    /// </summary>
+    /// <summary>Health for the player and enemies. No Unity code, so it is easy to test.</summary>
     public class Health : IDamageable
     {
         public int Max { get; }
         public int Current { get; private set; }
         public bool IsDead => Current <= 0;
 
-        /// <summary>Raised with (current, max) whenever health changes.</summary>
+        /// <summary>Fires with (current, max) when health changes.</summary>
         public event Action<int, int> Changed;
 
-        /// <summary>Raised once, the moment health reaches zero.</summary>
+        /// <summary>Fires once when health hits zero.</summary>
         public event Action Died;
 
         public Health(int max)

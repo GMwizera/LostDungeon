@@ -4,8 +4,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Managers
 {
     /// <summary>
-    /// The project has "Reload Domain" turned off for fast Play mode, so static state survives
-    /// between Play sessions. This clears it before any scene loads.
+    /// Domain reload is off to make Play faster, so static values stay between runs.
+    /// This clears them before a scene loads.
     /// </summary>
     internal static class PlayModeReset
     {

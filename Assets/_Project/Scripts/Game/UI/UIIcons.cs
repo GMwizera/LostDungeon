@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.UI
 {
-    /// <summary>All UI pictures in one asset, so screens use icons (not text) for states like locked or completed.</summary>
+    /// <summary>All the UI icons in one asset.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/UI/Icons")]
     public class UIIcons : ScriptableObject
     {

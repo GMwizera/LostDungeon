@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
 {
-    /// <summary>Warrior: runs at the player and hits up close.</summary>
+    /// <summary>Warrior: runs at the player and hits close up.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Enemies/Melee Behaviour")]
     public class MeleeEnemyBehaviour : EnemyBehaviour
     {

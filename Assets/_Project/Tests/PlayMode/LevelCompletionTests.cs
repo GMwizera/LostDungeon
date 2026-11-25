@@ -15,9 +15,8 @@ using UnityEngine.UIElements;
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Plays level 1 to the end: defeat every enemy, use the exit door, and check that the level is saved
-    /// as completed, the next level unlocks, and the Expedition Debrief screen is shown and filled in.
-    /// The player's real save file is backed up and restored, so running tests never changes their progress.
+    /// Beats level 1 and checks it is saved, level 2 opens and the debrief screen shows.
+    /// The real save is backed up and put back, so tests don't wipe progress.
     /// </summary>
     public class LevelCompletionTests
     {
@@ -47,7 +46,7 @@ namespace LostDungeon.PlayModeTests
         {
             SceneManager.LoadScene(GameManager.MenuScene);
             yield return null;
-            SaveManager.Instance.ResetProgress(); // start from a clean save for the test
+            SaveManager.Instance.ResetProgress(); // start with a fresh save
             GameManager.Instance.StartGame();
 
             float waited = 0f;
@@ -57,7 +56,7 @@ namespace LostDungeon.PlayModeTests
                 yield return null;
             }
             Assert.AreEqual(GameState.Playing, GameManager.Instance.State);
-            yield return new WaitForSeconds(0.5f); // let the spawner place the enemies
+            yield return new WaitForSeconds(0.5f); // wait for enemies to spawn
 
             foreach (EnemyController enemy in Object.FindObjectsByType<EnemyController>(FindObjectsInactive.Exclude))
                 enemy.TakeDamage(999);

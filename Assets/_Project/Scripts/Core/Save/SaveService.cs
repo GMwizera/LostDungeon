@@ -3,8 +3,8 @@ using System;
 namespace LostDungeon.Core.Save
 {
     /// <summary>
-    /// Loads and saves SaveData through a storage and a JSON serializer that are passed in.
-    /// A missing or broken save never crashes the game: it falls back to a fresh save.
+    /// Loads and saves the game using the storage and JSON tool it is given.
+    /// A missing or broken save just starts a new one, it never crashes.
     /// </summary>
     public class SaveService
     {
@@ -19,7 +19,7 @@ namespace LostDungeon.Core.Save
             this.fromJson = fromJson ?? throw new ArgumentNullException(nameof(fromJson));
         }
 
-        /// <summary>True if the last Load found a save that could not be read.</summary>
+        /// <summary>True if the last load found a broken save.</summary>
         public bool LastLoadWasCorrupt { get; private set; }
 
         public bool HasSave() => storage.Exists();
@@ -52,7 +52,7 @@ namespace LostDungeon.Core.Save
 
         public void Delete() => storage.Delete();
 
-        /// <summary>Fills in anything missing, e.g. a save written by an older version of the game.</summary>
+        /// <summary>Fills in missing parts, like in a save from an older version.</summary>
         private static SaveData Repair(SaveData data)
         {
             if (data == null)

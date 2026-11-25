@@ -2,7 +2,7 @@ using System;
 
 namespace LostDungeon.Core.Navigation
 {
-    /// <summary>A cell on the level grid. Plain C# so pathfinding can be tested without Unity.</summary>
+    /// <summary>One cell on the level grid. No Unity, so it is easy to test.</summary>
     public readonly struct GridPoint : IEquatable<GridPoint>
     {
         public int X { get; }

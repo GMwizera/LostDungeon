@@ -1,9 +1,8 @@
 namespace LostDungeon.Game.Enemies
 {
     /// <summary>
-    /// The "brain" of an enemy type (Strategy pattern): looks at the situation and picks a state.
-    /// Warrior, Archer and Guardian differ only in their behaviour and their EnemyData numbers;
-    /// the controller and the states are shared.
+    /// The enemy's brain (Strategy pattern). It picks what state to be in.
+    /// All enemy types share the same body and states.
     /// </summary>
     public interface IEnemyBehaviour
     {

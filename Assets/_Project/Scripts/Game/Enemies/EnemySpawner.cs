@@ -5,10 +5,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
 {
-    /// <summary>
-    /// Spawns a level's enemies from the pool at marked points and reports when all are defeated
-    /// (a level objective will listen to AllEnemiesDefeated).
-    /// </summary>
+    /// <summary>Spawns enemies from the pool and says when they are all dead.</summary>
     public class EnemySpawner : MonoBehaviour
     {
         [Serializable]

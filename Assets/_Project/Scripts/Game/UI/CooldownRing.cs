@@ -3,13 +3,10 @@ using UnityEngine.UIElements;
 
 namespace LostDungeon.Game.UI
 {
-    /// <summary>
-    /// A circular cooldown ring drawn with UI Toolkit's vector painter: a dim track, and a bright arc
-    /// that refills clockwise from the top as the ability recharges. A full bright ring means "ready".
-    /// </summary>
+    /// <summary>A ring that fills up as an ability recharges. Full means ready.</summary>
     public class CooldownRing : VisualElement
     {
-        private float remaining; // 1 = just used, 0 = ready
+        private float remaining; // 1 is just used, 0 is ready
         private Color color = Color.white;
         private Color track = new Color(1f, 1f, 1f, 0.15f);
         private float thickness = 4f;
@@ -29,7 +26,7 @@ namespace LostDungeon.Game.UI
             MarkDirtyRepaint();
         }
 
-        /// <summary>Fraction of the cooldown still to go (0 = ready).</summary>
+        /// <summary>How much cooldown is left. 0 means ready.</summary>
         public float Remaining
         {
             get => remaining;

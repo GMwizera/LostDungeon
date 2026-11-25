@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Abilities
 {
-    /// <summary>Close-range strike: damages every IDamageable in a small sphere in front of the user.</summary>
+    /// <summary>A close hit that hurts everything just in front.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Abilities/Melee Attack")]
     public class MeleeAttackAbility : AbilityDefinition
     {
@@ -34,7 +34,7 @@ namespace LostDungeon.Game.Abilities
                     !target.TryGetComponent(out IDamageable damageable))
                     continue;
                 if (damageable.IsDead || !damaged.Add(damageable))
-                    continue; // already hit this swing (it may have several colliders)
+                    continue; // already hit, it may have more than one collider
 
                 DamageResult result = DamageCalculator.Roll(damage, critChance, critMultiplier, Random.value);
                 damageable.TakeDamage(result.Amount);

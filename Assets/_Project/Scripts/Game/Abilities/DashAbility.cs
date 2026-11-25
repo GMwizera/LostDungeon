@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Abilities
 {
-    /// <summary>Quick burst of speed in the facing direction. Works on anything that implements IDashable.</summary>
+    /// <summary>A quick dash forward. Works on anything that is IDashable.</summary>
     [CreateAssetMenu(menuName = "Lost Dungeon/Abilities/Dash")]
     public class DashAbility : AbilityDefinition
     {

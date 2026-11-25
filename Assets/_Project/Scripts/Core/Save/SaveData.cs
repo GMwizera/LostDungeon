@@ -3,10 +3,7 @@ using System.Collections.Generic;
 
 namespace LostDungeon.Core.Save
 {
-    /// <summary>
-    /// Everything written to the save file. Public fields and [Serializable] so Unity's JsonUtility
-    /// can turn it into readable JSON.
-    /// </summary>
+    /// <summary>What goes in the save file. Public fields so JsonUtility can write it.</summary>
     [Serializable]
     public class SaveData
     {
@@ -18,7 +15,7 @@ namespace LostDungeon.Core.Save
         public List<InventoryEntry> inventory = new List<InventoryEntry>();
         public GameSettings settings = new GameSettings();
 
-        /// <summary>Rewards earned from levels, e.g. "ability.fireball" or "health.bonus".</summary>
+        /// <summary>Rewards from levels, like "ability.fireball".</summary>
         public List<string> unlocks = new List<string>();
     }
 

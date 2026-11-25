@@ -4,9 +4,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Visuals
 {
     /// <summary>
-    /// Tints a 3D model briefly when it gets hit, so damage is easy to see.
-    /// Uses a MaterialPropertyBlock, so the shared materials are never changed.
-    /// Enemies also get a permanent base tint (from EnemyData) through SetBaseTint.
+    /// Flashes a model red when it gets hit.
+    /// A MaterialPropertyBlock keeps the shared materials unchanged.
     /// </summary>
     public class HitFlash : MonoBehaviour
     {
@@ -27,8 +26,7 @@ namespace LostDungeon.Game.Visuals
             block = new MaterialPropertyBlock();
             foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
             {
-                // Only lit surfaces (the body and weapons), not effect quads such as the ring under the feet.
-                // Glowing parts (skeleton eyes) keep their own glow.
+                // Only flash the body and weapons, not effects or glowing eyes.
                 bool lit = r.sharedMaterial != null && r.sharedMaterial.HasProperty(EmissionId)
                     && r.sharedMaterial.GetColor(EmissionId).maxColorComponent < 0.01f;
                 if ((r is MeshRenderer || r is SkinnedMeshRenderer) && lit)

@@ -6,11 +6,9 @@ using UnityEngine;
 namespace LostDungeon.Game.Abilities
 {
     /// <summary>
-    /// Abilities are ScriptableObject assets, so they can be tuned and swapped in the Inspector
-    /// (drag a different asset into a slot to change what a button does).
-    /// They hold settings only; per-use state such as cooldowns lives in AbilitySlot.
-    /// Activate is a template method: it shows the ability's visual effect, then runs Perform,
-    /// which each ability class writes for itself.
+    /// Base for ability assets, so I can swap abilities in the Inspector.
+    /// It only holds settings. Cooldowns live in AbilitySlot.
+    /// Template Method: Activate shows the effect, then calls each ability's own Perform.
     /// </summary>
     public abstract class AbilityDefinition : ScriptableObject, IAbility
     {

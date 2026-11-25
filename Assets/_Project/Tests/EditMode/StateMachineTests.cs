@@ -6,7 +6,7 @@ namespace LostDungeon.Tests
 {
     public class StateMachineTests
     {
-        /// <summary>A state that writes what happens to it into a shared log.</summary>
+        /// <summary>A test state that writes down what happens to it.</summary>
         private class LoggingState : IState<List<string>>
         {
             private readonly string name;

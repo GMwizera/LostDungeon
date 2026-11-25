@@ -5,8 +5,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Interaction
 {
     /// <summary>
-    /// A collectible lying on the floor. Walking over it collects it.
-    /// Potions heal straight away; everything else goes into the inventory.
+    /// An item on the floor. Walk over it to get it.
+    /// Potions heal right away. Other items go in the bag.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class Pickup : MonoBehaviour, ICollectable
@@ -28,7 +28,7 @@ namespace LostDungeon.Game.Interaction
         {
             if (visual == null)
                 return;
-            // Float and turn slowly so loot catches the eye.
+            // Bob and spin so the player notices it.
             visual.localPosition = visualStart + Vector3.up * (Mathf.Sin(Time.time * 3f) * 0.06f);
             visual.Rotate(0f, 90f * Time.deltaTime, 0f, Space.World);
         }
@@ -45,7 +45,7 @@ namespace LostDungeon.Game.Interaction
             if (itemId == ItemIds.Potion && collector.TryGetComponent(out PlayerHealth health))
             {
                 health.Heal(healAmount);
-                LostDungeon.Core.Events.GameEvents.RaiseItemCollected(itemId, amount); // sound, stats
+                LostDungeon.Core.Events.GameEvents.RaiseItemCollected(itemId, amount); // for the sound and stats
             }
             else
             {

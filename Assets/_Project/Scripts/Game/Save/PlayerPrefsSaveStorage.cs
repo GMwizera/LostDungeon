@@ -4,8 +4,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Save
 {
     /// <summary>
-    /// Save stored in PlayerPrefs. Used on WebGL, where PlayerPrefs is kept in the browser's IndexedDB
-    /// and survives closing the tab, while a normal file write may not be flushed.
+    /// Saves in PlayerPrefs. WebGL uses this because the browser keeps it
+    /// after the tab closes, but a file might be lost.
     /// </summary>
     public class PlayerPrefsSaveStorage : ISaveStorage
     {

@@ -13,9 +13,8 @@ using UnityEngine.UIElements;
 namespace LostDungeon.Game.UI
 {
     /// <summary>
-    /// Main menu as the "Dungeon Hub" from the Stitch design: live Kigali weather, hero status,
-    /// and the five chambers. Buttons: Start Game, Continue, Level Select, Settings, Exit.
-    /// Chamber cards show their state with icons and colour only (lock, play, check), never words.
+    /// The main menu: Kigali weather, hero info and the five levels.
+    /// Level cards use icons and colour, not words, to show their state.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class MainMenuController : MonoBehaviour
@@ -54,7 +53,7 @@ namespace LostDungeon.Game.UI
                 Refresh();
             };
 
-            UISounds.Show(root.Q("exit"), PlatformFeatures.CanQuit); // conditional compilation decides this
+            UISounds.Show(root.Q("exit"), PlatformFeatures.CanQuit); // set by conditional compilation
             root.Q("weather-icon").style.backgroundImage = new StyleBackground(icons.cloud);
             root.Q("pouch-icon").style.backgroundImage = new StyleBackground(icons.gold);
 

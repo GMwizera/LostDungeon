@@ -10,9 +10,8 @@ using UnityEngine;
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// One-click builds for the three required platforms. Each build first builds the Addressables
-    /// content for that platform (the level bundles), then the player, into SUMMATIVE/Builds/&lt;Platform&gt;.
-    /// Also runnable from the command line with -executeMethod for unattended builds.
+    /// One click builds for Windows, WebGL and Android.
+    /// Each one builds the level bundles first, then the game.
     /// </summary>
     public static class BuildScripts
     {
@@ -49,7 +48,7 @@ namespace LostDungeon.EditorTools
                 throw new BuildFailedException($"{target} build failed ({summary.totalErrors} errors).");
         }
 
-        /// <summary>Builds the level bundles for the active platform. Content must match the platform it runs on.</summary>
+        /// <summary>Builds the level bundles for the platform we are building.</summary>
         private static void BuildAddressables()
         {
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -66,19 +65,19 @@ namespace LostDungeon.EditorTools
             PlayerSettings.companyName = "Gisele Mwizera";
             PlayerSettings.productName = "Chronicles of the Lost Dungeon";
 
-            // Landscape only on phones: the HUD and touch controls are laid out for it.
+            // Phones stay sideways because the buttons are made for that.
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
             PlayerSettings.allowedAutorotateToPortrait = false;
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             PlayerSettings.allowedAutorotateToLandscapeLeft = true;
             PlayerSettings.allowedAutorotateToLandscapeRight = true;
 
-            // Android: 64-bit (required by most modern phones), so IL2CPP.
+            // Most new phones need 64 bit, and that needs IL2CPP.
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.giselemwizera.lostdungeon");
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
 
-            // WebGL: gzip with a fallback so it loads on hosts that don't send compression headers (Unity Play).
+            // The fallback lets the web build load on sites like Unity Play.
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
             PlayerSettings.WebGL.decompressionFallback = true;
         }

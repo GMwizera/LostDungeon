@@ -2,7 +2,7 @@ using LostDungeon.Core.World;
 
 namespace LostDungeon.Game.Weather
 {
-    /// <summary>The active dungeon conditions, read by enemies and the level's lighting.</summary>
+    /// <summary>The current dungeon conditions for enemies and lights.</summary>
     public static class WorldModifiers
     {
         public static DungeonConditions Current { get; private set; } = DungeonConditions.Normal;

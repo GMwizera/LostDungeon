@@ -1,9 +1,6 @@
 namespace LostDungeon.Core.Save
 {
-    /// <summary>
-    /// Where the save text lives. Desktop and mobile use a file; WebGL uses browser storage.
-    /// The save logic only knows this interface, so the platform choice stays in one place.
-    /// </summary>
+    /// <summary>Where the save is kept. A file on desktop and mobile, browser storage on WebGL.</summary>
     public interface ISaveStorage
     {
         bool Exists();

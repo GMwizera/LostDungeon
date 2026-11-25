@@ -1,9 +1,9 @@
 namespace LostDungeon.Core.World
 {
     /// <summary>
-    /// How the dungeon plays today, decided from the real weather in Kigali (from the REST API).
-    /// Rain makes the stone slippery so enemies are slower; night makes the dungeon darker and
-    /// enemies notice you later; heat makes enemies faster. Normal when the weather is unknown.
+    /// Changes the dungeon based on real Kigali weather from the REST API.
+    /// Rain slows enemies. Night is darker and enemies spot you later. Heat speeds them up.
+    /// If the weather is unknown, nothing changes.
     /// </summary>
     public readonly struct DungeonConditions
     {
@@ -25,7 +25,7 @@ namespace LostDungeon.Core.World
         public static DungeonConditions Normal =>
             new DungeonConditions("Still air", "Nothing unusual in the dungeon today.", 1f, 1f, 1f);
 
-        /// <summary>Readable name for a WMO weather code, e.g. 61 -> "Rain".</summary>
+        /// <summary>Turns a weather code into a name, like 61 -> "Rain".</summary>
         public static string DescribeWeather(int weatherCode)
         {
             if (weatherCode == 0) return "Clear sky";
@@ -39,8 +39,8 @@ namespace LostDungeon.Core.World
             return "Thunderstorm";
         }
 
-        /// <param name="weatherCode">WMO weather code from Open-Meteo (0 clear ... 99 thunderstorm).</param>
-        /// <param name="temperatureC">Air temperature in Celsius.</param>
+        /// <param name="weatherCode">Open-Meteo weather code (0 clear to 99 storm).</param>
+        /// <param name="temperatureC">Temperature in Celsius.</param>
         /// <param name="isDay">False after sunset.</param>
         public static DungeonConditions FromWeather(int weatherCode, float temperatureC, bool isDay)
         {

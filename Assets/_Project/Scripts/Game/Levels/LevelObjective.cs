@@ -6,8 +6,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Levels
 {
     /// <summary>
-    /// The level's goal: defeat every enemy, find the key if the exit is locked, then reach the exit.
-    /// Publishes its text through GameEvents for the HUD, and tells the exit door when it may open.
+    /// The level goal: beat all enemies, find the key if needed, then leave.
+    /// It sends its text out with an event and opens the door when done.
     /// </summary>
     public class LevelObjective : MonoBehaviour
     {

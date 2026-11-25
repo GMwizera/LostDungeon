@@ -3,7 +3,7 @@ using LostDungeon.Core.Save;
 
 namespace LostDungeon.Game.Save
 {
-    /// <summary>Save file on disk (Windows, Android, Editor). Writes to a temp file first so a crash can't leave half a save.</summary>
+    /// <summary>Saves to a file. Writes a temp file first so a crash can't break it.</summary>
     public class FileSaveStorage : ISaveStorage
     {
         private readonly string path;

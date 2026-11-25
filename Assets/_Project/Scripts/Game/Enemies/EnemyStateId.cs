@@ -1,6 +1,6 @@
 namespace LostDungeon.Game.Enemies
 {
-    /// <summary>The states an enemy can be in. Behaviours choose one of these each frame.</summary>
+    /// <summary>The states an enemy can be in.</summary>
     public enum EnemyStateId
     {
         Idle,

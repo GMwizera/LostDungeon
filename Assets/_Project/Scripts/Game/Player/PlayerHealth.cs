@@ -7,9 +7,8 @@ using UnityEngine;
 namespace LostDungeon.Game.Player
 {
     /// <summary>
-    /// Unity wrapper around the plain C# Health class.
-    /// Adds a short invulnerability window so one hit can't drain all health at once,
-    /// and forwards health changes to GameEvents so the HUD and audio can react without knowing the player.
+    /// The player's health. After a hit the player is safe for a moment.
+    /// Changes go out as events, so the HUD and sound don't need the player.
     /// </summary>
     public class PlayerHealth : MonoBehaviour, IDamageable
     {
@@ -38,7 +37,7 @@ namespace LostDungeon.Game.Player
 
         private void Start()
         {
-            // Let listeners (the HUD) show full health at the start.
+            // So the HUD shows full health at the start.
             GameEvents.RaisePlayerHealthChanged(Health.Current, Health.Max);
         }
 
@@ -64,7 +63,7 @@ namespace LostDungeon.Game.Player
 
         public void Heal(int amount) => Health.Heal(amount);
 
-        /// <summary>Extra max health from level rewards. Call before the player object is first enabled.</summary>
+        /// <summary>Bonus health from rewards. Call before the player is turned on.</summary>
         public void ConfigureMaxHealth(int bonus) => bonusHealth = Mathf.Max(0, bonus);
 
         private void OnHealthChanged(int current, int max)
@@ -75,7 +74,7 @@ namespace LostDungeon.Game.Player
 
         private void OnDied()
         {
-            // Stop the player and play the fall. The game over screen listens to PlayerDied.
+            // Stop and fall. The game over screen hears the event.
             if (characterAnimator != null)
                 characterAnimator.SetDead(true);
             GetComponent<PlayerMovement>().enabled = false;
