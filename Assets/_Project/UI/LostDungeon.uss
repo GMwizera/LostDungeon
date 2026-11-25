@@ -1,134 +1,395 @@
-/* Shared look for every screen: dark stone panels, warm gold accents. */
+/*
+   Abyssal Crypt design system (from the Google Stitch designs in stitch_lost_dungeon_crawler).
+   Void black surfaces, square corners, 1px razor borders, luminous accents:
+   gold #f59e0b = loot and main actions, cyan #38bdf8 = weather and agility,
+   red #ef4444 = health and danger, jade #10b981 = completion.
+*/
+
+/* ---------- Base ---------- */
 
 .screen {
     flex-grow: 1;
     align-items: center;
     justify-content: center;
-    background-color: rgb(18, 14, 22);
-    -unity-font-style: normal;
+    background-color: rgb(0, 0, 0);
+}
+
+Label {
+    color: rgb(244, 244, 245);
 }
 
 .panel {
-    min-width: 520px;
-    padding: 28px 36px;
-    align-items: stretch;
-    background-color: rgba(38, 30, 40, 0.95);
-    border-width: 3px;
-    border-color: rgb(196, 150, 72);
-    border-radius: 14px;
+    padding: 20px 22px;
+    background-color: rgb(10, 10, 10);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
+    border-radius: 0;
+}
+
+.panel--raised {
+    background-color: rgb(18, 18, 18);
 }
 
 .title {
-    font-size: 44px;
-    color: rgb(240, 200, 110);
+    font-size: 40px;
     -unity-font-style: bold;
-    -unity-text-align: middle-center;
-    margin-bottom: 8px;
+    letter-spacing: 3px;
+    color: rgb(244, 244, 245);
     white-space: normal;
 }
 
-.subtitle {
-    font-size: 18px;
-    color: rgb(200, 190, 210);
-    -unity-text-align: middle-center;
-    white-space: normal;
-    margin-bottom: 18px;
+.heading {
+    font-size: 24px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(244, 244, 245);
 }
+
+.eyebrow {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 2.5px;
+    color: rgb(245, 158, 11);
+}
+
+.mono {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: rgb(113, 113, 122);
+}
+
+.body {
+    font-size: 15px;
+    color: rgb(212, 212, 216);
+    white-space: normal;
+}
+
+.muted {
+    color: rgb(113, 113, 122);
+}
+
+.row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.divider {
+    height: 1px;
+    margin: 12px 0;
+    background-color: rgb(31, 31, 31);
+}
+
+.icon {
+    width: 22px;
+    height: 22px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.icon--lg {
+    width: 34px;
+    height: 34px;
+}
+
+/* ---------- Buttons ---------- */
 
 Button {
-    height: 56px;
-    margin: 6px 0;
-    font-size: 24px;
-    color: rgb(245, 235, 220);
-    background-color: rgb(78, 58, 72);
-    border-width: 2px;
-    border-color: rgb(150, 110, 70);
-    border-radius: 10px;
+    height: 48px;
+    margin: 5px 0;
+    padding: 0 16px;
+    font-size: 17px;
     -unity-font-style: bold;
+    letter-spacing: 2px;
+    -unity-text-align: middle-left;
+    color: rgb(244, 244, 245);
+    background-color: rgb(0, 0, 0);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
+    border-radius: 0;
     transition-duration: 0.08s;
 }
 
 Button:hover {
-    background-color: rgb(110, 80, 92);
-    border-color: rgb(240, 200, 110);
-    scale: 1.03 1.03;
+    border-color: rgb(56, 189, 248);
 }
 
 Button:active {
-    background-color: rgb(140, 100, 70);
+    background-color: rgb(18, 18, 18);
 }
 
 Button:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
 }
 
-.stats {
-    position: absolute;
-    bottom: 18px;
-    font-size: 18px;
-    color: rgb(170, 160, 180);
+.btn-primary {
+    color: rgb(245, 158, 11);
+    background-color: rgb(10, 10, 10);
+    border-color: rgb(245, 158, 11);
 }
 
-Slider, Toggle {
-    margin: 10px 0;
-    font-size: 22px;
-    color: rgb(230, 220, 210);
+.btn-primary:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgb(245, 158, 11);
+    border-color: rgb(245, 158, 11);
 }
 
-Slider Label, Toggle Label {
-    min-width: 160px;
-    color: rgb(230, 220, 210);
+/* Big solid call to action, e.g. "ENTER LEVEL 3: THE ARMORY" */
+.btn-cta {
+    height: 64px;
+    font-size: 20px;
+    color: rgb(42, 23, 0);
+    background-color: rgb(255, 193, 116);
+    border-color: rgb(255, 193, 116);
 }
 
-/* ---------- Level select ---------- */
+.btn-cta:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgb(245, 158, 11);
+    border-color: rgb(245, 158, 11);
+}
 
-.level-grid {
+.btn-danger {
+    color: rgb(239, 68, 68);
+    background-color: rgb(10, 10, 10);
+    border-color: rgb(239, 68, 68);
+}
+
+.btn-danger:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgb(239, 68, 68);
+}
+
+/* ---------- Chips (status tags) ---------- */
+
+.chip {
     flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 12px 0 18px 0;
-}
-
-.level-tile {
-    width: 150px;
-    height: 170px;
-    margin: 8px;
-    padding: 8px;
     align-items: center;
-    justify-content: space-between;
+    padding: 3px 9px;
+    border-width: 1px;
+    border-radius: 0;
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    border-color: rgb(63, 63, 70);
+    color: rgb(161, 161, 170);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
-.level-tile--completed {
-    border-color: rgb(240, 200, 110);
-    background-color: rgb(70, 60, 40);
+.chip Label {
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
 }
 
-.level-tile--available {
-    border-color: rgb(120, 220, 140);
-    background-color: rgb(46, 74, 56);
+.chip--gold {
+    border-color: rgba(245, 158, 11, 0.6);
+    background-color: rgba(245, 158, 11, 0.1);
+    color: rgb(245, 158, 11);
 }
 
-.level-tile--locked {
-    background-color: rgb(40, 38, 44);
-    border-color: rgb(70, 68, 74);
+.chip--gold Label {
+    color: rgb(245, 158, 11);
 }
 
-.level-number {
-    font-size: 44px;
-    color: rgb(250, 240, 220);
+.chip--cyan {
+    border-color: rgba(56, 189, 248, 0.6);
+    background-color: rgba(56, 189, 248, 0.1);
+    color: rgb(56, 189, 248);
 }
 
-.level-badge {
-    width: 56px;
-    height: 56px;
+.chip--cyan Label {
+    color: rgb(56, 189, 248);
+}
+
+.chip--red {
+    border-color: rgba(239, 68, 68, 0.7);
+    background-color: rgba(239, 68, 68, 0.12);
+    color: rgb(239, 68, 68);
+}
+
+.chip--red Label {
+    color: rgb(239, 68, 68);
+}
+
+.chip--jade {
+    border-color: rgba(16, 185, 129, 0.6);
+    background-color: rgba(16, 185, 129, 0.1);
+    color: rgb(16, 185, 129);
+}
+
+.chip--jade Label {
+    color: rgb(16, 185, 129);
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background-color: rgb(10, 10, 10);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
+    border-radius: 0;
+}
+
+.card-title {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(56, 189, 248);
+}
+
+/* Weather card: cyan accent edge */
+.weather-card {
+    border-left-width: 2px;
+    border-left-color: rgb(56, 189, 248);
+}
+
+.weather-temp {
+    font-size: 30px;
+    -unity-font-style: bold;
+    color: rgb(244, 244, 245);
+    margin-right: 10px;
+}
+
+.weather-name {
+    font-size: 20px;
+    color: rgb(56, 189, 248);
+}
+
+.effect-title {
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    color: rgb(56, 189, 248);
+}
+
+/* ---------- Dungeon hub (main menu) ---------- */
+
+.hub {
+    width: 94%;
+    height: 92%;
+    max-width: 1220px;
+    flex-direction: row;
+}
+
+.hub-left {
+    width: 38%;
+    min-width: 400px;
+    margin-right: 20px;
+}
+
+.hub-right {
+    flex-grow: 1;
+}
+
+.hub-brand {
+    margin-bottom: 14px;
+}
+
+.slot {
+    width: 44px;
+    height: 44px;
+    margin-right: 8px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(18, 18, 18);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
+}
+
+.slot--locked {
+    opacity: 0.35;
+}
+
+.hub-hearts {
+    flex-direction: row;
+    margin: 8px 0 10px 0;
+}
+
+.hub-heart {
+    width: 30px;
+    height: 30px;
+    margin-right: 6px;
+    padding: 4px;
+    background-color: rgb(18, 18, 18);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
     -unity-background-scale-mode: scale-to-fit;
 }
 
-.level-name {
-    font-size: 14px;
-    color: rgb(220, 210, 200);
-    white-space: normal;
-    -unity-text-align: middle-center;
+.stats {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgb(113, 113, 122);
+}
+
+/* Room cards on the chamber list */
+.room-card {
+    flex-direction: row;
+    align-items: center;
+    height: 78px;
+    margin: 0 0 8px 0;
+    padding: 0 14px;
+    background-color: rgb(10, 10, 10);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
+    border-radius: 0;
+}
+
+.room-card:hover {
+    border-color: rgb(56, 189, 248);
+}
+
+.room-card--available {
+    border-color: rgb(245, 158, 11);
+    background-color: rgb(18, 14, 6);
+}
+
+.room-card--locked {
+    opacity: 0.4;
+}
+
+.room-status {
+    width: 46px;
+    height: 46px;
+    margin-right: 14px;
+    padding: 9px;
+    background-color: rgb(18, 18, 18);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.room-card--available .room-status {
+    background-color: rgb(255, 193, 116);
+    border-color: rgb(255, 193, 116);
+}
+
+.room-number {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: rgb(113, 113, 122);
+    margin-right: 8px;
+}
+
+.room-name {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(244, 244, 245);
+}
+
+.room-card--available .room-name {
+    color: rgb(255, 193, 116);
+}
+
+.room-hostiles {
+    font-size: 13px;
+    color: rgb(161, 161, 170);
 }
 
 /* ---------- HUD ---------- */
@@ -137,17 +398,29 @@ Slider Label, Toggle Label {
     flex-grow: 1;
 }
 
-.top-left {
+.hud-top-left {
     position: absolute;
-    left: 20px;
-    top: 16px;
+    left: 24px;
+    top: 20px;
+    width: 560px;
 }
 
-.top-right {
+.hud-top-right {
     position: absolute;
-    right: 20px;
-    top: 16px;
+    right: 24px;
+    top: 20px;
+    width: 440px;
     align-items: flex-end;
+}
+
+.hud-box {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+    margin-right: 8px;
+    background-color: rgba(10, 10, 10, 0.92);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
 }
 
 .hearts {
@@ -155,29 +428,54 @@ Slider Label, Toggle Label {
 }
 
 .heart {
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
     margin-right: 4px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
-.hud-label {
-    font-size: 20px;
-    color: rgb(245, 235, 220);
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: black;
-    margin-top: 6px;
+.hud-mono {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    color: rgb(244, 244, 245);
+}
+
+.hud-mono--gold {
+    color: rgb(255, 193, 116);
+}
+
+.objective-bar {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background-color: rgba(10, 10, 10, 0.92);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
 }
 
 .objective {
-    color: rgb(240, 200, 110);
+    flex-grow: 1;
+    font-size: 17px;
+    color: rgb(244, 244, 245);
+    white-space: normal;
+}
+
+.weather-banner {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: rgba(10, 10, 10, 0.92);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
+    border-left-width: 2px;
+    border-left-color: rgb(56, 189, 248);
 }
 
 .conditions {
-    font-size: 16px;
-    max-width: 420px;
+    font-size: 14px;
+    color: rgb(56, 189, 248);
     white-space: normal;
-    -unity-text-align: upper-right;
 }
 
 .inventory {
@@ -188,34 +486,38 @@ Slider Label, Toggle Label {
 .inventory-item {
     flex-direction: row;
     align-items: center;
-    margin-left: 12px;
-    padding: 4px 10px;
-    background-color: rgba(0, 0, 0, 0.45);
-    border-radius: 8px;
+    margin-left: 8px;
+    padding: 6px 10px;
+    background-color: rgba(10, 10, 10, 0.92);
+    border-width: 1px;
+    border-color: rgba(245, 158, 11, 0.5);
 }
 
 .inventory-icon {
-    width: 30px;
-    height: 30px;
+    width: 22px;
+    height: 22px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .inventory-count {
-    font-size: 22px;
-    color: white;
-    margin-left: 4px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 193, 116);
+    margin-left: 6px;
 }
 
 .pause-button {
-    width: 56px;
-    height: 56px;
-    margin-top: 10px;
-    font-size: 22px;
+    width: 48px;
+    height: 48px;
+    margin-top: 8px;
+    padding: 0;
+    -unity-text-align: middle-center;
+    font-size: 18px;
 }
 
 .abilities {
     position: absolute;
-    bottom: 20px;
+    bottom: 22px;
     left: 0;
     right: 0;
     flex-direction: row;
@@ -223,23 +525,38 @@ Slider Label, Toggle Label {
 }
 
 .ability-slot {
-    width: 74px;
-    height: 74px;
-    margin: 0 8px;
-    background-color: rgba(20, 16, 24, 0.8);
-    border-width: 2px;
-    border-color: rgb(196, 150, 72);
-    border-radius: 10px;
+    width: 76px;
+    height: 76px;
+    margin: 0 6px;
+    background-color: rgba(10, 10, 10, 0.92);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
     overflow: hidden;
 }
 
+.ability-slot--sword { border-color: rgba(239, 68, 68, 0.8); }
+.ability-slot--dash { border-color: rgba(56, 189, 248, 0.8); }
+.ability-slot--fireball { border-color: rgba(245, 158, 11, 0.8); }
+
 .ability-icon {
     position: absolute;
-    left: 10px;
+    left: 14px;
     top: 10px;
-    right: 10px;
-    bottom: 10px;
+    right: 14px;
+    bottom: 22px;
     -unity-background-scale-mode: scale-to-fit;
+}
+
+.ability-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    font-size: 11px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    -unity-text-align: middle-center;
+    color: rgb(161, 161, 170);
 }
 
 .ability-cooldown {
@@ -248,36 +565,41 @@ Slider Label, Toggle Label {
     right: 0;
     bottom: 0;
     height: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
 .ability-lock {
     position: absolute;
-    left: 14px;
-    top: 14px;
-    right: 14px;
-    bottom: 14px;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 20px;
     -unity-background-scale-mode: scale-to-fit;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 .ability-key {
     position: absolute;
-    bottom: 2px;
-    right: 6px;
-    font-size: 13px;
-    color: rgb(240, 220, 180);
+    top: 3px;
+    right: 5px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: rgb(113, 113, 122);
 }
 
 .prompt {
     position: absolute;
-    bottom: 110px;
+    bottom: 112px;
     align-self: center;
-    font-size: 22px;
-    color: white;
-    padding: 6px 16px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    color: rgb(244, 244, 245);
+    background-color: rgba(10, 10, 10, 0.95);
+    border-width: 1px;
+    border-color: rgb(245, 158, 11);
 }
 
 /* ---------- Overlays ---------- */
@@ -290,21 +612,101 @@ Slider Label, Toggle Label {
     bottom: 0;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.65);
+    background-color: rgba(0, 0, 0, 0.82);
+}
+
+.overlay-panel {
+    width: 60%;
+    max-width: 620px;
+}
+
+.debrief-title {
+    font-size: 34px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    color: rgb(244, 244, 245);
+    white-space: normal;
+    margin: 4px 0 6px 0;
+}
+
+.danger-title {
+    font-size: 34px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(239, 68, 68);
+}
+
+/* Progress track: R1 to R5 */
+.track {
+    flex-direction: row;
+    align-items: center;
+    margin: 6px 0 4px 0;
+}
+
+.track-node {
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+    background-color: rgb(18, 18, 18);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.track-node--current {
+    background-color: rgb(245, 158, 11);
+    border-color: rgb(245, 158, 11);
+}
+
+.track-line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: rgb(39, 39, 42);
+}
+
+.track-line--done {
+    background-color: rgb(245, 158, 11);
+}
+
+.spoil {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background-color: rgb(10, 10, 10);
+    border-width: 1px;
+    border-color: rgb(31, 31, 31);
+}
+
+.spoil-icon {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    margin-right: 12px;
+    background-color: rgb(18, 18, 18);
+    border-width: 1px;
+    border-color: rgb(39, 39, 42);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.spoil-name {
+    font-size: 16px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+    color: rgb(255, 193, 116);
 }
 
 .loading-bar {
-    height: 22px;
-    margin: 18px 0;
-    background-color: rgb(30, 26, 34);
-    border-radius: 8px;
+    height: 14px;
+    margin: 16px 0;
+    background-color: rgb(31, 31, 31);
     overflow: hidden;
 }
 
 .loading-fill {
     height: 100%;
     width: 0;
-    background-color: rgb(240, 200, 110);
+    background-color: rgb(245, 158, 11);
 }
 
 /* ---------- Touch controls ---------- */
@@ -314,45 +716,79 @@ Slider Label, Toggle Label {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 260px;
+    height: 270px;
 }
 
 .joystick {
     position: absolute;
     left: 40px;
     bottom: 40px;
-    width: 180px;
-    height: 180px;
-    border-radius: 90px;
-    background-color: rgba(255, 255, 255, 0.12);
-    border-width: 2px;
-    border-color: rgba(255, 255, 255, 0.35);
+    width: 190px;
+    height: 190px;
+    border-radius: 95px;
+    background-color: rgba(18, 18, 18, 0.85);
+    border-width: 1px;
+    border-color: rgb(63, 63, 70);
     align-items: center;
     justify-content: center;
 }
 
 .joystick-knob {
-    width: 76px;
-    height: 76px;
-    border-radius: 38px;
-    background-color: rgba(255, 255, 255, 0.45);
+    width: 74px;
+    height: 74px;
+    border-radius: 37px;
+    background-color: rgba(245, 158, 11, 0.35);
+    border-width: 1px;
+    border-color: rgb(245, 158, 11);
+}
+
+.compass {
+    position: absolute;
+    font-size: 12px;
+    color: rgb(113, 113, 122);
 }
 
 .touch-buttons {
     position: absolute;
     right: 30px;
     bottom: 30px;
-    width: 240px;
-    height: 220px;
+    width: 250px;
+    height: 230px;
 }
 
 .touch-button {
     position: absolute;
-    width: 92px;
-    height: 92px;
-    border-radius: 46px;
-    background-color: rgba(196, 150, 72, 0.45);
-    border-width: 2px;
-    border-color: rgba(255, 230, 180, 0.7);
+    width: 96px;
+    height: 96px;
+    border-radius: 48px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(18, 18, 18, 0.9);
+    border-width: 1px;
+    border-color: rgb(63, 63, 70);
+}
+
+.touch-button--strike {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    background-color: rgb(245, 158, 11);
+    border-color: rgb(245, 158, 11);
+}
+
+.touch-icon {
+    width: 34px;
+    height: 34px;
     -unity-background-scale-mode: scale-to-fit;
+}
+
+.touch-label {
+    font-size: 12px;
+    -unity-font-style: bold;
+    letter-spacing: 1.5px;
+    color: rgb(244, 244, 245);
+}
+
+.touch-button--strike .touch-label {
+    color: rgb(42, 23, 0);
 }

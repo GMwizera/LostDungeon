@@ -1,31 +1,95 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="LostDungeon.uss" />
     <ui:VisualElement name="root" class="screen">
-        <ui:VisualElement name="main-panel" class="panel">
-            <ui:Label text="Chronicles of the Lost Dungeon" class="title" />
-            <ui:Label name="conditions" text="Checking Kigali weather..." class="subtitle" />
-            <ui:Button name="start" text="Start Game" />
-            <ui:Button name="continue" text="Continue" />
-            <ui:Button name="levels" text="Level Select" />
-            <ui:Button name="settings" text="Settings" />
-            <ui:Button name="exit" text="Exit" />
-        </ui:VisualElement>
+        <ui:VisualElement class="hub">
 
-        <ui:VisualElement name="levels-panel" class="panel">
-            <ui:Label text="Choose a Level" class="title" />
-            <ui:VisualElement name="level-grid" class="level-grid" />
-            <ui:Button name="levels-back" text="Back" />
-        </ui:VisualElement>
+            <!-- Left column: brand, live weather, hero status -->
+            <ui:VisualElement class="hub-left">
+                <ui:VisualElement class="hub-brand">
+                    <ui:Label text="CHRONICLES OF THE" class="eyebrow" />
+                    <ui:Label text="LOST DUNGEON" class="title" />
+                </ui:VisualElement>
 
-        <ui:VisualElement name="settings-panel" class="panel">
-            <ui:Label text="Settings" class="title" />
-            <ui:Slider name="music" label="Music" low-value="0" high-value="1" />
-            <ui:Slider name="effects" label="Effects" low-value="0" high-value="1" />
-            <ui:Toggle name="touch" label="Touch controls" />
-            <ui:Button name="reset" text="Reset progress" />
-            <ui:Button name="settings-back" text="Back" />
-        </ui:VisualElement>
+                <ui:VisualElement class="card weather-card">
+                    <ui:VisualElement class="row">
+                        <ui:VisualElement name="weather-icon" class="icon" />
+                        <ui:Label text=" KIGALI LIVE WEATHER" class="card-title" />
+                        <ui:VisualElement class="spacer" />
+                        <ui:Label name="api-chip" text="CONNECTING" class="chip" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="row" style="margin-top: 8px;">
+                        <ui:Label name="weather-temp" text="--°C" class="weather-temp" />
+                        <ui:Label name="weather-name" text="Checking..." class="weather-name" />
+                    </ui:VisualElement>
+                    <ui:Label text="GEO ANCHOR: -1.94° S, 30.06° E" class="mono" />
+                    <ui:VisualElement class="card panel--raised" style="margin: 10px 0 0 0;">
+                        <ui:Label name="effect-title" text="DUNGEON CONDITIONS" class="effect-title" />
+                        <ui:Label name="effect-text" class="body" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
 
-        <ui:Label name="stats" class="stats" />
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="row">
+                        <ui:Label text="HERO EXPEDITION STATUS" class="card-title" style="color: rgb(255, 193, 116);" />
+                        <ui:VisualElement class="spacer" />
+                        <ui:Label name="floor-chip" text="FLOOR 01 READY" class="chip chip--gold" />
+                    </ui:VisualElement>
+                    <ui:Label name="vitality" text="VITALITY 6/6 HEARTS" class="mono" style="margin-top: 10px;" />
+                    <ui:VisualElement name="hub-hearts" class="hub-hearts" />
+                    <ui:VisualElement class="row">
+                        <ui:VisualElement>
+                            <ui:Label text="EQUIPPED ARSENAL" class="mono" />
+                            <ui:VisualElement name="arsenal" class="row" style="margin-top: 6px;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="spacer" />
+                        <ui:VisualElement>
+                            <ui:Label text="POUCH STASH" class="mono" />
+                            <ui:VisualElement class="row" style="margin-top: 10px;">
+                                <ui:VisualElement name="pouch-icon" class="icon" />
+                                <ui:Label name="pouch-gold" text="0" class="hud-mono hud-mono--gold" style="margin-left: 6px; font-size: 18px;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:Label name="stats" class="stats" />
+            </ui:VisualElement>
+
+            <!-- Right column: menu, level select, settings -->
+            <ui:VisualElement class="hub-right">
+                <ui:VisualElement name="main-panel" class="panel" style="flex-grow: 1; justify-content: center;">
+                    <ui:Label text="EXPEDITION" class="eyebrow" />
+                    <ui:Label text="Clear five chambers. Recover the keys. Escape the dungeon." class="body" style="margin: 4px 0 18px 0; font-size: 17px;" />
+                    <ui:Button name="continue" text="CONTINUE" class="btn-cta" />
+                    <ui:Button name="start" text="START GAME" class="btn-primary" />
+                    <ui:Button name="levels" text="LEVEL SELECT" />
+                    <ui:Button name="settings" text="SETTINGS" />
+                    <ui:Button name="exit" text="EXIT" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="levels-panel" class="panel" style="flex-grow: 1;">
+                    <ui:VisualElement class="row" style="margin-bottom: 12px;">
+                        <ui:Label text="DUNGEON CHAMBER MATRIX" class="heading" />
+                        <ui:VisualElement class="spacer" />
+                        <ui:Label name="cleared-chip" text="0/5 CLEARED" class="chip chip--cyan" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="level-grid" />
+                    <ui:VisualElement class="spacer" />
+                    <ui:Button name="levels-enter" text="ENTER LEVEL 1" class="btn-cta" />
+                    <ui:Button name="levels-back" text="BACK" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="settings-panel" class="panel" style="flex-grow: 1;">
+                    <ui:Label text="SETTINGS" class="heading" style="margin-bottom: 14px;" />
+                    <ui:Slider name="music" label="MUSIC" low-value="0" high-value="1" />
+                    <ui:Slider name="effects" label="EFFECTS" low-value="0" high-value="1" />
+                    <ui:Toggle name="touch" label="TOUCH CONTROLS" />
+                    <ui:VisualElement class="divider" />
+                    <ui:Button name="reset" text="RESET PROGRESS" class="btn-danger" />
+                    <ui:VisualElement class="spacer" />
+                    <ui:Button name="settings-back" text="BACK" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

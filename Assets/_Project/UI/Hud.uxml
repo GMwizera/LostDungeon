@@ -1,68 +1,148 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="LostDungeon.uss" />
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
-        <ui:VisualElement class="top-left" picking-mode="Ignore">
-            <ui:VisualElement name="hearts" class="hearts" picking-mode="Ignore" />
-            <ui:Label name="level-name" class="hud-label" picking-mode="Ignore" />
-            <ui:Label name="objective" class="hud-label objective" picking-mode="Ignore" />
+
+        <!-- Top left: vitality, key, gate, objective -->
+        <ui:VisualElement class="hud-top-left" picking-mode="Ignore">
+            <ui:VisualElement class="row" picking-mode="Ignore">
+                <ui:VisualElement class="hud-box" picking-mode="Ignore">
+                    <ui:VisualElement name="hearts" class="hearts" picking-mode="Ignore" />
+                    <ui:Label name="hearts-bonus" text="+2 BONUS" class="hud-mono hud-mono--gold" style="margin-left: 6px;" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="key-box" class="hud-box" picking-mode="Ignore">
+                    <ui:VisualElement name="key-icon" class="icon" picking-mode="Ignore" />
+                    <ui:Label name="key-label" text="0/1 KEY" class="hud-mono hud-mono--gold" style="margin-left: 6px;" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="gate-box" class="hud-box" picking-mode="Ignore">
+                    <ui:VisualElement name="gate-icon" class="icon" picking-mode="Ignore" />
+                    <ui:Label name="gate-label" text="GATE SEALED" class="hud-mono" style="margin-left: 6px;" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="objective-bar" picking-mode="Ignore">
+                <ui:VisualElement name="objective-icon" class="icon" style="margin-right: 10px;" picking-mode="Ignore" />
+                <ui:Label name="objective" class="objective" picking-mode="Ignore" />
+                <ui:Label name="foes" text="0 FOES" class="chip chip--red" picking-mode="Ignore" />
+            </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement class="top-right" picking-mode="Ignore">
-            <ui:Label name="conditions" class="hud-label conditions" picking-mode="Ignore" />
-            <ui:VisualElement name="inventory" class="inventory" picking-mode="Ignore" />
+        <!-- Top right: weather, room, pouch, pause -->
+        <ui:VisualElement class="hud-top-right" picking-mode="Ignore">
+            <ui:VisualElement class="weather-banner" picking-mode="Ignore">
+                <ui:VisualElement class="row" picking-mode="Ignore">
+                    <ui:VisualElement name="weather-icon" class="icon" style="margin-right: 8px;" picking-mode="Ignore" />
+                    <ui:Label name="weather-title" text="KIGALI WEATHER" class="card-title" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="conditions" class="conditions" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="row" style="margin-top: 8px;" picking-mode="Ignore">
+                <ui:Label name="level-name" text="ROOM 1" class="chip" picking-mode="Ignore" />
+                <ui:VisualElement name="inventory" class="inventory" style="margin-top: 0;" picking-mode="Ignore" />
+            </ui:VisualElement>
             <ui:Button name="pause-button" text="II" class="pause-button" />
         </ui:VisualElement>
 
         <ui:VisualElement name="abilities" class="abilities" picking-mode="Ignore" />
         <ui:Label name="prompt" class="prompt" picking-mode="Ignore" />
 
+        <!-- Touch controls -->
         <ui:VisualElement name="touch" class="touch" picking-mode="Ignore">
             <ui:VisualElement name="joystick" class="joystick">
+                <ui:Label text="N" class="compass" style="top: 6px;" picking-mode="Ignore" />
+                <ui:Label text="S" class="compass" style="bottom: 6px;" picking-mode="Ignore" />
+                <ui:Label text="W" class="compass" style="left: 10px;" picking-mode="Ignore" />
+                <ui:Label text="E" class="compass" style="right: 10px;" picking-mode="Ignore" />
                 <ui:VisualElement name="joystick-knob" class="joystick-knob" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:VisualElement class="touch-buttons" picking-mode="Ignore">
-                <ui:VisualElement name="touch-attack" class="touch-button" style="right: 0; bottom: 0; width: 110px; height: 110px;" />
-                <ui:VisualElement name="touch-dash" class="touch-button" style="right: 125px; bottom: 0;" />
-                <ui:VisualElement name="touch-fireball" class="touch-button" style="right: 10px; bottom: 125px;" />
-                <ui:VisualElement name="touch-interact" class="touch-button" style="right: 125px; bottom: 110px;" />
+                <ui:VisualElement name="touch-attack" class="touch-button touch-button--strike" style="right: 0; bottom: 0;">
+                    <ui:VisualElement name="touch-attack-icon" class="touch-icon" picking-mode="Ignore" />
+                    <ui:Label text="STRIKE" class="touch-label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="touch-dash" class="touch-button" style="right: 132px; bottom: 0;">
+                    <ui:VisualElement name="touch-dash-icon" class="touch-icon" picking-mode="Ignore" />
+                    <ui:Label text="DASH" class="touch-label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="touch-fireball" class="touch-button" style="right: 12px; bottom: 132px;">
+                    <ui:VisualElement name="touch-fireball-icon" class="touch-icon" picking-mode="Ignore" />
+                    <ui:Label text="FIRE" class="touch-label" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="touch-interact" class="touch-button" style="right: 132px; bottom: 112px;">
+                    <ui:VisualElement name="touch-interact-icon" class="touch-icon" picking-mode="Ignore" />
+                    <ui:Label text="USE" class="touch-label" picking-mode="Ignore" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <!-- Pause -->
         <ui:VisualElement name="pause-overlay" class="overlay">
-            <ui:VisualElement class="panel">
-                <ui:Label text="Paused" class="title" />
-                <ui:Button name="resume" text="Resume" />
-                <ui:Button name="pause-restart" text="Restart Level" />
-                <ui:Button name="pause-menu" text="Main Menu" />
+            <ui:VisualElement class="panel overlay-panel">
+                <ui:Label text="EXPEDITION HALTED" class="eyebrow" />
+                <ui:Label text="PAUSED" class="title" style="margin-bottom: 14px;" />
+                <ui:Button name="resume" text="RESUME" class="btn-primary" />
+                <ui:Button name="pause-restart" text="RESTART LEVEL" />
+                <ui:Button name="pause-menu" text="MAIN MENU" />
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <!-- Level complete: Expedition Debrief -->
         <ui:VisualElement name="complete-overlay" class="overlay">
-            <ui:VisualElement class="panel">
-                <ui:Label text="Level Complete!" class="title" />
-                <ui:Label name="complete-reward" class="subtitle" />
-                <ui:Label name="complete-stats" class="subtitle" />
-                <ui:Button name="next-level" text="Next Level" />
-                <ui:Button name="complete-menu" text="Main Menu" />
+            <ui:VisualElement class="panel row" style="width: 92%; max-width: 1060px; align-items: flex-start;">
+                <ui:VisualElement style="width: 50%; margin-right: 20px;">
+                    <ui:Label text="EXPEDITION DEBRIEF" class="eyebrow" />
+                    <ui:Label name="sector-chip" text="SECTOR 01 TELEMETRY" class="chip chip--gold" style="align-self: flex-start; margin-top: 10px;" />
+                    <ui:Label name="complete-title" text="ROOM 1 CLEARED · EXIT UNSEALED" class="debrief-title" />
+                    <ui:Label name="complete-summary" class="body muted" />
+                    <ui:VisualElement class="card" style="margin-top: 14px;">
+                        <ui:VisualElement class="row">
+                            <ui:Label text="EXPEDITION PROGRESSION STATE" class="card-title" />
+                            <ui:VisualElement class="spacer" />
+                            <ui:Label name="progress-pct" text="20% COMPLETE" class="hud-mono" style="color: rgb(56, 189, 248);" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="track" class="track" style="margin-top: 12px;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="card weather-card">
+                        <ui:VisualElement class="row">
+                            <ui:Label text="ATMOSPHERIC LINK ACTIVE" class="card-title" />
+                            <ui:VisualElement class="spacer" />
+                            <ui:Label name="debrief-temp" text="KIGALI" class="chip" />
+                        </ui:VisualElement>
+                        <ui:Label name="debrief-weather" class="body" style="margin-top: 6px;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:VisualElement class="row" style="margin-bottom: 10px;">
+                        <ui:Label text="SPOILS ACQUIRED" class="heading" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="spoils" />
+                    <ui:Label name="complete-reward" class="chip chip--jade" style="align-self: flex-start; margin: 6px 0 14px 0;" />
+                    <ui:Label name="complete-stats" class="mono" />
+                    <ui:Button name="next-level" text="DESCENT TO LEVEL 2  >" class="btn-cta" style="margin-top: 14px;" />
+                    <ui:Button name="complete-menu" text="MAIN MENU" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <!-- Game over -->
         <ui:VisualElement name="gameover-overlay" class="overlay">
-            <ui:VisualElement class="panel">
-                <ui:Label text="You Fell in the Dungeon" class="title" />
-                <ui:Button name="retry" text="Try Again" />
-                <ui:Button name="gameover-menu" text="Main Menu" />
+            <ui:VisualElement class="panel overlay-panel" style="border-color: rgba(239, 68, 68, 0.6);">
+                <ui:Label text="EXPEDITION FAILED" class="eyebrow" style="color: rgb(239, 68, 68);" />
+                <ui:Label text="VITALITY DEPLETED" class="danger-title" />
+                <ui:Label name="gameover-text" text="You fell in the dungeon." class="body" style="margin: 6px 0 16px 0;" />
+                <ui:Button name="retry" text="TRY AGAIN" class="btn-danger" />
+                <ui:Button name="gameover-menu" text="MAIN MENU" />
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <!-- Loading -->
         <ui:VisualElement name="loading-overlay" class="overlay">
-            <ui:VisualElement class="panel">
-                <ui:Label text="Entering the Dungeon" class="title" />
+            <ui:VisualElement class="panel overlay-panel">
+                <ui:Label text="DESCENDING" class="eyebrow" />
+                <ui:Label name="loading-title" text="ENTERING ROOM 1" class="title" />
                 <ui:VisualElement class="loading-bar">
                     <ui:VisualElement name="loading-fill" class="loading-fill" />
                 </ui:VisualElement>
-                <ui:Label name="loading-message" text="Loading..." class="subtitle" />
-                <ui:Button name="loading-back" text="Back to Menu" />
+                <ui:Label name="loading-message" text="Loading chamber from Addressables..." class="mono" />
+                <ui:Button name="loading-back" text="BACK TO MENU" style="margin-top: 12px;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
