@@ -1,166 +1,96 @@
 using System.IO;
 using LostDungeon.Game.Abilities;
 using LostDungeon.Game.Combat;
+using LostDungeon.Game.Interaction;
+using LostDungeon.Game.Inventory;
 using LostDungeon.Game.Player;
 using LostDungeon.Game.Visuals;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Creates the Day 2 combat assets (fireball sprite + prefab, three ability assets),
-    /// gives the player its abilities, and places breakable barrels to practise on.
-    /// Existing assets are kept, so tuning done in the Inspector is not overwritten.
+    /// Creates the hero's three abilities (Strategy assets with their visual effects)
+    /// and the 3D player: an elemental mage with a staff, a torch light, and all the player scripts.
+    /// Also holds the small helpers every builder uses.
     /// </summary>
     public static class CombatSetupBuilder
     {
-        private const string GeneratedArtFolder = "Assets/_Project/Art/Generated";
-        private const string FireballSpritePath = GeneratedArtFolder + "/Fireball.png";
-        private const string PrefabFolder = "Assets/_Project/Prefabs";
-        private const string FireballPrefabPath = PrefabFolder + "/Fireball.prefab";
         private const string AbilityFolder = "Assets/_Project/ScriptableObjects/Abilities";
-        private const string BarrelSpritePath = "Assets/_Project/Art/kenney_isometric-miniature-dungeon/Isometric/barrel_N.png";
 
-        public static void SetUpPlayer(GameObject player)
+        public static GameObject CreatePlayer(Vector3 position)
         {
-            Projectile fireballPrefab = GetOrCreateFireballPrefab();
-
-            var sword = GetOrCreateAbility<MeleeAttackAbility>("Sword", ability =>
-                SetValues(ability, ("displayName", "Sword"), ("cooldownSeconds", 0.4f), ("playsActionAnimation", true)));
-            var dash = GetOrCreateAbility<DashAbility>("Dash", ability =>
-                SetValues(ability, ("displayName", "Dash"), ("cooldownSeconds", 1.2f)));
-            var fireball = GetOrCreateAbility<ProjectileAbility>("Fireball", ability =>
-                SetValues(ability, ("displayName", "Fireball"), ("cooldownSeconds", 0.8f), ("playsActionAnimation", true)));
-            SetValues(fireball, ("projectilePrefab", fireballPrefab));
-
-            // TryGetComponent, not "?? AddComponent": in the Editor a missing component is a fake null that ?? doesn't catch.
-            if (!player.TryGetComponent(out HitFlash flash))
-                flash = player.AddComponent<HitFlash>();
-            SetValues(player.GetComponent<PlayerHealth>(), ("hitFlash", flash));
-
-            if (!player.TryGetComponent(out Faction faction))
-                faction = player.AddComponent<Faction>();
-            SetValues(faction, ("team", (int)Team.Player));
-
-            if (!player.TryGetComponent(out PlayerAbilities abilities))
-                abilities = player.AddComponent<PlayerAbilities>();
-            SetValues(abilities,
-                ("attack", sword),
-                ("dash", dash),
-                ("special", fireball),
-                ("spriteAnimator", player.GetComponent<DirectionalSpriteAnimator>()));
-        }
-
-        public static void CreateBreakables(Grid grid, Vector3Int[] cells)
-        {
-            var parent = new GameObject("Breakables").transform;
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(BarrelSpritePath);
-
-            foreach (Vector3Int cell in cells)
+            GameObject player = CharacterBuilder.Create("Player", new CharacterBuilder.Look
             {
-                var barrel = new GameObject("Barrel");
-                barrel.transform.SetParent(parent);
-                barrel.transform.position = grid.GetCellCenterWorld(cell);
+                ModelPath = $"{KayKitSetup.Root}/Characters/Mage.fbx",
+                Controller = KayKitSetup.BuildController("Hero", "Idle_A", "Walking_A", "Running_A",
+                    "Melee_2H_Attack_Spinning", "Ranged_Magic_Shoot", "Hit_A", "Death_A", attackSpeed: 1.7f),
+                RightHand = $"{KayKitSetup.PropsFolder}/staff.fbx",
+                Ring = EffectsBuilder.RingMaterial("FX_RingHero"),
+                Radius = 0.24f,
+                RunSpeed = 2.8f,
+            });
+            player.transform.position = position;
 
-                var renderer = barrel.AddComponent<SpriteRenderer>();
-                renderer.sprite = sprite;
-                renderer.sortingOrder = 0;
+            // No hat: the hero's face and hair show from the high camera, like a monk rather than a wizard.
+            Transform hat = KayKitSetup.FindBone(player.transform, "Mage_Hat");
+            if (hat != null)
+                hat.gameObject.SetActive(false);
 
-                var collider = barrel.AddComponent<CircleCollider2D>();
-                collider.radius = 0.18f;
-                collider.offset = Vector2.zero; // Unity centres a new collider on the sprite; keep it on the floor
+            player.AddComponent<PlayerInputReader>();
+            player.AddComponent<PlayerMovement>();
+            player.AddComponent<PlayerHealth>();
+            player.AddComponent<PlayerInventory>();
+            player.AddComponent<PlayerInteractor>();
+            SetValues(player.AddComponent<Faction>(), ("team", (int)Team.Player));
+            SetValues(player.GetComponent<PlayerHealth>(),
+                ("hitFlash", player.GetComponent<HitFlash>()), ("characterAnimator", player.GetComponent<CharacterAnimator>()));
 
-                var flash = barrel.AddComponent<HitFlash>();
-                var prop = barrel.AddComponent<BreakableProp>();
-                SetValues(prop, ("hitFlash", flash));
-            }
+            (AbilityDefinition sword, AbilityDefinition dash, AbilityDefinition fireball) = CreateHeroAbilities();
+            SetValues(player.AddComponent<PlayerAbilities>(),
+                ("attack", sword), ("dash", dash), ("special", fireball),
+                ("characterAnimator", player.GetComponent<CharacterAnimator>()));
+
+            // A warm light that travels with the hero, so the dark dungeon is lit where they walk.
+            var torch = new GameObject("Torch");
+            torch.transform.SetParent(player.transform, false);
+            torch.transform.localPosition = new Vector3(0f, 2.4f, -0.4f);
+            var light = torch.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.72f, 0.45f);
+            light.intensity = 2.6f;
+            light.range = 6.5f;
+            light.shadows = LightShadows.None;
+            torch.AddComponent<TorchFlicker>();
+            return player;
         }
 
-        // ---------- Fireball ----------
-
-        private static Projectile GetOrCreateFireballPrefab()
+        /// <summary>The hero's Strategy assets. Values are written every build so the numbers match the 3D scale.</summary>
+        public static (AbilityDefinition, AbilityDefinition, AbilityDefinition) CreateHeroAbilities()
         {
-            var existing = AssetDatabase.LoadAssetAtPath<Projectile>(FireballPrefabPath);
-            if (existing != null)
-                return existing;
+            var sword = GetOrCreateAbility<MeleeAttackAbility>("Sword");
+            SetValues(sword, ("displayName", "Sword"), ("cooldownSeconds", 0.45f), ("animationTrigger", "Attack"),
+                ("damage", 1), ("reach", 0.5f), ("radius", 0.55f), ("critChance", 0.2f), ("critMultiplier", 2f),
+                ("castEffect", EffectsBuilder.HeroSlash), ("effectDistance", 0.35f), ("effectHeight", 0.55f));
 
-            Sprite sprite = GetOrCreateFireballSprite();
-            EnsureFolder(PrefabFolder);
+            var dash = GetOrCreateAbility<DashAbility>("Dash");
+            SetValues(dash, ("displayName", "Dash"), ("cooldownSeconds", 1.2f), ("animationTrigger", ""),
+                ("speed", 10f), ("duration", 0.16f),
+                ("castEffect", EffectsBuilder.WindBurst), ("effectDistance", 0f), ("effectHeight", 0.05f));
 
-            // Root sits at ground level so it hits things at their feet; the glowing visual floats above it.
-            var root = new GameObject("Fireball");
-            var body = root.AddComponent<Rigidbody2D>();
-            body.gravityScale = 0f;
-            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            body.interpolation = RigidbodyInterpolation2D.Interpolate;
+            var fireball = GetOrCreateAbility<ProjectileAbility>("Fireball");
+            SetValues(fireball, ("displayName", "Fireball"), ("cooldownSeconds", 0.8f), ("animationTrigger", "Cast"),
+                ("projectilePrefab", AssetDatabase.LoadAssetAtPath<Projectile>(EffectsBuilder.FireballPath)),
+                ("speed", 7.5f), ("damage", 2), ("spawnDistance", 0.45f),
+                ("castEffect", EffectsBuilder.CastFlash), ("effectDistance", 0.4f), ("effectHeight", 0.7f));
 
-            var collider = root.AddComponent<CircleCollider2D>();
-            collider.isTrigger = true;
-            collider.radius = 0.08f;
-
-            root.AddComponent<SortingGroup>(); // sort by the root's ground position, not the floating visual
-            root.AddComponent<Projectile>();
-
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(root.transform, false);
-            visual.transform.localPosition = new Vector3(0f, 0.22f, 0f);
-            visual.AddComponent<SpriteRenderer>().sprite = sprite;
-
-            var light = visual.AddComponent<Light2D>();
-            light.lightType = Light2D.LightType.Point;
-            light.color = new Color(1f, 0.55f, 0.2f);
-            light.intensity = 1.2f;
-            light.pointLightOuterRadius = 0.9f;
-            light.pointLightInnerRadius = 0.1f;
-
-            PrefabUtility.SaveAsPrefabAsset(root, FireballPrefabPath);
-            Object.DestroyImmediate(root);
-            return AssetDatabase.LoadAssetAtPath<Projectile>(FireballPrefabPath);
-        }
-
-        private static Sprite GetOrCreateFireballSprite()
-        {
-            if (!File.Exists(FireballSpritePath))
-            {
-                EnsureFolder(GeneratedArtFolder);
-                const int size = 64;
-                var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-                var core = new Color(1f, 0.95f, 0.6f);
-                var edge = new Color(1f, 0.35f, 0.05f);
-
-                for (int y = 0; y < size; y++)
-                {
-                    for (int x = 0; x < size; x++)
-                    {
-                        float distance = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(size / 2f, size / 2f)) / (size / 2f);
-                        float alpha = Mathf.Pow(Mathf.Clamp01(1f - distance), 1.4f);
-                        Color color = Color.Lerp(core, edge, Mathf.Clamp01(distance * 1.6f));
-                        color.a = alpha;
-                        texture.SetPixel(x, y, color);
-                    }
-                }
-
-                File.WriteAllBytes(FireballSpritePath, texture.EncodeToPNG());
-                Object.DestroyImmediate(texture);
-                AssetDatabase.ImportAsset(FireballSpritePath);
-
-                var importer = (TextureImporter)AssetImporter.GetAtPath(FireballSpritePath);
-                importer.textureType = TextureImporterType.Sprite;
-                importer.spritePixelsPerUnit = 200f; // about 0.3 units across
-                importer.alphaIsTransparency = true;
-                importer.mipmapEnabled = false;
-                importer.SaveAndReimport();
-            }
-
-            return AssetDatabase.LoadAssetAtPath<Sprite>(FireballSpritePath);
+            return (sword, dash, fireball);
         }
 
         // ---------- Helpers ----------
 
-        internal static T GetOrCreateAbility<T>(string assetName, System.Action<T> configureNew) where T : AbilityDefinition
+        internal static T GetOrCreateAbility<T>(string assetName) where T : AbilityDefinition
         {
             EnsureFolder(AbilityFolder);
             string path = $"{AbilityFolder}/{assetName}.asset";
@@ -170,8 +100,6 @@ namespace LostDungeon.EditorTools
 
             ability = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(ability, path);
-            configureNew(ability);
-            AssetDatabase.SaveAssets();
             return ability;
         }
 
@@ -201,25 +129,6 @@ namespace LostDungeon.EditorTools
             }
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
-        }
-
-        /// <summary>
-        /// Puts every collider in a prefab back at the object's origin (its feet). Adding a collider to an
-        /// object with a sprite makes Unity centre it on the sprite, which for these tall sprites is far above the floor.
-        /// </summary>
-        internal static void ZeroColliderOffsets(string prefabPath)
-        {
-            GameObject root = PrefabUtility.LoadPrefabContents(prefabPath);
-            try
-            {
-                foreach (Collider2D collider in root.GetComponents<Collider2D>())
-                    collider.offset = Vector2.zero;
-                PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
-            }
-            finally
-            {
-                PrefabUtility.UnloadPrefabContents(root);
-            }
         }
 
         internal static void EnsureFolder(string path)

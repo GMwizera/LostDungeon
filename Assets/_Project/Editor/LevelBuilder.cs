@@ -12,14 +12,17 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
-using UnityEngine.Tilemaps;
+using UnityEngine.Rendering;
 using static LostDungeon.EditorTools.CombatSetupBuilder;
 
 namespace LostDungeon.EditorTools
 {
     /// <summary>
-    /// Builds the five level prefabs from the layouts below, marks each one Addressable
+    /// Builds the five 3D level prefabs from the layouts below, marks each one Addressable
     /// (address "Level1" ... "Level5", one bundle per level) and creates the LevelCatalog.
+    /// Every cell is one world unit. The room covers cells (0,0) to (Width-1, Height-1);
+    /// tall walls stand on the far sides (north and east) and low barriers on the near sides,
+    /// so the 45 degree camera can always see in.
     /// </summary>
     public static class LevelBuilder
     {
@@ -27,20 +30,21 @@ namespace LostDungeon.EditorTools
         private const string DefinitionFolder = "Assets/_Project/ScriptableObjects/Levels";
         public const string CatalogPath = DefinitionFolder + "/LevelCatalog.asset";
         private const string AddressablesGroup = "Levels";
-        private const string EnemyPrefabFolder = "Assets/_Project/Prefabs/Enemies";
+        private const float WallHeight = 2f;
+
+        private enum Theme { Temple, Cellar, Armory, Ruins, Vault }
 
         private class Layout
         {
             public string Name;
             public int Width;
             public int Height;
-            public string Floor;
-            public string AccentFloor;
+            public Theme Theme;
             public Vector2Int PlayerSpawn;
             public int DoorX;
             public (string enemy, Vector2Int cell)[] Enemies;
             public Vector2Int[] Obstacles = new Vector2Int[0];
-            public string ObstacleTile = "stoneColumn_N";
+            public string Obstacle = "pillar";
             public Vector2Int Chest;
             public (string id, int amount)[] ChestLoot;
             public bool RequiresKey;
@@ -57,7 +61,7 @@ namespace LostDungeon.EditorTools
         {
             new Layout
             {
-                Name = "The Entrance", Width = 8, Height = 8, Floor = "stoneTile", AccentFloor = "stoneUneven",
+                Name = "The Entrance", Width = 8, Height = 8, Theme = Theme.Temple,
                 PlayerSpawn = new Vector2Int(1, 1), DoorX = 4,
                 Enemies = new[] { ("Warrior", new Vector2Int(6, 6)), ("Warrior", new Vector2Int(1, 6)) },
                 Obstacles = new[] { new Vector2Int(3, 4), new Vector2Int(5, 3) },
@@ -66,40 +70,40 @@ namespace LostDungeon.EditorTools
                 Barrels = new[] { new Vector2Int(0, 7), new Vector2Int(7, 4) },
                 RewardUnlock = LevelManager.UnlockFireball,
                 RewardText = "Fireball unlocked! Press Q or right-click to throw it.",
-                RewardTag = "FIREBALL GRANTED", Hostiles = "Fast Warriors",
+                RewardTag = "FIREBALL GRANTED", Hostiles = "Skeleton Warriors",
             },
             new Layout
             {
-                Name = "Flooded Cellar", Width = 10, Height = 8, Floor = "dirtTiles", AccentFloor = "dirt",
+                Name = "Flooded Cellar", Width = 10, Height = 8, Theme = Theme.Cellar,
                 PlayerSpawn = new Vector2Int(1, 1), DoorX = 7,
                 Enemies = new[] { ("Warrior", new Vector2Int(8, 6)), ("Archer", new Vector2Int(2, 6)), ("Warrior", new Vector2Int(8, 2)) },
                 Obstacles = new[] { new Vector2Int(4, 2), new Vector2Int(4, 3), new Vector2Int(5, 5), new Vector2Int(6, 5) },
-                ObstacleTile = "woodenCrates_N",
+                Obstacle = "crates_stacked",
                 Chest = new Vector2Int(0, 7), ChestLoot = new[] { (ItemIds.Gold, 8) },
                 Pickups = new[] { (ItemIds.Potion, new Vector2Int(7, 3)), (ItemIds.Gold, new Vector2Int(2, 2)) },
                 Barrels = new[] { new Vector2Int(9, 0), new Vector2Int(3, 7) },
                 Traps = new[] { new Vector2Int(5, 2) },
                 RewardUnlock = LevelManager.UnlockHealthBonus,
                 RewardText = "Your maximum health went up by 2 hearts!",
-                RewardTag = "+2 EXTRA HEARTS", Hostiles = "Warriors and a sniping Archer",
+                RewardTag = "+2 EXTRA HEARTS", Hostiles = "Warriors and a Bone Archer",
             },
             new Layout
             {
-                Name = "The Armory", Width = 10, Height = 10, Floor = "planks", AccentFloor = "planksBroken",
+                Name = "The Armory", Width = 10, Height = 10, Theme = Theme.Armory,
                 PlayerSpawn = new Vector2Int(1, 1), DoorX = 2, RequiresKey = true,
                 Enemies = new[] { ("Archer", new Vector2Int(1, 8)), ("Archer", new Vector2Int(8, 8)), ("Guardian", new Vector2Int(7, 2)) },
                 Obstacles = new[] { new Vector2Int(3, 5), new Vector2Int(6, 5), new Vector2Int(3, 6), new Vector2Int(6, 6) },
-                ObstacleTile = "barrels_N",
+                Obstacle = "barrel_large",
                 Chest = new Vector2Int(9, 1), ChestLoot = new[] { (ItemIds.Key, 1), (ItemIds.Gold, 10) },
                 Pickups = new[] { (ItemIds.Potion, new Vector2Int(5, 8)) },
                 Barrels = new[] { new Vector2Int(0, 4), new Vector2Int(9, 5) },
                 Traps = new[] { new Vector2Int(4, 3), new Vector2Int(5, 7) },
                 RewardText = "You found the armory's treasure.",
-                RewardTag = "KEY VAULT", Hostiles = "Armoured Guardian and Archers",
+                RewardTag = "KEY VAULT", Hostiles = "Crypt Guardian and Bone Archers",
             },
             new Layout
             {
-                Name = "Collapsed Halls", Width = 12, Height = 10, Floor = "stoneUneven", AccentFloor = "stoneMissingTiles",
+                Name = "Collapsed Halls", Width = 12, Height = 10, Theme = Theme.Ruins,
                 PlayerSpawn = new Vector2Int(1, 1), DoorX = 10,
                 Enemies = new[]
                 {
@@ -120,7 +124,7 @@ namespace LostDungeon.EditorTools
             },
             new Layout
             {
-                Name = "Guardian's Vault", Width = 12, Height = 12, Floor = "stone", AccentFloor = "stoneTile",
+                Name = "Guardian's Vault", Width = 12, Height = 12, Theme = Theme.Vault,
                 PlayerSpawn = new Vector2Int(1, 1), DoorX = 6, RequiresKey = true,
                 Enemies = new[]
                 {
@@ -129,27 +133,20 @@ namespace LostDungeon.EditorTools
                     ("Archer", new Vector2Int(1, 10)), ("Archer", new Vector2Int(10, 1)),
                 },
                 Obstacles = new[] { new Vector2Int(3, 3), new Vector2Int(8, 8), new Vector2Int(3, 8), new Vector2Int(8, 5) },
+                Obstacle = "pillar_decorated",
                 Chest = new Vector2Int(10, 10), ChestLoot = new[] { (ItemIds.Key, 1), (ItemIds.Gold, 25) },
                 Pickups = new[] { (ItemIds.Potion, new Vector2Int(5, 5)), (ItemIds.Potion, new Vector2Int(1, 7)), (ItemIds.Potion, new Vector2Int(10, 5)) },
                 Barrels = new[] { new Vector2Int(0, 11), new Vector2Int(11, 0), new Vector2Int(5, 0) },
                 Traps = new[] { new Vector2Int(6, 6), new Vector2Int(4, 10) },
                 RewardText = "You escaped the Lost Dungeon. Well done!",
-                RewardTag = "FINAL BREACH", Hostiles = "Two Guardians and the full garrison",
+                RewardTag = "FINAL BREACH", Hostiles = "Two Crypt Guardians and the full garrison",
             },
         };
 
-        public static LevelCatalog BuildAll(Dictionary<string, Tile> tiles, UIIconsRef icons)
+        public static LevelCatalog BuildAll(Dictionary<string, EnemyController> enemyPrefabs)
         {
             EnsureFolder(LevelFolder);
             EnsureFolder(DefinitionFolder);
-            tiles = TestRoomBuilder.ReloadTiles(tiles); // earlier scene changes may have unloaded them
-
-            var enemyPrefabs = new Dictionary<string, EnemyController>
-            {
-                ["Warrior"] = AssetDatabase.LoadAssetAtPath<EnemyController>($"{EnemyPrefabFolder}/Warrior.prefab"),
-                ["Archer"] = AssetDatabase.LoadAssetAtPath<EnemyController>($"{EnemyPrefabFolder}/Archer.prefab"),
-                ["Guardian"] = AssetDatabase.LoadAssetAtPath<EnemyController>($"{EnemyPrefabFolder}/Guardian.prefab"),
-            };
 
             var catalog = AssetDatabase.LoadAssetAtPath<LevelCatalog>(CatalogPath);
             if (catalog == null)
@@ -163,7 +160,7 @@ namespace LostDungeon.EditorTools
             {
                 int number = i + 1;
                 string prefabPath = $"{LevelFolder}/Level{number}.prefab";
-                BuildLevelPrefab(number, Layouts[i], tiles, enemyPrefabs, icons, prefabPath);
+                BuildLevelPrefab(number, Layouts[i], enemyPrefabs, prefabPath);
                 MakeAddressable(prefabPath, $"Level{number}");
                 definitions.Add(CreateDefinition(number, Layouts[i]));
             }
@@ -177,14 +174,6 @@ namespace LostDungeon.EditorTools
             EditorUtility.SetDirty(catalog);
             AssetDatabase.SaveAssets();
             return catalog;
-        }
-
-        /// <summary>The few icon sprites the levels need (pickups), passed in from the icon factory.</summary>
-        public class UIIconsRef
-        {
-            public Sprite Gold;
-            public Sprite Key;
-            public Sprite Potion;
         }
 
         private static LevelDefinition CreateDefinition(int number, Layout layout)
@@ -231,30 +220,12 @@ namespace LostDungeon.EditorTools
 
         // ---------- Level prefab ----------
 
-        private static void BuildLevelPrefab(int number, Layout layout, Dictionary<string, Tile> tiles,
-            Dictionary<string, EnemyController> enemyPrefabs, UIIconsRef icons, string path)
+        private static void BuildLevelPrefab(int number, Layout layout, Dictionary<string, EnemyController> enemyPrefabs, string path)
         {
+            var random = new System.Random(number * 97);
             var root = new GameObject($"Level{number}");
             var levelRoot = root.AddComponent<LevelRoot>();
 
-            Grid grid = TestRoomBuilder.CreateGrid();
-            grid.transform.SetParent(root.transform, false);
-            // Individual mode: Chunk mode dropped tiles that come from different textures (black holes).
-            Tilemap floor = TestRoomBuilder.CreateTilemap(grid, "Floor", TestRoomBuilder.FloorOrder, TilemapRenderer.Mode.Individual);
-            Tilemap walls = TestRoomBuilder.CreateTilemap(grid, "Walls", TestRoomBuilder.ObjectOrder, TilemapRenderer.Mode.Individual);
-            TestRoomBuilder.AddWallCollision(walls.gameObject);
-
-            // Obsidian mood from the Stitch design: darker, cooler stone. A tint works on every platform,
-            // unlike 2D lights, which the WebGL build did not apply.
-            floor.color = new Color(0.55f, 0.55f, 0.62f);
-            walls.color = new Color(0.62f, 0.62f, 0.7f);
-            SetValues(grid.gameObject.AddComponent<TilemapNavigationGrid>(), ("floor", floor), ("walls", walls));
-
-            PaintFloor(floor, layout, tiles, number);
-            PaintWalls(walls, layout, tiles);
-            TestRoomBuilder.BuildWallCollider(walls);
-
-            Vector3 Cell(Vector2Int c) => grid.GetCellCenterWorld(new Vector3Int(c.x, c.y, 0));
             Transform Group(string name)
             {
                 var t = new GameObject(name).transform;
@@ -262,20 +233,37 @@ namespace LostDungeon.EditorTools
                 return t;
             }
 
-            EnemySpawner spawner = CreateSpawner(Group("Enemies"), layout, enemyPrefabs, Cell);
+            var blocked = new HashSet<Vector2Int>(layout.Obstacles) { layout.Chest };
+            var trapCells = new HashSet<Vector2Int>(layout.Traps);
 
+            BuildFloor(Group("Floor"), layout, trapCells, random);
+            BuildWalls(Group("Walls"), layout, random);
+            BuildCollision(Group("Collision"), layout);
+
+            Transform obstacles = Group("Obstacles");
+            foreach (Vector2Int cell in layout.Obstacles)
+                CreateObstacle(obstacles, layout.Obstacle, cell, random);
+
+            var navigation = Group("Navigation").gameObject.AddComponent<LevelNavigationGrid>();
+            var open = new List<bool>();
+            for (int y = 0; y < layout.Height; y++)
+                for (int x = 0; x < layout.Width; x++)
+                    open.Add(!blocked.Contains(new Vector2Int(x, y)));
+            navigation.Configure(layout.Width, layout.Height, open);
+
+            EnemySpawner spawner = CreateSpawner(Group("Enemies"), layout, enemyPrefabs);
             var objective = Group("Objective").gameObject.AddComponent<LevelObjective>();
             SetValues(objective, ("spawner", spawner), ("requiresKey", layout.RequiresKey));
 
             Transform props = Group("Props");
-            CreateDoor(props, Cell(new Vector2Int(layout.DoorX, layout.Height)), objective);
-            CreateChest(props, Cell(layout.Chest), layout.ChestLoot);
+            CreateDoor(props, layout, objective);
+            CreateChest(props, layout.Chest, layout.ChestLoot, layout);
             foreach ((string id, Vector2Int cell) in layout.Pickups)
-                CreatePickup(props, Cell(cell), id, icons);
+                CreatePickup(props, cell, id);
             foreach (Vector2Int cell in layout.Barrels)
-                CreateBarrel(props, Cell(cell));
+                CreateBarrel(props, cell);
             foreach (Vector2Int cell in layout.Traps)
-                CreateTrap(props, Cell(cell));
+                CreateTrap(props, cell);
 
             Transform spawn = Group("PlayerSpawn");
             spawn.position = Cell(layout.PlayerSpawn);
@@ -285,103 +273,213 @@ namespace LostDungeon.EditorTools
             Object.DestroyImmediate(root);
         }
 
-        private static void PaintFloor(Tilemap floor, Layout layout, Dictionary<string, Tile> tiles, int seed)
+        private static Vector3 Cell(Vector2Int cell) => new Vector3(cell.x + 0.5f, 0f, cell.y + 0.5f);
+
+        /// <summary>Places a KayKit dungeon model (already imported at the 1 tile = 1 unit scale).</summary>
+        internal static GameObject Place(Transform parent, string model, Vector3 position, float yaw = 0f, float scale = 1f)
         {
-            var random = new System.Random(seed * 31);
-            for (int x = 0; x < layout.Width; x++)
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(KayKitSetup.Model($"{KayKitSetup.DungeonFolder}/{model}.fbx"));
+            PrefabUtility.UnpackPrefabInstance(go, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = position;
+            go.transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
+            go.transform.localScale = Vector3.one * scale;
+            return go;
+        }
+
+        // ---------- Floor ----------
+
+        private static string FloorTile(Theme theme, System.Random random)
+        {
+            int roll = random.Next(100);
+            switch (theme)
             {
-                for (int y = 0; y < layout.Height; y++)
+                case Theme.Cellar:
+                    return roll < 30 ? "floor_dirt_small_A" : roll < 55 ? "floor_dirt_small_B" : roll < 80 ? "floor_dirt_small_C" : "floor_dirt_small_weeds";
+                case Theme.Armory:
+                    return roll < 70 ? "floor_wood_small" : "floor_wood_small_dark";
+                case Theme.Ruins:
+                    return roll < 45 ? "floor_tile_small" : roll < 65 ? "floor_tile_small_broken_A" : roll < 85 ? "floor_tile_small_broken_B" : "floor_tile_small_weeds_A";
+                case Theme.Vault:
+                    return roll < 80 ? "floor_tile_small" : "floor_tile_small_weeds_B";
+                default: // Temple: mossy stone, like the reference art
+                    return roll < 60 ? "floor_tile_small" : roll < 80 ? "floor_tile_small_weeds_A" : roll < 95 ? "floor_tile_small_weeds_B" : "floor_tile_small_decorated";
+            }
+        }
+
+        private static void BuildFloor(Transform parent, Layout layout, HashSet<Vector2Int> trapCells, System.Random random)
+        {
+            // One ring of extra floor under the walls, so they never stand over the void.
+            for (int x = -1; x <= layout.Width; x++)
+            {
+                for (int y = -1; y <= layout.Height; y++)
                 {
-                    string name = random.Next(5) == 0 ? layout.AccentFloor : layout.Floor;
-                    string facing = TestRoomBuilder.Facings[random.Next(4)];
-                    floor.SetTile(new Vector3Int(x, y, 0), tiles[$"{name}_{facing}"]);
+                    if (trapCells.Contains(new Vector2Int(x, y)))
+                        continue; // the trap has its own floor plate
+                    GameObject tile = Place(parent, FloorTile(layout.Theme, random), Cell(new Vector2Int(x, y)), 90f * random.Next(4));
+                    foreach (Renderer r in tile.GetComponentsInChildren<Renderer>())
+                        r.shadowCastingMode = ShadowCastingMode.Off;
                 }
             }
         }
 
-        /// <summary>Walls sit in the ring of cells just outside the room (see TestRoomBuilder for the rule).</summary>
-        private static void PaintWalls(Tilemap walls, Layout layout, Dictionary<string, Tile> tiles)
+        // ---------- Walls ----------
+
+        private static void BuildWalls(Transform parent, Layout layout, System.Random random)
         {
             int w = layout.Width, h = layout.Height;
-            for (int x = 0; x < w; x++)
+            int doorSegment = layout.DoorX / 2;
+
+            // North (far) wall, along X. Segments are 2 cells long.
+            for (int k = 0; k < w / 2; k++)
             {
-                walls.SetTile(new Vector3Int(x, h, 0), x == layout.DoorX
-                    ? tiles[TestRoomBuilder.BlockerTile] // the door object is drawn here; this keeps the gap solid
-                    : tiles[x % 4 == 1 ? "stoneWallWindow_W" : "stoneWall_W"]);
-                walls.SetTile(new Vector3Int(x, -1, 0), tiles["stoneWallHalf_E"]);
+                float x = 2 * k + 1;
+                if (k == doorSegment)
+                    continue; // the exit door is built separately
+                Place(parent, WallPiece(random), new Vector3(x, 0f, h + 0.25f));
+                if (k % 2 == 0)
+                    AddTorch(parent, new Vector3(x, 0f, h), 180f, layout.Theme);
+                else
+                    AddBanner(parent, new Vector3(x, 0f, h), 180f, random);
             }
 
-            for (int y = 0; y < h; y++)
+            // East (far) wall, along Z.
+            for (int k = 0; k < h / 2; k++)
             {
-                walls.SetTile(new Vector3Int(w, y, 0), tiles["stoneWall_N"]);
-                walls.SetTile(new Vector3Int(-1, y, 0), tiles["stoneWallHalf_S"]);
+                float z = 2 * k + 1;
+                Place(parent, WallPiece(random), new Vector3(w + 0.25f, 0f, z), 90f);
+                if (k % 2 == 1)
+                    AddTorch(parent, new Vector3(w, 0f, z), 270f, layout.Theme);
             }
 
-            // Room corners: the wall cells on either side only touch at a point, so block the corner cell too.
-            foreach (var corner in new[] { new Vector3Int(-1, -1, 0), new Vector3Int(w, -1, 0), new Vector3Int(-1, h, 0), new Vector3Int(w, h, 0) })
-                walls.SetTile(corner, tiles[TestRoomBuilder.BlockerTile]);
+            // Corner and end pillars.
+            Place(parent, "pillar", new Vector3(w + 0.25f, 0f, h + 0.25f));
+            Place(parent, "pillar", new Vector3(-0.25f, 0f, h + 0.25f));
+            Place(parent, "pillar", new Vector3(w + 0.25f, 0f, -0.25f));
 
-            foreach (Vector2Int cell in layout.Obstacles)
-                walls.SetTile(new Vector3Int(cell.x, cell.y, 0), tiles[layout.ObstacleTile]);
+            // South and west (near) sides: knee-high barriers, so the camera sees over them.
+            for (int k = 0; k < w / 2; k++)
+                Place(parent, "barrier", new Vector3(2 * k + 1, 0f, -0.15f));
+            for (int k = 0; k < h / 2; k++)
+                Place(parent, "barrier", new Vector3(-0.15f, 0f, 2 * k + 1), 90f);
+            Place(parent, "barrier_column", new Vector3(-0.15f, 0f, -0.15f));
         }
 
-        private static EnemySpawner CreateSpawner(Transform parent, Layout layout,
-            Dictionary<string, EnemyController> prefabs, System.Func<Vector2Int, Vector3> cell)
+        private static string WallPiece(System.Random random)
         {
-            var spawner = parent.gameObject.AddComponent<EnemySpawner>();
-            var serialized = new SerializedObject(spawner);
-            SerializedProperty list = serialized.FindProperty("spawns");
-            list.arraySize = layout.Enemies.Length;
-
-            for (int i = 0; i < layout.Enemies.Length; i++)
-            {
-                (string enemy, Vector2Int at) = layout.Enemies[i];
-                var point = new GameObject($"{enemy} Spawn").transform;
-                point.SetParent(parent, false);
-                point.position = cell(at);
-
-                SerializedProperty element = list.GetArrayElementAtIndex(i);
-                element.FindPropertyRelative("prefab").objectReferenceValue = prefabs[enemy];
-                element.FindPropertyRelative("point").objectReferenceValue = point;
-            }
-
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            return spawner;
+            int roll = random.Next(100);
+            return roll < 70 ? "wall" : roll < 85 ? "wall_cracked" : "wall_window_closed";
         }
 
-        private static SpriteRenderer CreateSprite(Transform parent, string name, Vector3 position, string isoSprite, int order)
+        internal static void AddTorch(Transform parent, Vector3 wallFoot, float yaw) => AddTorch(parent, wallFoot, yaw, Theme.Temple);
+
+        private static void AddTorch(Transform parent, Vector3 wallFoot, float yaw, Theme theme)
+        {
+            Vector3 inward = Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
+            Place(parent, "torch_mounted", wallFoot + Vector3.up * 1.15f, yaw);
+
+            var go = new GameObject("Torch Light");
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = wallFoot + Vector3.up * 1.55f + inward * 0.45f;
+            var light = go.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = theme == Theme.Vault ? new Color(1f, 0.62f, 0.32f) : new Color(1f, 0.58f, 0.26f);
+            light.intensity = 2.4f;
+            light.range = 5f;
+            light.shadows = LightShadows.None;
+            go.AddComponent<TorchFlicker>();
+        }
+
+        private static void AddBanner(Transform parent, Vector3 wallFoot, float yaw, System.Random random)
+        {
+            string[] banners = { "banner_patternA_red", "banner_patternB_blue", "banner_shield_red", "banner_thin_red" };
+            Place(parent, banners[random.Next(banners.Length)], wallFoot + Vector3.up * 0f, yaw);
+        }
+
+        /// <summary>
+        /// Invisible solid boxes around the room. The visible barriers on the near side are low,
+        /// but the collision is a full wall on every side, so nothing can leave the room.
+        /// </summary>
+        private static void BuildCollision(Transform parent, Layout layout)
+        {
+            float w = layout.Width, h = layout.Height;
+            AddBox(parent, "North", new Vector3(w / 2f, WallHeight / 2f, h + 0.25f), new Vector3(w + 1f, WallHeight, 0.5f));
+            AddBox(parent, "South", new Vector3(w / 2f, WallHeight / 2f, -0.25f), new Vector3(w + 1f, WallHeight, 0.5f));
+            AddBox(parent, "East", new Vector3(w + 0.25f, WallHeight / 2f, h / 2f), new Vector3(0.5f, WallHeight, h + 1f));
+            AddBox(parent, "West", new Vector3(-0.25f, WallHeight / 2f, h / 2f), new Vector3(0.5f, WallHeight, h + 1f));
+        }
+
+        private static BoxCollider AddBox(Transform parent, string name, Vector3 center, Vector3 size)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            go.transform.position = position;
-            var renderer = go.AddComponent<SpriteRenderer>();
-            renderer.sprite = IsoSprite(isoSprite);
-            renderer.sortingOrder = order;
-            return renderer;
+            go.transform.localPosition = center;
+            var box = go.AddComponent<BoxCollider>();
+            box.size = size;
+            return box;
         }
 
-        private static Sprite IsoSprite(string name) =>
-            AssetDatabase.LoadAssetAtPath<Sprite>($"{TestRoomBuilder.IsoFolder}/{name}.png");
+        // ---------- Obstacles and props ----------
 
-        private static void CreateDoor(Transform parent, Vector3 position, LevelObjective objective)
+        private static void CreateObstacle(Transform parent, string model, Vector2Int cell, System.Random random)
         {
-            SpriteRenderer renderer = CreateSprite(parent, "ExitDoor", position, "stoneWallDoorClosed_W", TestRoomBuilder.ObjectOrder);
-            var blocker = renderer.gameObject.AddComponent<BoxCollider2D>();
-            blocker.size = new Vector2(0.6f, 0.3f);
-            blocker.offset = Vector2.zero; // Unity centres a new collider on the sprite; keep it on the floor
-            SetValues(renderer.gameObject.AddComponent<ExitDoor>(),
-                ("objective", objective), ("spriteRenderer", renderer),
-                ("closedSprite", IsoSprite("stoneWallDoorClosed_W")), ("openSprite", IsoSprite("stoneWallDoorOpen_W")));
+            float scale = model == "crates_stacked" ? 0.85f : model == "barrel_large" ? 0.95f : 1f;
+            GameObject go = Place(parent, model, Cell(cell), 90f * random.Next(4), scale);
+            go.name = $"Obstacle {cell}";
+            var box = go.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, WallHeight / 2f, 0f) / scale;
+            box.size = new Vector3(0.82f, WallHeight, 0.82f) / scale;
         }
 
-        private static void CreateChest(Transform parent, Vector3 position, (string id, int amount)[] loot)
+        private static void CreateDoor(Transform parent, Layout layout, LevelObjective objective)
         {
-            SpriteRenderer renderer = CreateSprite(parent, "Chest", position, "chestClosed_N", TestRoomBuilder.ObjectOrder);
-            var chestCollider = renderer.gameObject.AddComponent<CircleCollider2D>();
-            chestCollider.radius = 0.2f;
-            chestCollider.offset = Vector2.zero;
-            var chest = renderer.gameObject.AddComponent<Chest>();
-            SetValues(chest, ("spriteRenderer", renderer), ("openSprite", IsoSprite("chestOpen_N")));
+            int segment = layout.DoorX / 2;
+            Vector3 position = new Vector3(2 * segment + 1, 0f, layout.Height + 0.25f);
+            GameObject doorway = Place(parent, "wall_doorway", position);
+            doorway.name = "ExitDoor";
+
+            var blocker = doorway.AddComponent<BoxCollider>();
+            blocker.center = new Vector3(0f, WallHeight / 2f, 0f);
+            blocker.size = new Vector3(2f, WallHeight, 0.5f);
+
+            // Warm light beyond the doorway: faint while sealed, bright once the way out is open.
+            var glow = new GameObject("Exit Glow");
+            glow.transform.SetParent(doorway.transform, false);
+            glow.transform.localPosition = new Vector3(0f, 1.2f, 0.9f);
+            var light = glow.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.82f, 0.5f);
+            light.intensity = 0.6f;
+            light.range = 6f;
+            light.shadows = LightShadows.None;
+
+            Transform door = doorway.transform.Find("wall_doorway_door");
+            SetValues(doorway.AddComponent<ExitDoor>(), ("objective", objective), ("door", door), ("glow", light));
+        }
+
+        private static void CreateChest(Transform parent, Vector2Int cell, (string id, int amount)[] loot, Layout layout)
+        {
+            // Face the middle of the room.
+            Vector2 toCentre = new Vector2(layout.Width / 2f - cell.x, layout.Height / 2f - cell.y);
+            float yaw = Mathf.Round(Mathf.Atan2(toCentre.x, toCentre.y) * Mathf.Rad2Deg / 90f) * 90f;
+            GameObject chestObject = Place(parent, "chest", Cell(cell), yaw);
+            chestObject.name = "Chest";
+
+            var box = chestObject.AddComponent<BoxCollider>();
+            box.center = new Vector3(0f, 0.35f, 0f);
+            box.size = new Vector3(0.85f, 0.7f, 0.75f);
+
+            var glowObject = new GameObject("Treasure Glow");
+            glowObject.transform.SetParent(chestObject.transform, false);
+            glowObject.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+            var glow = glowObject.AddComponent<Light>();
+            glow.type = LightType.Point;
+            glow.color = new Color(1f, 0.78f, 0.3f);
+            glow.intensity = 2.5f;
+            glow.range = 2.5f;
+
+            var chest = chestObject.AddComponent<Chest>();
+            SetValues(chest, ("lid", chestObject.transform.Find("chest_lid")), ("glow", glow));
 
             var serialized = new SerializedObject(chest);
             SerializedProperty list = serialized.FindProperty("loot");
@@ -394,42 +492,81 @@ namespace LostDungeon.EditorTools
             serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void CreatePickup(Transform parent, Vector3 position, string itemId, UIIconsRef icons)
+        private static void CreatePickup(Transform parent, Vector2Int cell, string itemId)
         {
             var go = new GameObject($"Pickup ({itemId})");
             go.transform.SetParent(parent, false);
-            go.transform.position = position;
+            go.transform.localPosition = Cell(cell);
 
-            var trigger = go.AddComponent<CircleCollider2D>();
+            var trigger = go.AddComponent<SphereCollider>();
             trigger.isTrigger = true;
-            trigger.radius = 0.15f;
+            trigger.radius = 0.35f;
+            trigger.center = new Vector3(0f, 0.4f, 0f);
 
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(go.transform, false);
-            visual.transform.localPosition = new Vector3(0f, 0.15f, 0f);
-            var renderer = visual.AddComponent<SpriteRenderer>();
-            renderer.sprite = itemId == ItemIds.Potion ? icons.Potion : itemId == ItemIds.Key ? icons.Key : icons.Gold;
-            go.AddComponent<UnityEngine.Rendering.SortingGroup>().sortingOrder = TestRoomBuilder.ObjectOrder;
+            var visual = new GameObject("Visual").transform;
+            visual.SetParent(go.transform, false);
+            visual.localPosition = new Vector3(0f, 0.3f, 0f);
+            string model = itemId == ItemIds.Potion ? "bottle_A_green" : itemId == ItemIds.Key ? "key" : "coin_stack_small";
+            float scale = itemId == ItemIds.Potion ? 1.4f : itemId == ItemIds.Key ? 1.2f : 1f;
+            Place(visual, model, Vector3.zero, 0f, scale);
+
+            var glowObject = new GameObject("Glow");
+            glowObject.transform.SetParent(go.transform, false);
+            glowObject.transform.localPosition = new Vector3(0f, 0.6f, 0f);
+            var glow = glowObject.AddComponent<Light>();
+            glow.type = LightType.Point;
+            glow.color = itemId == ItemIds.Potion ? new Color(0.35f, 1f, 0.5f) : new Color(1f, 0.8f, 0.3f);
+            glow.intensity = 1.6f;
+            glow.range = 1.6f;
 
             SetValues(go.AddComponent<Pickup>(),
-                ("itemId", itemId), ("amount", itemId == ItemIds.Gold ? 3 : 1), ("visual", visual.transform));
+                ("itemId", itemId), ("amount", itemId == ItemIds.Gold ? 3 : 1), ("visual", visual));
         }
 
-        private static void CreateBarrel(Transform parent, Vector3 position)
+        private static void CreateBarrel(Transform parent, Vector2Int cell)
         {
-            SpriteRenderer renderer = CreateSprite(parent, "Barrel", position, "barrel_N", TestRoomBuilder.ObjectOrder);
-            var barrelCollider = renderer.gameObject.AddComponent<CircleCollider2D>();
-            barrelCollider.radius = 0.18f;
-            barrelCollider.offset = Vector2.zero;
-            var flash = renderer.gameObject.AddComponent<HitFlash>();
-            SetValues(renderer.gameObject.AddComponent<BreakableProp>(), ("hitFlash", flash));
+            GameObject barrel = Place(parent, "barrel_small", Cell(cell), Random.Range(0f, 360f), 1.1f);
+            barrel.name = "Barrel";
+            var collider = barrel.AddComponent<CapsuleCollider>();
+            collider.radius = 0.25f;
+            collider.height = 0.6f;
+            collider.center = new Vector3(0f, 0.3f, 0f);
+            var flash = barrel.AddComponent<HitFlash>();
+            SetValues(barrel.AddComponent<BreakableProp>(), ("hitFlash", flash), ("breakEffect", EffectsBuilder.BreakDust));
         }
 
-        private static void CreateTrap(Transform parent, Vector3 position)
+        private static void CreateTrap(Transform parent, Vector2Int cell)
         {
-            SpriteRenderer renderer = CreateSprite(parent, "Trap", position, "planksHole_N", TestRoomBuilder.FloorDecalOrder);
-            renderer.gameObject.AddComponent<PolygonCollider2D>().isTrigger = true;
-            renderer.gameObject.AddComponent<SpikeTrap>();
+            GameObject trap = Place(parent, "floor_tile_big_spikes", Cell(cell), 0f, 0.5f); // the plate is 2x2 cells: halve it
+            trap.name = "Spike Trap";
+            var trigger = trap.AddComponent<BoxCollider>();
+            trigger.isTrigger = true;
+            trigger.center = new Vector3(0f, 0.5f, 0f);
+            trigger.size = new Vector3(1.7f, 1f, 1.7f); // in the trap's own (halved) scale: about one cell
+            SetValues(trap.AddComponent<SpikeTrap>(), ("spikes", trap.transform.Find("spikes")), ("hiddenDepth", 0.9f));
+        }
+
+        private static EnemySpawner CreateSpawner(Transform parent, Layout layout, Dictionary<string, EnemyController> prefabs)
+        {
+            var spawner = parent.gameObject.AddComponent<EnemySpawner>();
+            var serialized = new SerializedObject(spawner);
+            SerializedProperty list = serialized.FindProperty("spawns");
+            list.arraySize = layout.Enemies.Length;
+
+            for (int i = 0; i < layout.Enemies.Length; i++)
+            {
+                (string enemy, Vector2Int at) = layout.Enemies[i];
+                var point = new GameObject($"{enemy} Spawn").transform;
+                point.SetParent(parent, false);
+                point.position = Cell(at);
+
+                SerializedProperty element = list.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("prefab").objectReferenceValue = prefabs[enemy];
+                element.FindPropertyRelative("point").objectReferenceValue = point;
+            }
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return spawner;
         }
     }
 }
