@@ -12,6 +12,8 @@ namespace LostDungeon.Game.Enemies
     {
         [Header("Identity")]
         [SerializeField] private string id = "Enemy";
+        [SerializeField] private string displayName = "Skeleton";
+        [SerializeField, Min(1)] private int level = 1;
         [SerializeField] private Color tint = Color.white;
         [SerializeField] private float scale = 1f;
 
@@ -31,6 +33,8 @@ namespace LostDungeon.Game.Enemies
         [SerializeField] private AbilityDefinition attack;
 
         public string Id => id;
+        public string DisplayName => displayName;
+        public int Level => level;
         public Color Tint => tint;
         public float Scale => scale;
         public int MaxHealth => maxHealth;

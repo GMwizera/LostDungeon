@@ -15,6 +15,7 @@ namespace LostDungeon.Game.Managers
             GameEvents.ResetAll();
             Levels.ExitDoor.ResetStatics();
             Weather.WorldModifiers.Reset();
+            Combat.CombatFeedback.Reset();
         }
     }
 }

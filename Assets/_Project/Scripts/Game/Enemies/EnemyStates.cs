@@ -57,20 +57,21 @@ namespace LostDungeon.Game.Enemies
 
     public class DeadState : IState<EnemyController>
     {
-        private const float FadeSeconds = 0.6f;
+        private const float FallSeconds = 1.1f; // death animation
+        private const float SinkSeconds = 0.8f; // then the bones sink into the floor
         private float elapsed;
 
         public void Enter(EnemyController enemy)
         {
             elapsed = 0f;
-            enemy.Stop();
         }
 
         public void Tick(EnemyController enemy, float deltaTime)
         {
             elapsed += deltaTime;
-            enemy.SetFade(1f - elapsed / FadeSeconds);
-            if (elapsed >= FadeSeconds)
+            if (elapsed > FallSeconds)
+                enemy.SetSink((elapsed - FallSeconds) / SinkSeconds);
+            if (elapsed >= FallSeconds + SinkSeconds)
                 enemy.Remove();
         }
 

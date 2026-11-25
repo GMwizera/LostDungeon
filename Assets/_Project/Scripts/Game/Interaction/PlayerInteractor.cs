@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using LostDungeon.Core.Events;
 using LostDungeon.Game.Player;
 using UnityEngine;
@@ -12,10 +11,10 @@ namespace LostDungeon.Game.Interaction
     [RequireComponent(typeof(PlayerInputReader))]
     public class PlayerInteractor : MonoBehaviour
     {
-        [SerializeField] private float radius = 0.7f;
+        [SerializeField] private float radius = 0.9f;
         [SerializeField] private float scanInterval = 0.1f;
 
-        private readonly List<Collider2D> nearby = new List<Collider2D>();
+        private readonly Collider[] nearby = new Collider[16];
         private PlayerInputReader input;
         private IInteractable current;
         private string shownPrompt;
@@ -54,16 +53,18 @@ namespace LostDungeon.Game.Interaction
         /// </summary>
         private IInteractable FindNearest()
         {
-            Physics2D.OverlapCircle(transform.position, radius, ContactFilter2D.noFilter, nearby);
+            int count = Physics.OverlapSphereNonAlloc(transform.position + Vector3.up * World.Ground.BodyHeight, radius,
+                nearby, Physics.AllLayers, QueryTriggerInteraction.Collide);
 
             IInteractable best = null;
             float bestDistance = float.MaxValue;
-            foreach (Collider2D candidate in nearby)
+            for (int i = 0; i < count; i++)
             {
+                Collider candidate = nearby[i];
                 if (!candidate.TryGetComponent(out IInteractable interactable) || !interactable.CanInteract(gameObject))
                     continue;
 
-                float distance = ((Vector2)candidate.transform.position - (Vector2)transform.position).sqrMagnitude;
+                float distance = (candidate.transform.position - transform.position).sqrMagnitude;
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;

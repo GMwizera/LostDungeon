@@ -1,32 +1,50 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace LostDungeon.Game.Visuals
 {
-    /// <summary>Tints a sprite briefly when something gets hit, so damage is easy to see.</summary>
+    /// <summary>
+    /// Tints a 3D model briefly when it gets hit, so damage is easy to see.
+    /// Uses a MaterialPropertyBlock, so the shared materials are never changed.
+    /// Enemies also get a permanent base tint (from EnemyData) through SetBaseTint.
+    /// </summary>
     public class HitFlash : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Color flashColor = new Color(1f, 0.35f, 0.35f);
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");
+
+        [SerializeField] private Color flashColor = new Color(1f, 0.45f, 0.4f);
+        [SerializeField] private Color flashGlow = new Color(0.9f, 0.15f, 0.05f);
         [SerializeField] private float duration = 0.12f;
 
-        private Color normalColor = Color.white;
+        private readonly List<Renderer> renderers = new List<Renderer>();
+        private MaterialPropertyBlock block;
+        private Color baseTint = Color.white;
         private float endTime = -1f;
 
         private void Awake()
         {
-            if (spriteRenderer == null)
-                spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (spriteRenderer != null)
-                normalColor = spriteRenderer.color;
+            block = new MaterialPropertyBlock();
+            foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            {
+                // Only lit surfaces (the body and weapons), not effect quads such as the ring under the feet.
+                // Glowing parts (skeleton eyes) keep their own glow.
+                bool lit = r.sharedMaterial != null && r.sharedMaterial.HasProperty(EmissionId)
+                    && r.sharedMaterial.GetColor(EmissionId).maxColorComponent < 0.01f;
+                if ((r is MeshRenderer || r is SkinnedMeshRenderer) && lit)
+                    renderers.Add(r);
+            }
+        }
+
+        public void SetBaseTint(Color tint)
+        {
+            baseTint = tint;
+            Apply(baseTint, Color.black);
         }
 
         public void Flash()
         {
-            if (spriteRenderer == null)
-                return;
-            if (endTime < 0f)
-                normalColor = spriteRenderer.color; // remember the current tint (enemies are tinted on spawn)
-            spriteRenderer.color = flashColor;
+            Apply(baseTint * flashColor, flashGlow);
             endTime = Time.time + duration;
         }
 
@@ -34,16 +52,31 @@ namespace LostDungeon.Game.Visuals
         {
             if (endTime > 0f && Time.time >= endTime)
             {
-                spriteRenderer.color = normalColor;
+                Apply(baseTint, Color.black);
                 endTime = -1f;
             }
         }
 
         private void OnDisable()
         {
-            if (spriteRenderer != null && endTime > 0f)
-                spriteRenderer.color = normalColor;
+            if (endTime > 0f)
+                Apply(baseTint, Color.black);
             endTime = -1f;
+        }
+
+        private void Apply(Color color, Color glow)
+        {
+            if (block == null)
+                return;
+            foreach (Renderer r in renderers)
+            {
+                if (r == null)
+                    continue;
+                r.GetPropertyBlock(block);
+                block.SetColor(BaseColorId, color);
+                block.SetColor(EmissionId, glow);
+                r.SetPropertyBlock(block);
+            }
         }
     }
 }

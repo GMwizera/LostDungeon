@@ -22,7 +22,9 @@ namespace LostDungeon.Game.UI
     {
         private class AbilityView
         {
-            public VisualElement CooldownFill;
+            public VisualElement Root;
+            public CooldownRing Ring;
+            public Label Time;
             public VisualElement Lock;
             public float Duration;
             public float Remaining;
@@ -32,10 +34,13 @@ namespace LostDungeon.Game.UI
         [SerializeField] private PlayerInputReader playerInput;
 
         private readonly Dictionary<string, AbilityView> abilities = new Dictionary<string, AbilityView>();
-        private readonly Dictionary<string, Label> itemCounts = new Dictionary<string, Label>();
         private VisualElement root;
-        private VisualElement hearts;
-        private VisualElement inventory;
+        private VisualElement vitalityFill;
+        private Label vitalityText;
+        private Label goldCount;
+        private VisualElement foeDots;
+        private Label roomCount;
+        private VisualElement objectiveBanner;
         private Label objective;
         private Label levelName;
         private Label prompt;
@@ -55,8 +60,12 @@ namespace LostDungeon.Game.UI
         private void OnEnable()
         {
             root = GetComponent<UIDocument>().rootVisualElement;
-            hearts = root.Q("hearts");
-            inventory = root.Q("inventory");
+            vitalityFill = root.Q("vitality-fill");
+            vitalityText = root.Q<Label>("vitality-text");
+            goldCount = root.Q<Label>("gold-count");
+            foeDots = root.Q("foe-dots");
+            roomCount = root.Q<Label>("room-count");
+            objectiveBanner = root.Q("objective-banner");
             objective = root.Q<Label>("objective");
             levelName = root.Q<Label>("level-name");
             prompt = root.Q<Label>("prompt");
@@ -72,6 +81,10 @@ namespace LostDungeon.Game.UI
             SetIcon("key-icon", icons.key);
             SetIcon("objective-icon", icons.flag);
             SetIcon("weather-icon", icons.cloud);
+            SetIcon("gold-icon", icons.gold);
+            SetIcon("orb-strike-icon", icons.sword);
+            SetIcon("orb-wind-icon", icons.dash);
+            SetIcon("orb-fire-icon", icons.fireball);
 
             CreateAbilitySlots();
             BindButtons();
@@ -118,13 +131,14 @@ namespace LostDungeon.Game.UI
 
         private void Update()
         {
-            // Cooldown fills count down locally from the AbilityActivated event (no reference to the player).
+            // Cooldown rings count down locally from the AbilityActivated event (no reference to the player).
             foreach (AbilityView view in abilities.Values)
             {
                 if (view.Remaining <= 0f)
                     continue;
                 view.Remaining = Mathf.Max(0f, view.Remaining - Time.deltaTime);
-                view.CooldownFill.style.height = Length.Percent(view.Duration > 0f ? view.Remaining / view.Duration * 100f : 0f);
+                view.Ring.Remaining = view.Duration > 0f ? view.Remaining / view.Duration : 0f;
+                view.Time.text = view.Remaining > 0.05f ? $"{view.Remaining:0.0}s" : "";
             }
         }
 
@@ -137,50 +151,61 @@ namespace LostDungeon.Game.UI
                 element.style.backgroundImage = new StyleBackground(sprite);
         }
 
+        /// <summary>Round ability buttons with cooldown rings. Tapping or clicking one uses the ability.</summary>
         private void CreateAbilitySlots()
         {
             VisualElement bar = root.Q("abilities");
             bar.Clear();
             abilities.Clear();
-            AddAbility(bar, "Sword", "STRIKE", "sword", icons.sword, "LMB");
-            AddAbility(bar, "Dash", "DASH", "dash", icons.dash, "SPACE");
-            AddAbility(bar, "Fireball", "FIRE", "fireball", icons.fireball, "Q");
+            AddAbility(bar, "Sword", "STRIKE", "strike", icons.sword, "LMB", new Color(1f, 0.82f, 0.35f), 6f, playerInput != null ? playerInput.PressAttack : null);
+            AddAbility(bar, "Dash", "DASH", "dash", icons.dash, "SPACE", new Color(0.4f, 0.9f, 1f), 4f, playerInput != null ? playerInput.PressDash : null);
+            AddAbility(bar, "Fireball", "FIRE", "fire", icons.fireball, "Q", new Color(1f, 0.5f, 0.2f), 4f, playerInput != null ? playerInput.PressFireball : null);
+            AddAbility(bar, "Use", "USE", "use", icons.key, "E", new Color(0.3f, 0.9f, 0.6f), 0f, playerInput != null ? playerInput.PressInteract : null);
         }
 
-        private void AddAbility(VisualElement bar, string abilityName, string label, string style, Sprite icon, string keyHint)
+        private void AddAbility(VisualElement bar, string abilityName, string label, string style, Sprite icon, string keyHint,
+            Color ringColor, float ringWidth, System.Action press)
         {
-            var slot = new VisualElement();
-            slot.AddToClassList("ability-slot");
-            slot.AddToClassList($"ability-slot--{style}");
+            var button = new VisualElement();
+            button.AddToClassList("fe-ability");
+            button.AddToClassList($"fe-ability--{style}");
 
-            var image = new VisualElement();
-            image.AddToClassList("ability-icon");
+            var ring = new CooldownRing();
+            ring.Configure(ringColor, ringWidth);
+            if (ringWidth > 0f)
+                button.Add(ring);
+
+            var image = new VisualElement { pickingMode = PickingMode.Ignore };
+            image.AddToClassList("fe-ability-icon");
             image.style.backgroundImage = new StyleBackground(icon);
-            slot.Add(image);
+            button.Add(image);
 
-            var name = new Label(label);
-            name.AddToClassList("ability-name");
-            slot.Add(name);
+            var name = new Label(label) { pickingMode = PickingMode.Ignore };
+            name.AddToClassList("fe-ability-name");
+            button.Add(name);
 
-            var fill = new VisualElement();
-            fill.AddToClassList("ability-cooldown");
-            slot.Add(fill);
+            var time = new Label("") { pickingMode = PickingMode.Ignore };
+            time.AddToClassList("fe-ability-time");
+            button.Add(time);
 
             if (!PlatformFeatures.IsMobile)
             {
-                var key = new Label($"[{keyHint}]");
-                key.AddToClassList("ability-key");
-                slot.Add(key);
+                var key = new Label(keyHint) { pickingMode = PickingMode.Ignore };
+                key.AddToClassList("fe-ability-key");
+                button.Add(key);
             }
 
-            var lockIcon = new VisualElement();
-            lockIcon.AddToClassList("ability-lock");
+            var lockIcon = new VisualElement { pickingMode = PickingMode.Ignore };
+            lockIcon.AddToClassList("fe-ability-lock");
             lockIcon.style.backgroundImage = new StyleBackground(icons.locked);
             UISounds.Show(lockIcon, false);
-            slot.Add(lockIcon);
+            button.Add(lockIcon);
 
-            bar.Add(slot);
-            abilities[abilityName] = new AbilityView { CooldownFill = fill, Lock = lockIcon };
+            if (press != null)
+                button.RegisterCallback<PointerDownEvent>(_ => press());
+
+            bar.Add(button);
+            abilities[abilityName] = new AbilityView { Root = button, Ring = ring, Time = time, Lock = lockIcon };
         }
 
         private void BindButtons()
@@ -198,7 +223,7 @@ namespace LostDungeon.Game.UI
         }
 
         /// <summary>
-        /// On-screen joystick and buttons. Shown on phones (and on touch screens in the browser)
+        /// On-screen joystick (the round ability buttons are always shown). Shown on phones (and on touch screens in the browser)
         /// unless turned off in Settings.
         /// </summary>
         private void SetUpTouchControls()
@@ -244,76 +269,45 @@ namespace LostDungeon.Game.UI
                 playerInput.SetVirtualMove(new Vector2(offset.x, -offset.y) / radius); // UI y points down
             }
 
-            SetIcon("touch-attack-icon", icons.sword);
-            SetIcon("touch-dash-icon", icons.dash);
-            SetIcon("touch-fireball-icon", icons.fireball);
-            SetIcon("touch-interact-icon", icons.key);
-
-            BindTouchButton("touch-attack", playerInput.PressAttack);
-            BindTouchButton("touch-dash", playerInput.PressDash);
-            BindTouchButton("touch-fireball", playerInput.PressFireball);
-            BindTouchButton("touch-interact", playerInput.PressInteract);
         }
-
-        private void BindTouchButton(string name, System.Action action) =>
-            root.Q(name).RegisterCallback<PointerDownEvent>(_ => action());
 
         // ---------- Event handlers ----------
 
         private void OnHealthChanged(int current, int max)
         {
-            hearts.Clear();
-            for (int i = 0; i < max; i++)
-            {
-                var heart = new VisualElement();
-                heart.AddToClassList("heart");
-                heart.style.backgroundImage = new StyleBackground(i < current ? icons.heartFull : icons.heartEmpty);
-                hearts.Add(heart);
-            }
+            float fraction = max > 0 ? (float)current / max : 0f;
+            vitalityFill.style.width = Length.Percent(fraction * 100f);
+            vitalityFill.style.backgroundColor = fraction > 0.34f ? new Color(0.91f, 0.71f, 0.24f) : new Color(0.94f, 0.27f, 0.27f);
+            vitalityText.text = $"{current}/{max}  {Mathf.RoundToInt(fraction * 100f)}%";
         }
 
         private void OnInventoryChanged(string itemId, int count)
         {
-            if (itemId == ItemIds.Key)
-                return; // the key has its own chip
-
-            if (!itemCounts.TryGetValue(itemId, out Label label))
-            {
-                var item = new VisualElement();
-                item.AddToClassList("inventory-item");
-                var icon = new VisualElement();
-                icon.AddToClassList("inventory-icon");
-                icon.style.backgroundImage = new StyleBackground(icons.ForItem(itemId));
-                label = new Label();
-                label.AddToClassList("inventory-count");
-                item.Add(icon);
-                item.Add(label);
-                inventory.Add(item);
-                itemCounts[itemId] = label;
-            }
-
-            label.text = count.ToString();
-            UISounds.Show(label.parent, count > 0);
+            if (itemId == ItemIds.Gold)
+                goldCount.text = count.ToString();
         }
 
-        private void OnObjectiveChanged(string text) => objective.text = text;
+        private void OnObjectiveChanged(string text) => objective.text = text?.ToUpperInvariant();
 
-        /// <summary>Key counter, gate chip and foe counter, like the Stitch combat HUD.</summary>
+        /// <summary>Key orb, enemies-remaining dots, and the banner turning green when the exit opens.</summary>
         private void OnObjectiveStatusChanged(int defeated, int total, bool requiresKey, bool hasKey, bool exitOpen)
         {
             levelNeedsKey = requiresKey;
-            UISounds.Show(root.Q("key-box"), requiresKey);
-            root.Q<Label>("key-label").text = hasKey ? "1/1 KEY" : "0/1 KEY";
-
-            var gateLabel = root.Q<Label>("gate-label");
-            gateLabel.text = exitOpen ? "EXIT OPEN" : "GATE SEALED";
-            gateLabel.style.color = exitOpen ? new Color(0.06f, 0.73f, 0.51f) : new Color(0.94f, 0.27f, 0.27f);
-            SetIcon("gate-icon", exitOpen ? icons.completed : icons.locked);
+            VisualElement keyOrb = root.Q("key-box");
+            UISounds.Show(keyOrb, requiresKey);
+            keyOrb.EnableInClassList("fe-orb--off", !hasKey);
+            objectiveBanner.EnableInClassList("fe-banner--open", exitOpen);
+            SetIcon("objective-icon", exitOpen ? icons.completed : icons.flag);
 
             int remaining = Mathf.Max(0, total - defeated);
-            var foes = root.Q<Label>("foes");
-            foes.text = remaining == 1 ? "1 FOE" : $"{remaining} FOES";
-            UISounds.Show(foes, remaining > 0);
+            root.Q<Label>("foes").text = remaining == 0 ? "ALL DEFEATED" : $"{remaining} REMAIN:";
+            foeDots.Clear();
+            for (int i = 0; i < remaining; i++)
+            {
+                var dot = new VisualElement { pickingMode = PickingMode.Ignore };
+                dot.AddToClassList("fe-dot");
+                foeDots.Add(dot);
+            }
         }
 
         private void OnPromptChanged(string text)
@@ -332,13 +326,19 @@ namespace LostDungeon.Game.UI
 
         private void OnLevelStarted(int number, string displayName)
         {
-            levelName.text = $"ROOM {number} · {displayName.ToUpperInvariant()}";
+            levelName.text = displayName.ToUpperInvariant();
+            GameManager game = GameManager.Instance;
+            roomCount.text = $"ROOM {number} / {(game.Catalog != null ? game.Catalog.Count : 5)}";
+            goldCount.text = "0";
             enemiesThisLevel = 0;
             goldThisLevel = 0;
             potionsThisLevel = 0;
 
             SaveManager save = SaveManager.Instance;
-            UISounds.Show(abilities["Fireball"].Lock, !save.HasUnlock(LevelManager.UnlockFireball));
+            bool fireball = save.HasUnlock(LevelManager.UnlockFireball);
+            UISounds.Show(abilities["Fireball"].Lock, !fireball);
+            abilities["Fireball"].Root.EnableInClassList("fe-ability--locked", !fireball);
+            root.Q("orb-fire").EnableInClassList("fe-orb--off", !fireball);
             UISounds.Show(root.Q("hearts-bonus"), save.HasUnlock(LevelManager.UnlockHealthBonus));
         }
 

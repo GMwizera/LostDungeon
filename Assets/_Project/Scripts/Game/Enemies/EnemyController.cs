@@ -11,6 +11,8 @@ using LostDungeon.Game.Player;
 using LostDungeon.Game.Pooling;
 using LostDungeon.Game.Visuals;
 using LostDungeon.Game.Weather;
+using LostDungeon.Game.World;
+using LostDungeon.Game.Combat;
 using UnityEngine;
 
 namespace LostDungeon.Game.Enemies
@@ -21,19 +23,19 @@ namespace LostDungeon.Game.Enemies
     /// attack, die) that states use, so it never needs to change when a new enemy type is added.
     /// Pooled: spawned and removed through PoolManager.
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody))]
     public class EnemyController : MonoBehaviour, IDamageable, IPoolable
     {
         private const float RepathSeconds = 0.4f;
         private const float WaypointReachedDistance = 0.08f;
 
         [SerializeField] private EnemyData data;
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private DirectionalSpriteAnimator spriteAnimator;
+        [SerializeField] private CharacterAnimator characterAnimator;
         [SerializeField] private HitFlash hitFlash;
 
-        private Rigidbody2D body;
-        private Collider2D[] colliders;
+        private Rigidbody body;
+        private Collider[] colliders;
+        private Vector3 modelRestPosition;
         private Health health;
         private Cooldown attackCooldown;
         private StateMachine<EnemyController> stateMachine;
@@ -49,23 +51,27 @@ namespace LostDungeon.Game.Enemies
 
         public EnemyData Data => data;
         public EnemyStateId CurrentState { get; private set; }
-        public Vector2 Position => body.position;
+        public Vector2 Position => Ground.ToFloor(body.position);
         public Vector2 HomePosition { get; private set; }
         public bool HasTarget => target != null && targetHealth != null && !targetHealth.IsDead;
-        public Vector2 TargetPosition => target != null ? (Vector2)target.position : Position;
+        public Vector2 TargetPosition => target != null ? Ground.ToFloor(target.position) : Position;
         public float DistanceToTarget => HasTarget ? Vector2.Distance(Position, TargetPosition) : float.PositiveInfinity;
         public float DistanceToHome => Vector2.Distance(Position, HomePosition);
         public bool AttackReady => attackCooldown != null && attackCooldown.IsReady;
         public bool IsDead => health == null || health.IsDead;
 
+        /// <summary>For the HUD's name plate: 0 to 1.</summary>
+        public float HealthFraction => health == null ? 0f : (float)health.Current / health.Max;
+
         private void Awake()
         {
-            body = GetComponent<Rigidbody2D>();
-            body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            colliders = GetComponents<Collider2D>();
-            if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-            if (spriteAnimator == null) spriteAnimator = GetComponentInChildren<DirectionalSpriteAnimator>();
+            body = GetComponent<Rigidbody>();
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            colliders = GetComponents<Collider>();
+            if (characterAnimator == null) characterAnimator = GetComponent<CharacterAnimator>();
             if (hitFlash == null) hitFlash = GetComponent<HitFlash>();
+            if (characterAnimator != null && characterAnimator.Model != null)
+                modelRestPosition = characterAnimator.Model.localPosition;
 
             stateMachine = new StateMachine<EnemyController>(this);
             states = new Dictionary<EnemyStateId, IState<EnemyController>>
@@ -99,11 +105,19 @@ namespace LostDungeon.Game.Enemies
             initialised = true;
             health = new Health(data.MaxHealth);
             attackCooldown = new Cooldown(data.Attack != null ? data.Attack.CooldownSeconds : 1f);
-            HomePosition = transform.position;
+            HomePosition = Ground.ToFloor(transform.position);
             transform.localScale = Vector3.one * data.Scale;
-            spriteRenderer.color = data.Tint;
-            foreach (Collider2D c in colliders)
+            if (hitFlash != null)
+                hitFlash.SetBaseTint(data.Tint);
+            foreach (Collider c in colliders)
                 c.enabled = true;
+            body.isKinematic = false;
+            if (characterAnimator != null)
+            {
+                characterAnimator.SetDead(false);
+                characterAnimator.Model.localPosition = modelRestPosition;
+                characterAnimator.FaceDirection(Vector2.down, instant: true);
+            }
 
             PlayerHealth player = FindAnyObjectByType<PlayerHealth>();
             target = player != null ? player.transform : null;
@@ -138,14 +152,19 @@ namespace LostDungeon.Game.Enemies
 
         // ---------- Actions used by states ----------
 
-        public void Stop() => body.linearVelocity = Vector2.zero;
+        public void Stop()
+        {
+            if (!body.isKinematic)
+                body.linearVelocity = Vector3.zero;
+        }
 
         public void MoveTowards(Vector2 point, float speedMultiplier = 1f)
         {
             Vector2 offset = point - Position;
-            body.linearVelocity = offset.sqrMagnitude < 0.0004f
+            Vector2 velocity = offset.sqrMagnitude < 0.0004f
                 ? Vector2.zero
                 : offset.normalized * (data.MoveSpeed * speedMultiplier * WorldModifiers.EnemySpeed);
+            body.linearVelocity = Ground.ToWorld(velocity);
         }
 
         public void ClearPath()
@@ -158,7 +177,7 @@ namespace LostDungeon.Game.Enemies
         /// <summary>Walks along an A* path to the destination, recalculating it a few times per second.</summary>
         public void FollowPathTo(Vector2 destination, float deltaTime)
         {
-            TilemapNavigationGrid grid = TilemapNavigationGrid.Current;
+            LevelNavigationGrid grid = LevelNavigationGrid.Current;
             if (grid == null)
             {
                 MoveTowards(destination); // no level grid: walk straight
@@ -184,8 +203,8 @@ namespace LostDungeon.Game.Enemies
 
         public void FaceTarget()
         {
-            if (spriteAnimator != null && HasTarget)
-                spriteAnimator.FaceDirection(TargetPosition - Position);
+            if (characterAnimator != null && HasTarget)
+                characterAnimator.FaceDirection(TargetPosition - Position);
         }
 
         public void PerformAttack()
@@ -195,16 +214,16 @@ namespace LostDungeon.Game.Enemies
 
             data.Attack.Activate(new AbilityContext(gameObject, Position, TargetPosition - Position));
             attackCooldown.Start();
-            if (spriteAnimator != null)
-                spriteAnimator.PlayAction();
+            if (characterAnimator != null)
+                characterAnimator.PlayAction(data.Attack.AnimationTrigger);
             GameEvents.RaiseEnemyAttacked(data.Id);
         }
 
-        public void SetFade(float alpha)
+        /// <summary>After the death animation the body sinks into the floor (0 = standing, 1 = gone).</summary>
+        public void SetSink(float amount)
         {
-            Color color = spriteRenderer.color;
-            color.a = Mathf.Clamp01(alpha);
-            spriteRenderer.color = color;
+            if (characterAnimator != null && characterAnimator.Model != null)
+                characterAnimator.Model.localPosition = modelRestPosition + Vector3.down * (Mathf.Clamp01(amount) * 1.2f);
         }
 
         /// <summary>Back to the pool (or destroyed if it was placed by hand).</summary>
@@ -223,12 +242,18 @@ namespace LostDungeon.Game.Enemies
 
             if (health.IsDead)
                 Die();
+            else if (characterAnimator != null && CurrentState != EnemyStateId.Attack)
+                characterAnimator.PlayHit();
         }
 
         private void Die()
         {
-            foreach (Collider2D c in colliders)
+            foreach (Collider c in colliders)
                 c.enabled = false;
+            Stop();
+            body.isKinematic = true; // the body stays where it fell
+            if (characterAnimator != null)
+                characterAnimator.SetDead(true);
             SetState(EnemyStateId.Dead);
             GameEvents.RaiseEnemyDefeated(data.Id);
             Died?.Invoke(this);

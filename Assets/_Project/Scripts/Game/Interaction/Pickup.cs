@@ -8,7 +8,7 @@ namespace LostDungeon.Game.Interaction
     /// A collectible lying on the floor. Walking over it collects it.
     /// Potions heal straight away; everything else goes into the inventory.
     /// </summary>
-    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Collider))]
     public class Pickup : MonoBehaviour, ICollectable
     {
         [SerializeField] private string itemId = ItemIds.Gold;
@@ -26,11 +26,14 @@ namespace LostDungeon.Game.Interaction
 
         private void Update()
         {
-            if (visual != null) // gentle bob so pickups stand out
-                visual.localPosition = visualStart + Vector3.up * (Mathf.Sin(Time.time * 3f) * 0.03f);
+            if (visual == null)
+                return;
+            // Float and turn slowly so loot catches the eye.
+            visual.localPosition = visualStart + Vector3.up * (Mathf.Sin(Time.time * 3f) * 0.06f);
+            visual.Rotate(0f, 90f * Time.deltaTime, 0f, Space.World);
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter(Collider other)
         {
             GameObject who = other.attachedRigidbody != null ? other.attachedRigidbody.gameObject : other.gameObject;
             if (who.TryGetComponent(out PlayerInventory _))

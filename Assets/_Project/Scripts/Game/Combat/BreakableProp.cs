@@ -1,4 +1,5 @@
 using LostDungeon.Core.Combat;
+using LostDungeon.Game.Pooling;
 using LostDungeon.Game.Visuals;
 using UnityEngine;
 
@@ -6,12 +7,13 @@ namespace LostDungeon.Game.Combat
 {
     /// <summary>
     /// A barrel or crate that breaks after a few hits. Implements IDamageable,
-    /// so the sword, fireballs and traps can all hurt it without knowing what it is.
+    /// so the staff, fireballs and traps can all hurt it without knowing what it is.
     /// </summary>
     public class BreakableProp : MonoBehaviour, IDamageable
     {
         [SerializeField] private int maxHealth = 3;
         [SerializeField] private HitFlash hitFlash;
+        [SerializeField] private PooledEffect breakEffect;
 
         private Health health;
 
@@ -36,7 +38,8 @@ namespace LostDungeon.Game.Combat
 
         private void OnBroken()
         {
-            // Day 4: drop a collectible here.
+            if (breakEffect != null && PoolManager.HasInstance)
+                PoolManager.Instance.Spawn(breakEffect, transform.position + Vector3.up * 0.4f, Quaternion.identity);
             gameObject.SetActive(false);
         }
     }

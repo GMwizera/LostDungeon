@@ -9,7 +9,6 @@ using LostDungeon.Game.Weather;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace LostDungeon.Game.Levels
@@ -29,18 +28,21 @@ namespace LostDungeon.Game.Levels
         [SerializeField] private LevelCatalog catalog;
         [SerializeField] private GameObject player;
         [SerializeField] private CameraFollow cameraFollow;
-        [SerializeField] private Light2D globalLight;
+        [SerializeField] private Light moonLight;
 
         private AsyncOperationHandle<GameObject> levelHandle;
         private LevelDefinition current;
         private float levelStartTime;
         private InputAction pauseAction;
         private float baseLightIntensity = 1f;
+        private Color baseAmbient;
 
         private void Awake()
         {
-            if (globalLight != null)
-                baseLightIntensity = globalLight.intensity; // the dungeon's normal darkness, set in the scene
+            // The dungeon's normal darkness, as set in the scene. The weather scales it.
+            if (moonLight != null)
+                baseLightIntensity = moonLight.intensity;
+            baseAmbient = RenderSettings.ambientLight;
         }
 
         public LevelDefinition Current => current;
@@ -98,8 +100,10 @@ namespace LostDungeon.Game.Levels
             var root = levelHandle.Result.GetComponent<LevelRoot>();
             PlacePlayer(root != null && root.PlayerSpawn != null ? root.PlayerSpawn.position : Vector3.zero);
 
-            if (globalLight != null)
-                globalLight.intensity = baseLightIntensity * WorldModifiers.LightIntensity; // darker at night in Kigali
+            // Darker at night in Kigali (live weather API).
+            if (moonLight != null)
+                moonLight.intensity = baseLightIntensity * WorldModifiers.LightIntensity;
+            RenderSettings.ambientLight = baseAmbient * Mathf.Lerp(0.6f, 1f, WorldModifiers.LightIntensity);
 
             levelStartTime = Time.time;
             GameManager.Instance.SetState(GameState.Playing);

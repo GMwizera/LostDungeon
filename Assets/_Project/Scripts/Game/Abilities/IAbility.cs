@@ -4,7 +4,7 @@ namespace LostDungeon.Game.Abilities
 {
     /// <summary>
     /// One interchangeable ability (Strategy pattern).
-    /// The player (and later enemies) only call Activate; how the ability works is hidden inside it.
+    /// The player and enemies only call Activate; how the ability works is hidden inside it.
     /// Adding a new ability means writing one new class, with no changes to the player.
     /// </summary>
     public interface IAbility
@@ -12,7 +12,10 @@ namespace LostDungeon.Game.Abilities
         string DisplayName { get; }
         float CooldownSeconds { get; }
         Sprite Icon { get; }
-        bool PlaysActionAnimation { get; }
+
+        /// <summary>Animator trigger the user plays ("Attack", "Cast"), or empty for none.</summary>
+        string AnimationTrigger { get; }
+
         void Activate(in AbilityContext context);
     }
 }

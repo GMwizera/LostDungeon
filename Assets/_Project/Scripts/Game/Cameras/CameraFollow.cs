@@ -2,13 +2,30 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Cameras
 {
-    /// <summary>Smoothly keeps the camera centred on a target.</summary>
+    /// <summary>
+    /// Isometric-style 3D camera: looks down at the hero from a fixed angle (45 degrees around, pitched down)
+    /// and smoothly follows them across the floor. Movement input is turned by the same angle,
+    /// so pressing "up" always walks up the screen.
+    /// </summary>
     public class CameraFollow : MonoBehaviour
     {
         [SerializeField] private Transform target;
-        [SerializeField] private float smoothTime = 0.15f;
+        [SerializeField] private float smoothTime = 0.18f;
+        [SerializeField] private float yaw = 45f;
+        [SerializeField] private float pitch = 40f;
+        [SerializeField] private float distance = 10.5f;
+        [SerializeField] private float lookHeight = 0.8f;
 
         private Vector3 velocity;
+
+        /// <summary>The camera's turn around the vertical axis. Player input uses it.</summary>
+        public static float Yaw { get; private set; } = 45f;
+
+        private void Awake()
+        {
+            Yaw = yaw;
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
 
         public void SetTarget(Transform newTarget) => target = newTarget;
 
@@ -17,7 +34,7 @@ namespace LostDungeon.Game.Cameras
         {
             if (target == null)
                 return;
-            transform.position = new Vector3(target.position.x, target.position.y, transform.position.z);
+            transform.SetPositionAndRotation(Goal(), Quaternion.Euler(pitch, yaw, 0f));
             velocity = Vector3.zero;
         }
 
@@ -25,9 +42,13 @@ namespace LostDungeon.Game.Cameras
         {
             if (target == null)
                 return;
+            transform.position = Vector3.SmoothDamp(transform.position, Goal(), ref velocity, smoothTime);
+        }
 
-            Vector3 goal = new Vector3(target.position.x, target.position.y, transform.position.z);
-            transform.position = Vector3.SmoothDamp(transform.position, goal, ref velocity, smoothTime);
+        private Vector3 Goal()
+        {
+            Vector3 focus = target.position + Vector3.up * lookHeight;
+            return focus - Quaternion.Euler(pitch, yaw, 0f) * Vector3.forward * distance;
         }
     }
 }

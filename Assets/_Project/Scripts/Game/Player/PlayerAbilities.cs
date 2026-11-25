@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using LostDungeon.Core.Events;
 using LostDungeon.Game.Abilities;
 using LostDungeon.Game.Visuals;
+using LostDungeon.Game.World;
 using UnityEngine;
 
 namespace LostDungeon.Game.Player
@@ -16,7 +17,7 @@ namespace LostDungeon.Game.Player
         [SerializeField] private AbilityDefinition attack;
         [SerializeField] private AbilityDefinition dash;
         [SerializeField] private AbilityDefinition special;
-        [SerializeField] private DirectionalSpriteAnimator spriteAnimator;
+        [SerializeField] private CharacterAnimator characterAnimator;
 
         private readonly List<AbilitySlot> slots = new List<AbilitySlot>();
         private PlayerInputReader input;
@@ -32,8 +33,8 @@ namespace LostDungeon.Game.Player
         {
             input = GetComponent<PlayerInputReader>();
             movement = GetComponent<PlayerMovement>();
-            if (spriteAnimator == null)
-                spriteAnimator = GetComponentInChildren<DirectionalSpriteAnimator>();
+            if (characterAnimator == null)
+                characterAnimator = GetComponent<CharacterAnimator>();
 
             attackSlot = AddSlot(attack);
             dashSlot = AddSlot(dash);
@@ -76,12 +77,15 @@ namespace LostDungeon.Game.Player
             if (slot == null || !slot.IsReady || Time.timeScale == 0f)
                 return; // no attacks while paused or on a menu screen
 
-            var context = new AbilityContext(gameObject, transform.position, movement.FacingDirection);
+            var context = new AbilityContext(gameObject, Ground.ToFloor(transform.position), movement.FacingDirection);
             slot.Ability.Activate(context);
             slot.Cooldown.Start();
 
-            if (slot.Ability.PlaysActionAnimation && spriteAnimator != null)
-                spriteAnimator.PlayAction();
+            if (characterAnimator != null)
+            {
+                characterAnimator.FaceDirection(context.Direction, instant: true);
+                characterAnimator.PlayAction(slot.Ability.AnimationTrigger);
+            }
 
             GameEvents.RaiseAbilityActivated(slot.Ability.DisplayName, slot.Ability.CooldownSeconds);
         }

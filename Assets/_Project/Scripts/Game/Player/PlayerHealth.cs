@@ -16,6 +16,7 @@ namespace LostDungeon.Game.Player
         [SerializeField] private int maxHealth = 6;
         [SerializeField] private float invulnerableSeconds = 0.5f;
         [SerializeField] private HitFlash hitFlash;
+        [SerializeField] private CharacterAnimator characterAnimator;
 
         private float invulnerableUntil;
         private int bonusHealth;
@@ -31,6 +32,8 @@ namespace LostDungeon.Game.Player
             Health.Died += OnDied;
             if (hitFlash == null)
                 hitFlash = GetComponent<HitFlash>();
+            if (characterAnimator == null)
+                characterAnimator = GetComponent<CharacterAnimator>();
         }
 
         private void Start()
@@ -54,6 +57,8 @@ namespace LostDungeon.Game.Player
             invulnerableUntil = Time.time + invulnerableSeconds;
             if (hitFlash != null)
                 hitFlash.Flash();
+            if (characterAnimator != null && !IsDead)
+                characterAnimator.PlayHit();
             PlatformFeatures.Vibrate();
         }
 
@@ -70,7 +75,9 @@ namespace LostDungeon.Game.Player
 
         private void OnDied()
         {
-            // Stop the player. The game over screen will listen to PlayerDied (Day 5).
+            // Stop the player and play the fall. The game over screen listens to PlayerDied.
+            if (characterAnimator != null)
+                characterAnimator.SetDead(true);
             GetComponent<PlayerMovement>().enabled = false;
             GetComponent<PlayerInputReader>().enabled = false;
             Debug.Log("Player died");

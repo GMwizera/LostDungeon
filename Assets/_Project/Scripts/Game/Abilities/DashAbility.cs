@@ -7,10 +7,10 @@ namespace LostDungeon.Game.Abilities
     [CreateAssetMenu(menuName = "Lost Dungeon/Abilities/Dash")]
     public class DashAbility : AbilityDefinition
     {
-        [SerializeField] private float speed = 9f;
-        [SerializeField] private float duration = 0.15f;
+        [SerializeField] private float speed = 10f;
+        [SerializeField] private float duration = 0.16f;
 
-        public override void Activate(in AbilityContext context)
+        protected override void Perform(in AbilityContext context)
         {
             if (context.Owner.TryGetComponent(out IDashable dashable) && !dashable.IsDashing)
                 dashable.Dash(context.Direction, speed, duration);
