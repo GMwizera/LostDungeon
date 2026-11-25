@@ -792,3 +792,464 @@ Button:disabled {
 .touch-button--strike .touch-label {
     color: rgb(42, 23, 0);
 }
+
+/* ---------- World-space overlay: enemy name plates and damage numbers ---------- */
+.world-layer {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.nameplate {
+    position: absolute;
+    width: 150px;
+    margin-left: -75px;
+    margin-top: -30px;
+    align-items: center;
+}
+
+.nameplate-label {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(255, 214, 170);
+    letter-spacing: 1px;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    padding: 0;
+    margin: 0 0 2px 0;
+}
+
+.nameplate-bar {
+    width: 96px;
+    height: 7px;
+    background-color: rgba(10, 4, 4, 0.85);
+    border-width: 1px;
+    border-color: rgba(239, 68, 68, 0.75);
+}
+
+.nameplate-fill {
+    height: 100%;
+    width: 100%;
+    background-color: rgb(239, 68, 68);
+}
+
+.damage-number {
+    position: absolute;
+    width: 160px;
+    margin-left: -80px;
+    margin-top: -16px;
+    -unity-text-align: middle-center;
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(40, 14, 0);
+    padding: 0;
+}
+
+.damage-number--crit {
+    font-size: 32px;
+    color: rgb(255, 196, 46);
+    -unity-text-outline-color: rgb(120, 30, 0);
+}
+
+.damage-number--hurt {
+    color: rgb(255, 92, 92);
+    -unity-text-outline-color: rgb(60, 0, 0);
+}
+
+/* ======================================================================
+   "Four Elements" HUD: gold-framed capsules, element orbs, round glowing
+   ability buttons with cooldown rings, ring joystick.
+   ====================================================================== */
+.fe-hidden { display: none; }
+
+.fe-top {
+    position: absolute;
+    left: 18px; right: 18px; top: 14px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.fe-capsule {
+    background-color: rgba(8, 10, 9, 0.78);
+    border-width: 2px;
+    border-color: rgba(214, 168, 76, 0.85);
+    border-radius: 18px;
+    padding: 8px 14px;
+}
+
+.fe-vitality { width: 250px; }
+
+.fe-orbs { flex-direction: row; margin-bottom: 8px; }
+
+.fe-orb {
+    width: 38px; height: 38px;
+    border-radius: 19px;
+    border-width: 3px;
+    margin-right: 8px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(20, 22, 26, 0.9);
+}
+.fe-orb-icon { width: 20px; height: 20px; -unity-background-scale-mode: scale-to-fit; }
+.fe-orb--gold { border-color: rgb(255, 196, 70); background-color: rgba(120, 80, 10, 0.55); }
+.fe-orb--cyan { border-color: rgb(80, 220, 255); background-color: rgba(10, 80, 110, 0.55); }
+.fe-orb--fire { border-color: rgb(255, 110, 50); background-color: rgba(120, 30, 10, 0.55); }
+.fe-orb--jade { border-color: rgb(60, 220, 140); background-color: rgba(10, 90, 50, 0.55); }
+.fe-orb--off { border-color: rgb(90, 50, 50); background-color: rgba(30, 20, 20, 0.85); opacity: 0.7; }
+
+.fe-bar {
+    height: 12px;
+    border-radius: 6px;
+    background-color: rgba(30, 30, 30, 0.95);
+    border-width: 1px;
+    border-color: rgba(214, 168, 76, 0.5);
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+.fe-bar-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+    background-color: rgb(232, 180, 60);
+    border-right-width: 10px;
+    border-right-color: rgb(80, 210, 230);
+}
+
+.fe-caption {
+    font-size: 11px;
+    color: rgb(220, 200, 160);
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    padding: 0; margin: 0;
+}
+.fe-caption--gold { color: rgb(255, 196, 70); }
+.fe-caption--cyan { color: rgb(110, 225, 255); }
+
+.fe-room {
+    align-items: center;
+    padding: 8px 30px 10px 30px;
+    min-width: 230px;
+}
+.fe-room-title {
+    font-size: 15px;
+    color: rgb(255, 205, 100);
+    letter-spacing: 4px;
+    -unity-font-style: bold;
+    padding: 0; margin: 0;
+}
+.fe-room-count {
+    font-size: 26px;
+    color: rgb(255, 225, 150);
+    -unity-font-style: bold;
+    letter-spacing: 3px;
+    padding: 0; margin: 0 0 2px 0;
+}
+.fe-dot {
+    width: 10px; height: 10px;
+    border-radius: 5px;
+    margin-left: 4px;
+    background-color: rgb(239, 68, 68);
+    border-width: 1px;
+    border-color: rgb(255, 160, 140);
+}
+
+.fe-right { align-items: flex-end; }
+.fe-gold {
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 16px;
+}
+.fe-gold-count {
+    font-size: 20px;
+    color: rgb(255, 225, 150);
+    -unity-font-style: bold;
+    padding: 0; margin: 0 0 0 8px;
+}
+.fe-pause {
+    width: 46px; height: 46px;
+    margin: 0 0 0 10px;
+    border-radius: 12px;
+    border-width: 2px;
+    border-color: rgb(255, 205, 100);
+    background-color: rgb(214, 160, 50);
+    color: rgb(40, 24, 0);
+    font-size: 18px;
+    -unity-font-style: bold;
+}
+.fe-pause:hover { background-color: rgb(240, 190, 80); }
+
+.fe-weather {
+    margin-top: 8px;
+    max-width: 270px;
+    border-color: rgba(80, 200, 240, 0.6);
+    padding: 6px 12px;
+}
+.fe-weather-text {
+    font-size: 11px;
+    color: rgb(200, 225, 235);
+    white-space: normal;
+    padding: 0; margin: 3px 0 0 0;
+}
+
+.fe-banner {
+    position: absolute;
+    top: 128px;
+    left: 50%;
+    translate: -50% 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 22px;
+    background-color: rgba(18, 14, 6, 0.82);
+    border-width: 2px;
+    border-color: rgb(214, 168, 76);
+    border-radius: 10px;
+    max-width: 520px;
+}
+.fe-banner--open { border-color: rgb(60, 220, 140); background-color: rgba(6, 30, 18, 0.85); }
+.fe-banner-text {
+    font-size: 14px;
+    color: rgb(255, 225, 160);
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    padding: 0; margin: 0;
+}
+.fe-banner--open .fe-banner-text { color: rgb(150, 255, 200); }
+
+/* Round ability buttons, bottom right */
+.fe-abilities {
+    position: absolute;
+    right: 24px; bottom: 22px;
+    width: 300px; height: 230px;
+}
+.fe-ability {
+    position: absolute;
+    border-width: 2px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 12, 16, 0.85);
+}
+.fe-ability--strike {
+    width: 120px; height: 120px; border-radius: 60px;
+    right: 0; bottom: 0;
+    background-color: rgba(120, 80, 10, 0.92);
+    border-color: rgb(255, 210, 100);
+}
+.fe-ability--dash {
+    width: 74px; height: 74px; border-radius: 37px;
+    right: 132px; bottom: 10px;
+    border-color: rgb(80, 220, 255);
+    background-color: rgba(8, 50, 70, 0.9);
+}
+.fe-ability--fire {
+    width: 74px; height: 74px; border-radius: 37px;
+    right: 18px; bottom: 134px;
+    border-color: rgb(255, 110, 50);
+    background-color: rgba(90, 20, 8, 0.9);
+}
+.fe-ability--use {
+    width: 66px; height: 66px; border-radius: 16px;
+    right: 128px; bottom: 104px;
+    border-color: rgb(60, 220, 140);
+    background-color: rgba(8, 50, 30, 0.9);
+    rotate: 8deg;
+}
+.fe-ability-icon { width: 46%; height: 46%; -unity-background-scale-mode: scale-to-fit; }
+.fe-ability-name {
+    font-size: 11px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(255, 235, 190);
+    padding: 0; margin: 2px 0 0 0;
+}
+.fe-ability-time {
+    position: absolute;
+    top: 16%;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 255, 255);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}
+.fe-ability-key {
+    position: absolute;
+    top: -16px;
+    font-size: 10px;
+    color: rgb(200, 190, 160);
+    padding: 0; margin: 0;
+}
+.fe-ability-lock {
+    position: absolute;
+    width: 50%; height: 50%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+.fe-ability--locked { opacity: 0.45; }
+
+/* Ring joystick, bottom left (touch screens) */
+.fe-joystick-area { position: absolute; left: 28px; bottom: 24px; }
+.fe-joystick {
+    width: 170px; height: 170px;
+    border-radius: 85px;
+    border-width: 3px;
+    border-color: rgba(80, 220, 255, 0.85);
+    background-color: rgba(6, 30, 44, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+.fe-arrow {
+    position: absolute;
+    -unity-text-align: middle-center;
+    font-size: 12px;
+    color: rgba(130, 230, 255, 0.85);
+    padding: 0; margin: 0;
+}
+.fe-knob {
+    width: 70px; height: 70px;
+    border-radius: 35px;
+    border-width: 3px;
+    border-color: rgb(140, 235, 255);
+    background-color: rgba(30, 140, 190, 0.9);
+}
+
+/* ======================================================================
+   Temple theme for the menus (matches the in-game "Four Elements" HUD).
+   Later rules override the earlier Abyssal ones. The 3D temple scene
+   renders behind these panels, so surfaces are translucent.
+   ====================================================================== */
+.screen {
+    background-color: rgba(0, 0, 0, 0);
+    align-items: center;
+    justify-content: center;
+}
+
+.hub {
+    width: 96%;
+    height: 92%;
+    max-width: 1500px;
+    justify-content: space-between;
+}
+
+.hub-left {
+    width: 31%;
+    min-width: 330px;
+    margin-right: 0;
+}
+
+.hub-right {
+    flex-grow: 0;
+    width: 41%;
+    min-width: 420px;
+}
+
+.panel, .card {
+    background-color: rgba(10, 12, 10, 0.8);
+    border-width: 2px;
+    border-color: rgba(214, 168, 76, 0.7);
+    border-radius: 18px;
+}
+
+.panel--raised {
+    background-color: rgba(40, 32, 16, 0.6);
+    border-width: 1px;
+    border-color: rgba(214, 168, 76, 0.35);
+    border-radius: 12px;
+}
+
+.weather-card {
+    border-color: rgba(80, 200, 240, 0.7);
+    border-left-width: 2px;
+    border-left-color: rgba(80, 200, 240, 0.7);
+}
+
+.title {
+    font-size: 44px;
+    color: rgb(255, 224, 150);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(120, 60, 0);
+}
+
+.eyebrow { color: rgb(255, 190, 80); }
+.heading { color: rgb(255, 224, 150); }
+
+Button {
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: rgba(214, 168, 76, 0.45);
+    background-color: rgba(14, 14, 12, 0.85);
+    -unity-text-align: middle-center;
+    color: rgb(255, 235, 200);
+}
+
+Button:hover {
+    border-color: rgb(255, 210, 110);
+    background-color: rgba(70, 52, 16, 0.92);
+}
+
+.btn-primary {
+    color: rgb(40, 24, 0);
+    background-color: rgb(214, 160, 50);
+    border-color: rgb(255, 215, 120);
+}
+
+.btn-primary:hover {
+    color: rgb(30, 16, 0);
+    background-color: rgb(245, 195, 85);
+    border-color: rgb(255, 235, 170);
+}
+
+.btn-cta {
+    border-radius: 16px;
+    color: rgb(40, 22, 0);
+    background-color: rgb(240, 186, 66);
+    border-color: rgb(255, 230, 150);
+}
+
+.btn-cta:hover {
+    background-color: rgb(255, 205, 95);
+    border-color: rgb(255, 245, 200);
+}
+
+.btn-danger {
+    border-color: rgba(239, 68, 68, 0.8);
+    background-color: rgba(40, 8, 8, 0.85);
+}
+
+.chip { border-radius: 10px; }
+
+.slot, .hub-heart {
+    border-radius: 10px;
+    border-color: rgba(214, 168, 76, 0.4);
+    background-color: rgba(30, 24, 12, 0.8);
+}
+
+.room-card {
+    border-radius: 14px;
+    border-width: 2px;
+    background-color: rgba(12, 12, 10, 0.78);
+    border-color: rgba(214, 168, 76, 0.25);
+}
+
+.room-card:hover { border-color: rgb(255, 210, 110); }
+
+.room-card--available {
+    background-color: rgba(70, 50, 10, 0.8);
+    border-color: rgb(255, 205, 100);
+}
+
+.room-status {
+    border-radius: 23px;
+    border-color: rgba(214, 168, 76, 0.4);
+    background-color: rgba(30, 24, 12, 0.9);
+}
+
+.room-card--available .room-status {
+    background-color: rgb(240, 186, 66);
+    border-color: rgb(255, 230, 150);
+}
+
+.room-card--available .room-name { color: rgb(255, 214, 120); }
+
+.overlay { background-color: rgba(0, 0, 0, 0.62); }
+
+.stats { color: rgb(200, 185, 150); }

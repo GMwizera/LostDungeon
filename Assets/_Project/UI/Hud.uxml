@@ -2,77 +2,74 @@
     <Style src="LostDungeon.uss" />
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
 
-        <!-- Top left: vitality, key, gate, objective -->
-        <ui:VisualElement class="hud-top-left" picking-mode="Ignore">
-            <ui:VisualElement class="row" picking-mode="Ignore">
-                <ui:VisualElement class="hud-box" picking-mode="Ignore">
-                    <ui:VisualElement name="hearts" class="hearts" picking-mode="Ignore" />
-                    <ui:Label name="hearts-bonus" text="+2 BONUS" class="hud-mono hud-mono--gold" style="margin-left: 6px;" picking-mode="Ignore" />
-                </ui:VisualElement>
-                <ui:VisualElement name="key-box" class="hud-box" picking-mode="Ignore">
-                    <ui:VisualElement name="key-icon" class="icon" picking-mode="Ignore" />
-                    <ui:Label name="key-label" text="0/1 KEY" class="hud-mono hud-mono--gold" style="margin-left: 6px;" picking-mode="Ignore" />
-                </ui:VisualElement>
-                <ui:VisualElement name="gate-box" class="hud-box" picking-mode="Ignore">
-                    <ui:VisualElement name="gate-icon" class="icon" picking-mode="Ignore" />
-                    <ui:Label name="gate-label" text="GATE SEALED" class="hud-mono" style="margin-left: 6px;" picking-mode="Ignore" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement class="objective-bar" picking-mode="Ignore">
-                <ui:VisualElement name="objective-icon" class="icon" style="margin-right: 10px;" picking-mode="Ignore" />
-                <ui:Label name="objective" class="objective" picking-mode="Ignore" />
-                <ui:Label name="foes" text="0 FOES" class="chip chip--red" picking-mode="Ignore" />
-            </ui:VisualElement>
-        </ui:VisualElement>
+        <!-- Top bar, after the "Four Elements" mobile HUD design -->
+        <ui:VisualElement class="fe-top" picking-mode="Ignore">
 
-        <!-- Top right: weather, room, pouch, pause -->
-        <ui:VisualElement class="hud-top-right" picking-mode="Ignore">
-            <ui:VisualElement class="weather-banner" picking-mode="Ignore">
+            <!-- Left: element orbs and the vitality bar -->
+            <ui:VisualElement class="fe-capsule fe-vitality" picking-mode="Ignore">
+                <ui:VisualElement class="fe-orbs" picking-mode="Ignore">
+                    <ui:VisualElement name="orb-strike" class="fe-orb fe-orb--gold" picking-mode="Ignore"><ui:VisualElement name="orb-strike-icon" class="fe-orb-icon" picking-mode="Ignore" /></ui:VisualElement>
+                    <ui:VisualElement name="orb-wind" class="fe-orb fe-orb--cyan" picking-mode="Ignore"><ui:VisualElement name="orb-wind-icon" class="fe-orb-icon" picking-mode="Ignore" /></ui:VisualElement>
+                    <ui:VisualElement name="orb-fire" class="fe-orb fe-orb--fire" picking-mode="Ignore"><ui:VisualElement name="orb-fire-icon" class="fe-orb-icon" picking-mode="Ignore" /></ui:VisualElement>
+                    <ui:VisualElement name="key-box" class="fe-orb fe-orb--jade" picking-mode="Ignore"><ui:VisualElement name="key-icon" class="fe-orb-icon" picking-mode="Ignore" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="fe-bar" picking-mode="Ignore">
+                    <ui:VisualElement name="vitality-fill" class="fe-bar-fill" picking-mode="Ignore" />
+                </ui:VisualElement>
                 <ui:VisualElement class="row" picking-mode="Ignore">
-                    <ui:VisualElement name="weather-icon" class="icon" style="margin-right: 8px;" picking-mode="Ignore" />
-                    <ui:Label name="weather-title" text="KIGALI WEATHER" class="card-title" picking-mode="Ignore" />
+                    <ui:Label text="VITALITY" class="fe-caption" picking-mode="Ignore" />
+                    <ui:Label name="hearts-bonus" text="+2" class="fe-caption fe-caption--gold" style="margin-left: 6px;" picking-mode="Ignore" />
+                    <ui:VisualElement class="spacer" picking-mode="Ignore" />
+                    <ui:Label name="vitality-text" text="6/6" class="fe-caption" picking-mode="Ignore" />
                 </ui:VisualElement>
-                <ui:Label name="conditions" class="conditions" picking-mode="Ignore" />
+                <ui:Label name="key-label" text="" class="fe-hidden" picking-mode="Ignore" />
             </ui:VisualElement>
-            <ui:VisualElement class="row" style="margin-top: 8px;" picking-mode="Ignore">
-                <ui:Label name="level-name" text="ROOM 1" class="chip" picking-mode="Ignore" />
-                <ui:VisualElement name="inventory" class="inventory" style="margin-top: 0;" picking-mode="Ignore" />
+
+            <!-- Centre: room counter and enemies remaining -->
+            <ui:VisualElement class="fe-capsule fe-room" picking-mode="Ignore">
+                <ui:Label name="level-name" text="THE ENTRANCE" class="fe-room-title" picking-mode="Ignore" />
+                <ui:Label name="room-count" text="1 / 5" class="fe-room-count" picking-mode="Ignore" />
+                <ui:VisualElement class="row" style="justify-content: center;" picking-mode="Ignore">
+                    <ui:Label name="foes" text="2 REMAIN:" class="fe-caption" picking-mode="Ignore" />
+                    <ui:VisualElement name="foe-dots" class="row" style="margin-left: 6px;" picking-mode="Ignore" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button name="pause-button" text="II" class="pause-button" />
+
+            <!-- Right: gold, pause, live weather -->
+            <ui:VisualElement class="fe-right" picking-mode="Ignore">
+                <ui:VisualElement class="row" picking-mode="Ignore">
+                    <ui:VisualElement class="fe-capsule fe-gold" picking-mode="Ignore">
+                        <ui:VisualElement name="gold-icon" class="icon" picking-mode="Ignore" />
+                        <ui:Label name="gold-count" text="0" class="fe-gold-count" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Button name="pause-button" text="II" class="fe-pause" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fe-capsule fe-weather" picking-mode="Ignore">
+                    <ui:VisualElement class="row" picking-mode="Ignore">
+                        <ui:VisualElement name="weather-icon" class="icon" style="margin-right: 6px;" picking-mode="Ignore" />
+                        <ui:Label name="weather-title" text="KIGALI WEATHER" class="fe-caption fe-caption--cyan" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="conditions" class="fe-weather-text" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="abilities" class="abilities" picking-mode="Ignore" />
+        <!-- Objective banner -->
+        <ui:VisualElement name="objective-banner" class="fe-banner" picking-mode="Ignore">
+            <ui:VisualElement name="objective-icon" class="icon" style="margin-right: 10px;" picking-mode="Ignore" />
+            <ui:Label name="objective" class="fe-banner-text" picking-mode="Ignore" />
+        </ui:VisualElement>
+
         <ui:Label name="prompt" class="prompt" picking-mode="Ignore" />
 
-        <!-- Touch controls -->
-        <ui:VisualElement name="touch" class="touch" picking-mode="Ignore">
-            <ui:VisualElement name="joystick" class="joystick">
-                <ui:Label text="N" class="compass" style="top: 6px;" picking-mode="Ignore" />
-                <ui:Label text="S" class="compass" style="bottom: 6px;" picking-mode="Ignore" />
-                <ui:Label text="W" class="compass" style="left: 10px;" picking-mode="Ignore" />
-                <ui:Label text="E" class="compass" style="right: 10px;" picking-mode="Ignore" />
-                <ui:VisualElement name="joystick-knob" class="joystick-knob" picking-mode="Ignore" />
-            </ui:VisualElement>
-            <ui:VisualElement class="touch-buttons" picking-mode="Ignore">
-                <ui:VisualElement name="touch-attack" class="touch-button touch-button--strike" style="right: 0; bottom: 0;">
-                    <ui:VisualElement name="touch-attack-icon" class="touch-icon" picking-mode="Ignore" />
-                    <ui:Label text="STRIKE" class="touch-label" picking-mode="Ignore" />
-                </ui:VisualElement>
-                <ui:VisualElement name="touch-dash" class="touch-button" style="right: 132px; bottom: 0;">
-                    <ui:VisualElement name="touch-dash-icon" class="touch-icon" picking-mode="Ignore" />
-                    <ui:Label text="DASH" class="touch-label" picking-mode="Ignore" />
-                </ui:VisualElement>
-                <ui:VisualElement name="touch-fireball" class="touch-button" style="right: 12px; bottom: 132px;">
-                    <ui:VisualElement name="touch-fireball-icon" class="touch-icon" picking-mode="Ignore" />
-                    <ui:Label text="FIRE" class="touch-label" picking-mode="Ignore" />
-                </ui:VisualElement>
-                <ui:VisualElement name="touch-interact" class="touch-button" style="right: 132px; bottom: 112px;">
-                    <ui:VisualElement name="touch-interact-icon" class="touch-icon" picking-mode="Ignore" />
-                    <ui:Label text="USE" class="touch-label" picking-mode="Ignore" />
-                </ui:VisualElement>
+        <!-- Controls: ring joystick (touch screens) and round ability buttons with cooldown rings -->
+        <ui:VisualElement name="touch" class="fe-joystick-area" picking-mode="Ignore">
+            <ui:VisualElement name="joystick" class="fe-joystick">
+                <ui:VisualElement name="joystick-knob" class="fe-knob" picking-mode="Ignore" />
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <ui:VisualElement name="abilities" class="fe-abilities" picking-mode="Ignore" />
         <!-- Pause -->
         <ui:VisualElement name="pause-overlay" class="overlay">
             <ui:VisualElement class="panel overlay-panel">
