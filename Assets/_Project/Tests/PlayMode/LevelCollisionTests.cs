@@ -1,65 +1,62 @@
 using System.Collections;
 using LostDungeon.Game.Levels;
+using LostDungeon.Game.Navigation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.TestTools;
-using UnityEngine.Tilemaps;
 
 namespace LostDungeon.PlayModeTests
 {
     /// <summary>
-    /// Loads every level and checks with real physics that walls block and floor doesn't,
-    /// including the room corners where two wall cells only touch at a point.
+    /// Loads every level and checks with real 3D physics that the room is sealed on all four sides
+    /// (including the low barriers on the near side) and that the player's spawn point is open floor.
     /// </summary>
     public class LevelCollisionTests
     {
         [UnityTest]
-        public IEnumerator EveryLevel_WallsAndCornersAreSolid_FloorIsOpen()
+        public IEnumerator EveryLevel_RoomIsSealed_SpawnIsOpen()
         {
             for (int number = 1; number <= 5; number++)
             {
                 AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync($"Level{number}");
                 yield return handle;
                 Assert.AreEqual(AsyncOperationStatus.Succeeded, handle.Status, $"Level{number} failed to load.");
-
-                yield return new WaitForFixedUpdate(); // let the tilemap colliders build their shapes
                 yield return new WaitForFixedUpdate();
 
-                Tilemap floor = null, walls = null;
-                foreach (Tilemap map in handle.Result.GetComponentsInChildren<Tilemap>())
+                var grid = handle.Result.GetComponentInChildren<LevelNavigationGrid>();
+                Assert.IsNotNull(grid, $"Level{number} has no navigation grid.");
+                int w = grid.Width, h = grid.Height;
+
+                for (int x = -1; x <= w; x++)
                 {
-                    if (map.name == "Floor") floor = map;
-                    if (map.name == "Walls") walls = map;
+                    AssertSolid(number, new Vector3(x + 0.5f, 1f, -0.25f));     // near side
+                    AssertSolid(number, new Vector3(x + 0.5f, 1f, h + 0.25f));  // far side
                 }
-                Assert.IsNotNull(floor, $"Level{number} has no Floor tilemap.");
-                Assert.IsNotNull(walls, $"Level{number} has no Walls tilemap.");
-
-                floor.CompressBounds();
-                BoundsInt room = floor.cellBounds; // floor covers exactly the room
-                int wallCells = 0;
-
-                foreach (Vector3Int cell in walls.cellBounds.allPositionsWithin)
+                for (int y = -1; y <= h; y++)
                 {
-                    if (!walls.HasTile(cell))
-                        continue;
-                    wallCells++;
-                    Vector2 point = walls.GetCellCenterWorld(cell);
-                    Assert.IsNotNull(Physics2D.OverlapPoint(point), $"Level{number}: wall cell {cell} has no collider.");
+                    AssertSolid(number, new Vector3(-0.25f, 1f, y + 0.5f));
+                    AssertSolid(number, new Vector3(w + 0.25f, 1f, y + 0.5f));
                 }
 
-                Assert.Greater(wallCells, 0, $"Level{number} has no walls.");
-                Assert.IsNotNull(walls.GetTile(new Vector3Int(room.xMin - 1, room.yMin - 1, 0)), $"Level{number}: front corner is open.");
-
-                Vector2 floorPoint = floor.GetCellCenterWorld(new Vector3Int(room.xMin, room.yMin, 0));
-                Collider2D onFloor = Physics2D.OverlapPoint(floorPoint);
-                Assert.IsTrue(onFloor == null || onFloor.isTrigger || onFloor.GetComponentInParent<Tilemap>() == null,
-                    $"Level{number}: floor cell is blocked by a wall collider.");
+                Transform spawn = handle.Result.GetComponent<LevelRoot>().PlayerSpawn;
+                // Only the level's own colliders count (an earlier test may leave the hero standing here).
+                Collider[] blockers = System.Array.FindAll(
+                    Physics.OverlapSphere(spawn.position + Vector3.up * 0.6f, 0.2f, Physics.AllLayers, QueryTriggerInteraction.Ignore),
+                    c => c.transform.IsChildOf(handle.Result.transform));
+                Assert.IsEmpty(blockers, $"Level{number}: the player spawn at {spawn.position} is blocked by " +
+                    string.Join(", ", System.Array.ConvertAll(blockers, c => $"{c.name} ({c.GetType().Name}) at {c.bounds.center}")));
 
                 Addressables.Release(handle);
                 yield return null;
             }
+        }
+
+        private static void AssertSolid(int level, Vector3 point)
+        {
+            Assert.IsTrue(Physics.CheckSphere(point, 0.1f, Physics.AllLayers, QueryTriggerInteraction.Ignore),
+                $"Level{level}: the room edge at {point} has no wall.");
         }
     }
 }

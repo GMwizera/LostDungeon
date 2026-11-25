@@ -1,6 +1,6 @@
 # Chronicles of the Lost Dungeon
 
-An isometric dungeon crawler made in Unity 6 for the Advanced C# summative. Fight through five levels, defeat three kinds of enemies, open chests, find keys and escape. The real weather in Kigali changes how each run plays.
+A 3D dungeon crawler with a 45 degree camera, made in Unity 6 for the Advanced C# summative. Fight through five levels, defeat three kinds of enemies, open chests, find keys and escape. The real weather in Kigali changes how each run plays.
 
 | Build | Link |
 |---|---|
@@ -61,7 +61,14 @@ Screens taken from the designs:
 - **Combat HUD**: hearts, key counter, gate chip, objective bar with foe count, weather banner, ability slots, touch controls.
 - **Expedition Debrief** (level complete): progress track, weather link, spoils list and the next-level button.
 
-The dungeon tiles are tinted darker and cooler to match the obsidian mood, with a warm torch light around the player.
+## 3D presentation
+
+The game is fully 3D: rigged, animated KayKit characters in modular stone rooms, seen through a perspective camera at 45 degrees around and 40 degrees down.
+
+- **Rendering:** URP Universal renderer with HDR, 4x MSAA, soft real-time shadows from a cool moonlight, flickering warm torches on the walls, linear fog, and a post-processing profile (bloom, ACES tone mapping, colour grading, vignette). Built by `Editor/RenderSetup.cs`.
+- **Characters:** one shared skeleton rig, so one set of animations drives the hero (an elemental mage with a staff) and all three skeleton enemies. A generated Animator Controller per character blends idle, walk and run from speed and plays attack, cast, hit and death on triggers (`CharacterAnimator`).
+- **Feel:** a gold slash arc on every strike, a cyan wind swirl on dash, a glowing fireball with a flame trail, sparks on hits (bigger on critical hits), floating damage numbers ("-4 CRIT!"), a name plate with a health bar over each enemy, glowing rings under the hero (cyan) and enemies (red), opening chest lids, rising spike traps, and an exit door that swings open with light pouring through. Effects are pooled (`PooledEffect`).
+- **Gameplay stays 2D underneath:** the rules work on the floor plane (x, y), and `Ground` converts to the 3D world (x, 0, y). That is why the whole Core library and its tests did not change when the game moved to 3D.
 
 ## Architecture
 
@@ -96,7 +103,7 @@ Systems talk through **events** in `GameEvents` instead of holding references to
 | `ICollectable` | Pickups | Walk-over items |
 | `IPoolable` | Projectiles, enemies | Reset when reused from a pool |
 | `IDashable` | Player movement | Dash works on anything that can dash |
-| `INavigationGrid` | Tilemap grid, test grids | Pathfinding doesn't depend on Unity tilemaps |
+| `INavigationGrid` | Level grid, test grids | Pathfinding doesn't depend on how a level is built |
 | `ISaveStorage` | File storage, PlayerPrefs storage | Save logic doesn't depend on the platform |
 
 ## Design patterns
@@ -104,16 +111,17 @@ Systems talk through **events** in `GameEvents` instead of holding references to
 | Pattern | Where | Problem it solves |
 |---|---|---|
 | Singleton | `Singleton<T>`: `GameManager`, `SaveManager`, `AudioManager`, `PoolManager`, `WeatherService` | Exactly one of each global system, kept alive between scenes |
-| Observer | `GameEvents` (C# events) | UI, audio, saving and objectives react to gameplay with no direct references |
+| Observer | `GameEvents` and `CombatFeedback` (C# events) | UI, audio, saving and objectives react to gameplay with no direct references |
 | Strategy | `IAbility` (player abilities and enemy attacks), `IEnemyBehaviour` (enemy brains) | Interchangeable behaviour chosen as assets in the Inspector |
 | State | `StateMachine<T>` with Idle, Chase, Attack, Retreat, ReturnHome and Dead states; `GameState` for the game flow | Each state's logic lives in its own class instead of a large if/else block |
-| Object Pool | `ObjectPool<T>` + `PoolManager` | Fireballs, arrows and enemies are reused instead of created and destroyed |
+| Object Pool | `ObjectPool<T>` + `PoolManager` | Fireballs, arrows, enemies and visual effects are reused instead of created and destroyed |
+| Template Method (extra) | `AbilityDefinition.Activate` shows the ability's effect, then calls each ability's own `Perform` | Every ability gets its visual effect without repeating that code |
 
 ## Asset and content management: Addressables
 
 **Approach:** Unity Addressables (2.11).
 
-**What it manages:** the five level prefabs (`Assets/_Project/Levels/Level1` to `Level5`). Each level contains its tilemaps, props, chest, door, traps, pickups and enemy spawner. The enemy prefabs, enemy data, attack abilities, arrow prefab and sprites they use come along as dependencies. The `Levels` group uses **Pack Separately**, so every level is its own bundle and only the level being played is loaded.
+**What it manages:** the five level prefabs (`Assets/_Project/Levels/Level1` to `Level5`). Each level contains its 3D floor, walls, torches, props, chest, door, traps, pickups, navigation grid and enemy spawner. The enemy prefabs, models, animations, enemy data, attack abilities and arrow prefab they use come along as dependencies. The `Levels` group uses **Pack Separately**, so every level is its own bundle and only the level being played is loaded.
 
 **Loading:** `LevelManager` calls `Addressables.InstantiateAsync("LevelN")` when the Game scene starts. While it loads, a progress bar fills (`LevelLoadProgress` event).
 
@@ -146,8 +154,8 @@ If the request fails or takes more than 6 seconds, the game uses normal conditio
 
 ### 1. A* pathfinding (`Core/Navigation/AStarPathfinder.cs`)
 - **Purpose:** enemies walk around walls and obstacles to reach the player (and the Guardian walks back to its post).
-- **Approach:** A* on the level's tile grid, 4-directional moves of cost 1, Manhattan distance as the heuristic, my own binary min-heap (`MinHeap.cs`) as the open list. Paths are recalculated a few times per second and capped at 2000 searched cells so a bad request can't freeze the game.
-- **Why:** with an admissible heuristic A* always finds a shortest path while searching far fewer cells than breadth-first search. 4-directional moves follow the isometric tile edges, so enemies never cut through wall corners.
+- **Approach:** A* on the level's floor grid (one cell per floor tile), 4-directional moves of cost 1, Manhattan distance as the heuristic, my own binary min-heap (`MinHeap.cs`) as the open list. Paths are recalculated a few times per second and capped at 2000 searched cells so a bad request can't freeze the game.
+- **Why:** with an admissible heuristic A* always finds a shortest path while searching far fewer cells than breadth-first search. 4-directional moves follow the tile edges, so enemies never cut through pillar or wall corners.
 
 ### 2. Binary min-heap (`Core/Navigation/MinHeap.cs`)
 - **Purpose:** gives A* the most promising cell next.
@@ -195,5 +203,5 @@ Input uses the Input System with keyboard/mouse, gamepad and on-screen touch con
 
 ## Credits
 
-- Art: [Kenney Isometric Miniature Dungeon](https://kenney.nl) (CC0).
-- Icons, fireball, arrow, sound effects and music: generated by the project's editor scripts.
+- 3D art and animations: KayKit Dungeon Pack, Adventurers, Skeletons and Character Animations by [Kay Lousberg](https://kaylousberg.itch.io) (CC0).
+- Icons, visual effects, fireball, sound effects and music: generated by the project's editor scripts.
