@@ -41,6 +41,14 @@ namespace LostDungeon.Game.Weather
         public bool IsFetching { get; private set; }
         public string Summary { get; private set; } = "Checking Kigali weather...";
 
+        /// <summary>Temperature in Celsius, or null when there is no live data.</summary>
+        public float? Temperature { get; private set; }
+
+        /// <summary>Readable weather name, e.g. "Overcast & Rain".</summary>
+        public string WeatherName { get; private set; } = "Checking...";
+
+        public bool IsNight { get; private set; }
+
         private void Start()
         {
             if (!IsDuplicate)
@@ -66,6 +74,9 @@ namespace LostDungeon.Game.Weather
                     Conditions = DungeonConditions.FromWeather(weather.weather_code, weather.temperature_2m, weather.is_day == 1);
                     HasLiveData = true;
                     Summary = $"Kigali {weather.temperature_2m:0}°C";
+                    Temperature = weather.temperature_2m;
+                    WeatherName = DungeonConditions.DescribeWeather(weather.weather_code);
+                    IsNight = weather.is_day == 0;
                 }
                 else
                 {
@@ -73,6 +84,9 @@ namespace LostDungeon.Game.Weather
                     Conditions = DungeonConditions.Normal;
                     HasLiveData = false;
                     Summary = "Weather unavailable";
+                    Temperature = null;
+                    WeatherName = "Signal lost";
+                    IsNight = false;
                 }
             }
 

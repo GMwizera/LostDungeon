@@ -17,6 +17,8 @@ namespace LostDungeon.Game.UI
         public Sprite sword;
         public Sprite dash;
         public Sprite fireball;
+        public Sprite cloud;
+        public Sprite flag;
 
         public Sprite ForItem(string itemId)
         {

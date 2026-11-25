@@ -24,7 +24,7 @@ namespace LostDungeon.Game.Levels
     {
         public const string UnlockFireball = "ability.fireball";
         public const string UnlockHealthBonus = "health.bonus";
-        private const int HealthBonus = 2;
+        public const int HealthBonus = 2;
 
         [SerializeField] private LevelCatalog catalog;
         [SerializeField] private GameObject player;
@@ -35,6 +35,13 @@ namespace LostDungeon.Game.Levels
         private LevelDefinition current;
         private float levelStartTime;
         private InputAction pauseAction;
+        private float baseLightIntensity = 1f;
+
+        private void Awake()
+        {
+            if (globalLight != null)
+                baseLightIntensity = globalLight.intensity; // the dungeon's normal darkness, set in the scene
+        }
 
         public LevelDefinition Current => current;
 
@@ -92,7 +99,7 @@ namespace LostDungeon.Game.Levels
             PlacePlayer(root != null && root.PlayerSpawn != null ? root.PlayerSpawn.position : Vector3.zero);
 
             if (globalLight != null)
-                globalLight.intensity = WorldModifiers.LightIntensity;
+                globalLight.intensity = baseLightIntensity * WorldModifiers.LightIntensity; // darker at night in Kigali
 
             levelStartTime = Time.time;
             GameManager.Instance.SetState(GameState.Playing);

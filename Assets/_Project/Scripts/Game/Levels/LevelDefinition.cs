@@ -14,6 +14,8 @@ namespace LostDungeon.Game.Levels
         [SerializeField] private string addressKey = "Level1";
         [SerializeField] private string rewardUnlock;
         [SerializeField] private string rewardDescription;
+        [SerializeField] private string rewardTag;
+        [SerializeField] private string hostiles;
 
         public int Number => number;
         public string DisplayName => displayName;
@@ -23,5 +25,11 @@ namespace LostDungeon.Game.Levels
         public string RewardUnlock => rewardUnlock;
 
         public string RewardDescription => rewardDescription;
+
+        /// <summary>Short label for the level card, e.g. "FIREBALL GRANTED".</summary>
+        public string RewardTag => rewardTag;
+
+        /// <summary>Which enemies the level has, shown on the level card.</summary>
+        public string Hostiles => hostiles;
     }
 }

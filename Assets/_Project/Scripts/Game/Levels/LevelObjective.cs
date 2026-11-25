@@ -45,6 +45,7 @@ namespace LostDungeon.Game.Levels
             else
                 text = "Reach the exit door";
             GameEvents.RaiseObjectiveChanged(text);
+            GameEvents.RaiseObjectiveStatusChanged(defeated, spawner != null ? spawner.TotalCount : 0, requiresKey, hasKey, ExitUnlocked);
         }
 
         private void OnEnemyDefeated(string enemyId)
