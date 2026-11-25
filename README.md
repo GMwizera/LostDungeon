@@ -4,9 +4,9 @@ A 3D dungeon game in Unity 6. Clear 5 rooms of skeletons, find keys and escape. 
 
 | | Link |
 |---|---|
-| WebGL | _add link_ |
-| Windows | _add link_ |
-| Android | _add link_ |
+| WebGL | [Play on Unity Play](https://play.unity.com/en/games/33681485-404f-4e77-aabd-fe351516fdf4/chronicles-of-the-lost-dungeon) |
+| Windows | [LostDungeon-Windows.zip](https://github.com/GMwizera/LostDungeon/releases/download/v1.0/LostDungeon-Windows.zip) |
+| Android | [LostDungeon.apk](https://github.com/GMwizera/LostDungeon/releases/download/v1.0/LostDungeon.apk) |
 | Videos | _add link_ |
 
 ## Run it
