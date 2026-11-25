@@ -46,6 +46,10 @@ namespace LostDungeon.Game.Enemies
         private int pathIndex;
         private float repathTimer;
         private bool initialised;
+        private Vector2 wantedVelocity;
+        private float windUpLeft = -1f; // below zero = not winding up
+        private float stuckTime;
+        private float retargetTimer;
 
         public event Action<EnemyController> Died;
 
@@ -59,6 +63,12 @@ namespace LostDungeon.Game.Enemies
         public float DistanceToHome => Vector2.Distance(Position, HomePosition);
         public bool AttackReady => attackCooldown != null && attackCooldown.IsReady;
         public bool IsDead => health == null || health.IsDead;
+
+        /// <summary>
+        /// True when the enemy has been trying to move but a wall or obstacle has held it in place
+        /// for a moment (e.g. an archer backed into a corner).
+        /// </summary>
+        public bool IsStuck => stuckTime > 0.35f;
 
         /// <summary>For the HUD's name plate: 0 to 1.</summary>
         public float HealthFraction => health == null ? 0f : (float)health.Current / health.Max;
@@ -119,13 +129,25 @@ namespace LostDungeon.Game.Enemies
                 characterAnimator.FaceDirection(Vector2.down, instant: true);
             }
 
+            FindTarget();
+
+            ClearPath();
+            windUpLeft = -1f;
+            stuckTime = 0f;
+            wantedVelocity = Vector2.zero;
+            CurrentState = EnemyStateId.Idle;
+            stateMachine.ChangeState(states[EnemyStateId.Idle]);
+        }
+
+        /// <summary>
+        /// Looks for the player. A room's enemies spawn while the level is still loading, before the player
+        /// has been placed and switched on, so this is retried until the player is found.
+        /// </summary>
+        private void FindTarget()
+        {
             PlayerHealth player = FindAnyObjectByType<PlayerHealth>();
             target = player != null ? player.transform : null;
             targetHealth = player;
-
-            ClearPath();
-            CurrentState = EnemyStateId.Idle;
-            stateMachine.ChangeState(states[EnemyStateId.Idle]);
         }
 
         private void Update()
@@ -133,13 +155,38 @@ namespace LostDungeon.Game.Enemies
             if (!initialised)
                 return;
 
+            if (target == null || !target.gameObject.activeInHierarchy)
+            {
+                retargetTimer -= Time.deltaTime;
+                if (retargetTimer <= 0f)
+                {
+                    retargetTimer = 0.25f;
+                    FindTarget();
+                }
+            }
+
             if (!IsDead)
             {
                 attackCooldown.Tick(Time.deltaTime);
+                if (windUpLeft >= 0f)
+                {
+                    windUpLeft -= Time.deltaTime;
+                    if (windUpLeft < 0f)
+                        ReleaseAttack();
+                }
                 SetState(data.Behaviour.Decide(this));
             }
 
             stateMachine.Tick(Time.deltaTime);
+        }
+
+        private void FixedUpdate()
+        {
+            if (!initialised || IsDead)
+                return;
+            bool trying = wantedVelocity.sqrMagnitude > 0.25f;
+            bool held = Ground.ToFloor(body.linearVelocity).sqrMagnitude < wantedVelocity.sqrMagnitude * 0.1f;
+            stuckTime = trying && held ? stuckTime + Time.fixedDeltaTime : Mathf.Max(0f, stuckTime - Time.fixedDeltaTime * 2f);
         }
 
         private void SetState(EnemyStateId next)
@@ -154,6 +201,7 @@ namespace LostDungeon.Game.Enemies
 
         public void Stop()
         {
+            wantedVelocity = Vector2.zero;
             if (!body.isKinematic)
                 body.linearVelocity = Vector3.zero;
         }
@@ -164,6 +212,7 @@ namespace LostDungeon.Game.Enemies
             Vector2 velocity = offset.sqrMagnitude < 0.0004f
                 ? Vector2.zero
                 : offset.normalized * (data.MoveSpeed * speedMultiplier * WorldModifiers.EnemySpeed);
+            wantedVelocity = velocity;
             body.linearVelocity = Ground.ToWorld(velocity);
         }
 
@@ -207,15 +256,29 @@ namespace LostDungeon.Game.Enemies
                 characterAnimator.FaceDirection(TargetPosition - Position);
         }
 
+        /// <summary>
+        /// Starts an attack: the swing animation plays straight away and the hit lands after the wind-up,
+        /// in step with the weapon coming down. A quick dash during the wind-up avoids it.
+        /// </summary>
         public void PerformAttack()
         {
-            if (data.Attack == null || !HasTarget)
+            if (data.Attack == null || !HasTarget || windUpLeft >= 0f)
                 return;
 
-            data.Attack.Activate(new AbilityContext(gameObject, Position, TargetPosition - Position));
             attackCooldown.Start();
             if (characterAnimator != null)
                 characterAnimator.PlayAction(data.Attack.AnimationTrigger);
+            windUpLeft = data.WindUpSeconds;
+            if (windUpLeft <= 0f)
+                ReleaseAttack();
+        }
+
+        private void ReleaseAttack()
+        {
+            windUpLeft = -1f;
+            if (IsDead || !HasTarget)
+                return;
+            data.Attack.Activate(new AbilityContext(gameObject, Position, TargetPosition - Position));
             GameEvents.RaiseEnemyAttacked(data.Id);
         }
 
@@ -248,6 +311,7 @@ namespace LostDungeon.Game.Enemies
 
         private void Die()
         {
+            windUpLeft = -1f; // a dying enemy doesn't finish its swing
             foreach (Collider c in colliders)
                 c.enabled = false;
             Stop();

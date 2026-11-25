@@ -81,7 +81,7 @@ namespace LostDungeon.EditorTools
                 velocity.orbitalY = new ParticleSystem.MinMaxCurve(11f);
                 velocity.y = new ParticleSystem.MinMaxCurve(1.4f, 3.2f);
                 velocity.radial = new ParticleSystem.MinMaxCurve(0.4f);
-                velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f);
+                velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // same mode as y (random between two constants)
                 AddLight(root, new Color(0.4f, 0.9f, 1f), 1.8f, 2.5f);
             });
             SaveEffect("CastFlash", 0.35f, 0f, root =>
@@ -137,7 +137,7 @@ namespace LostDungeon.EditorTools
             velocity.orbitalY = new ParticleSystem.MinMaxCurve(3.5f);
             velocity.radial = new ParticleSystem.MinMaxCurve(-0.25f);
             velocity.y = new ParticleSystem.MinMaxCurve(0.7f, 1.4f);
-            velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f);
+            velocity.x = velocity.z = new ParticleSystem.MinMaxCurve(0f, 0f); // same mode as y (random between two constants)
 
             ParticleSystem embers = AddContinuous(go.transform, additive, new Color(1f, 0.55f, 0.2f), 0.06f, 1.8f, 12f);
             var emberMain = embers.main;

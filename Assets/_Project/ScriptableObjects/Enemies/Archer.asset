@@ -20,9 +20,10 @@ MonoBehaviour:
   maxHealth: 2
   armor: 0
   moveSpeed: 1.7
-  detectionRange: 6
+  detectionRange: 7.5
   attackRange: 4.2
   preferredDistance: 3
   guardRadius: 2
   behaviour: {fileID: 11400000, guid: 1eb86dde1c3244e51a14ce77925ae260, type: 2}
+  windUpSeconds: 0.3
   attack: {fileID: 11400000, guid: f06017ee21e4f449686a3dc5bcfdd854, type: 2}

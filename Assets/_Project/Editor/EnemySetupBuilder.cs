@@ -23,17 +23,17 @@ namespace LostDungeon.EditorTools
         {
             // Attacks reuse the player's ability classes: same code, different numbers.
             var warriorStrike = GetOrCreateAbility<MeleeAttackAbility>("WarriorStrike");
-            SetValues(warriorStrike, ("displayName", "WarriorStrike"), ("cooldownSeconds", 1.1f), ("animationTrigger", "Attack"),
+            SetValues(warriorStrike, ("displayName", "WarriorStrike"), ("cooldownSeconds", 0.9f), ("animationTrigger", "Attack"),
                 ("damage", 1), ("reach", 0.45f), ("radius", 0.45f), ("critChance", 0f),
                 ("castEffect", EffectsBuilder.EnemySlash), ("effectDistance", 0.35f), ("effectHeight", 0.55f));
             var guardianBash = GetOrCreateAbility<MeleeAttackAbility>("GuardianBash");
-            SetValues(guardianBash, ("displayName", "GuardianBash"), ("cooldownSeconds", 1.7f), ("animationTrigger", "Attack"),
+            SetValues(guardianBash, ("displayName", "GuardianBash"), ("cooldownSeconds", 1.4f), ("animationTrigger", "Attack"),
                 ("damage", 2), ("reach", 0.6f), ("radius", 0.6f), ("critChance", 0f),
                 ("castEffect", EffectsBuilder.EnemySlash), ("effectDistance", 0.5f), ("effectHeight", 0.6f));
             var archerShot = GetOrCreateAbility<ProjectileAbility>("ArcherShot");
-            SetValues(archerShot, ("displayName", "ArcherShot"), ("cooldownSeconds", 1.8f), ("animationTrigger", "Attack"),
+            SetValues(archerShot, ("displayName", "ArcherShot"), ("cooldownSeconds", 1.4f), ("animationTrigger", "Attack"),
                 ("projectilePrefab", AssetDatabase.LoadAssetAtPath<Projectile>(EffectsBuilder.ArrowPath)),
-                ("speed", 6f), ("damage", 1), ("spawnDistance", 0.4f), ("castEffect", null));
+                ("speed", 7f), ("damage", 1), ("spawnDistance", 0.4f), ("castEffect", null));
 
             var melee = GetOrCreate<MeleeEnemyBehaviour>("MeleeBehaviour");
             var ranged = GetOrCreate<RangedEnemyBehaviour>("RangedBehaviour");
@@ -42,15 +42,15 @@ namespace LostDungeon.EditorTools
             var warriorData = GetOrCreate<EnemyData>("Warrior");
             SetValues(warriorData, ("id", "Warrior"), ("displayName", "Skeleton Warrior"), ("level", 2),
                 ("tint", new Color(1f, 0.92f, 0.88f)), ("scale", 1f), ("maxHealth", 3), ("armor", 0), ("moveSpeed", 2f),
-                ("detectionRange", 4.5f), ("attackRange", 0.75f), ("behaviour", melee), ("attack", warriorStrike));
+                ("detectionRange", 6.5f), ("attackRange", 0.75f), ("behaviour", melee), ("attack", warriorStrike), ("windUpSeconds", 0.35f));
             var archerData = GetOrCreate<EnemyData>("Archer");
             SetValues(archerData, ("id", "Archer"), ("displayName", "Bone Archer"), ("level", 3),
                 ("tint", new Color(0.85f, 1f, 0.9f)), ("scale", 1f), ("maxHealth", 2), ("armor", 0), ("moveSpeed", 1.7f),
-                ("detectionRange", 6f), ("attackRange", 4.2f), ("preferredDistance", 3f), ("behaviour", ranged), ("attack", archerShot));
+                ("detectionRange", 7.5f), ("attackRange", 4.2f), ("preferredDistance", 3f), ("behaviour", ranged), ("attack", archerShot), ("windUpSeconds", 0.3f));
             var guardianData = GetOrCreate<EnemyData>("Guardian");
             SetValues(guardianData, ("id", "Guardian"), ("displayName", "Crypt Guardian"), ("level", 5),
                 ("tint", new Color(0.82f, 0.88f, 1f)), ("scale", 1.35f), ("maxHealth", 8), ("armor", 1), ("moveSpeed", 1.4f),
-                ("detectionRange", 4f), ("attackRange", 0.95f), ("guardRadius", 2.6f), ("behaviour", guardian), ("attack", guardianBash));
+                ("detectionRange", 5f), ("attackRange", 0.95f), ("guardRadius", 3.5f), ("behaviour", guardian), ("attack", guardianBash), ("windUpSeconds", 0.55f));
 
             EnsureFolder(EnemyPrefabFolder);
             Material ring = EffectsBuilder.RingMaterial("FX_RingEnemy");

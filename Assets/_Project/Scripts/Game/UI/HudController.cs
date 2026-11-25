@@ -34,7 +34,9 @@ namespace LostDungeon.Game.UI
         [SerializeField] private PlayerInputReader playerInput;
 
         private readonly Dictionary<string, AbilityView> abilities = new Dictionary<string, AbilityView>();
+        private readonly Dictionary<string, Label> itemCounts = new Dictionary<string, Label>();
         private VisualElement root;
+        private VisualElement inventory;
         private VisualElement vitalityFill;
         private Label vitalityText;
         private Label goldCount;
@@ -60,6 +62,7 @@ namespace LostDungeon.Game.UI
         private void OnEnable()
         {
             root = GetComponent<UIDocument>().rootVisualElement;
+            inventory = root.Q("inventory");
             vitalityFill = root.Q("vitality-fill");
             vitalityText = root.Q<Label>("vitality-text");
             goldCount = root.Q<Label>("gold-count");
@@ -281,10 +284,35 @@ namespace LostDungeon.Game.UI
             vitalityText.text = $"{current}/{max}  {Mathf.RoundToInt(fraction * 100f)}%";
         }
 
+        /// <summary>Gold pill plus the pouch strip: one slot per item the hero carries (gold, key, potions drunk).</summary>
         private void OnInventoryChanged(string itemId, int count)
         {
             if (itemId == ItemIds.Gold)
                 goldCount.text = count.ToString();
+            SetPouchSlot(itemId, count);
+        }
+
+        private void SetPouchSlot(string itemId, int count)
+        {
+            if (!itemCounts.TryGetValue(itemId, out Label label))
+            {
+                var slot = new VisualElement { pickingMode = PickingMode.Ignore };
+                slot.AddToClassList("fe-slot");
+                if (itemId == ItemIds.Key) slot.AddToClassList("fe-slot--key");
+                if (itemId == ItemIds.Potion) slot.AddToClassList("fe-slot--potion");
+                var icon = new VisualElement { pickingMode = PickingMode.Ignore };
+                icon.AddToClassList("fe-slot-icon");
+                icon.style.backgroundImage = new StyleBackground(icons.ForItem(itemId));
+                label = new Label { pickingMode = PickingMode.Ignore };
+                label.AddToClassList("fe-slot-count");
+                slot.Add(icon);
+                slot.Add(label);
+                inventory.Add(slot);
+                itemCounts[itemId] = label;
+            }
+
+            label.text = count.ToString();
+            UISounds.Show(label.parent, count > 0);
         }
 
         private void OnObjectiveChanged(string text) => objective.text = text?.ToUpperInvariant();
@@ -329,7 +357,7 @@ namespace LostDungeon.Game.UI
             levelName.text = displayName.ToUpperInvariant();
             GameManager game = GameManager.Instance;
             roomCount.text = $"ROOM {number} / {(game.Catalog != null ? game.Catalog.Count : 5)}";
-            goldCount.text = "0";
+            SetPouchSlot(ItemIds.Potion, 0); // potions are counted per level
             enemiesThisLevel = 0;
             goldThisLevel = 0;
             potionsThisLevel = 0;
@@ -364,13 +392,22 @@ namespace LostDungeon.Game.UI
             UISounds.Show(gameOverOverlay, state == GameState.GameOver);
             UISounds.Show(loadingOverlay, state == GameState.Loading);
 
+            // Menus get the screen to themselves: hide the gameplay HUD behind them.
+            bool playing = state == GameState.Playing;
+            foreach (string name in new[] { "fe-top", "fe-banner", "prompt", "fe-abilities", "fe-joystick-area", "world-layer" })
+                foreach (VisualElement element in root.Query(className: name).ToList())
+                    element.style.visibility = playing ? Visibility.Visible : Visibility.Hidden;
+            VisualElement world = root.Q("world-layer");
+            if (world != null)
+                world.style.visibility = playing ? Visibility.Visible : Visibility.Hidden;
+
             if (state == GameState.LevelComplete)
                 FillDebrief();
             if (state == GameState.GameOver)
                 root.Q<Label>("gameover-text").text = $"You fell in Room {GameManager.Instance.CurrentLevel}. The dungeon keeps your progress; try again.";
         }
 
-        /// <summary>The Expedition Debrief screen (level complete), after the Stitch design.</summary>
+        /// <summary>The level complete screen: what you cleared, what you earned, and where you are in the dungeon.</summary>
         private void FillDebrief()
         {
             GameManager game = GameManager.Instance;
@@ -378,40 +415,31 @@ namespace LostDungeon.Game.UI
             LevelDefinition level = game.Catalog != null ? game.Catalog.Get(number) : null;
             int levelCount = game.Catalog != null ? game.Catalog.Count : 5;
 
-            root.Q<Label>("sector-chip").text = $"SECTOR {number:00} TELEMETRY";
-            root.Q<Label>("complete-title").text = game.HasNextLevel
-                ? $"ROOM {number} CLEARED · EXIT UNSEALED"
-                : "THE LOST DUNGEON IS BEHIND YOU";
-            root.Q<Label>("complete-summary").text = levelNeedsKey
-                ? $"{enemiesThisLevel} hostiles defeated · Golden key recovered · {level?.DisplayName} escaped"
-                : $"{enemiesThisLevel} hostiles defeated · {level?.DisplayName} escaped";
+            root.Q<Label>("complete-title").text = game.HasNextLevel ? $"ROOM {number} CLEARED" : "YOU ESCAPED THE DUNGEON";
 
-            int percent = Mathf.RoundToInt(SaveManager.Instance.Progress.CompletedLevels.Count * 100f / levelCount);
-            root.Q<Label>("progress-pct").text = $"{percent}% COMPLETE";
-            BuildTrack(number, levelCount);
-
-            WeatherService weather = WeatherService.Instance;
-            root.Q<Label>("debrief-temp").text = weather.Temperature.HasValue ? $"KIGALI {weather.Temperature.Value:0}°C" : "KIGALI OFFLINE";
-            root.Q<Label>("debrief-weather").text = $"Weather condition: {weather.WeatherName}. {weather.Conditions.Description}";
+            var reward = root.Q<Label>("complete-reward");
+            bool hasReward = level != null && !string.IsNullOrEmpty(level.RewardTag);
+            reward.text = hasReward ? level.RewardTag.ToUpperInvariant() : "";
+            UISounds.Show(reward, hasReward);
 
             VisualElement spoils = root.Q("spoils");
             spoils.Clear();
-            spoils.Add(Spoil(icons.gold, $"+{goldThisLevel} GOLD", "Coins from the floor and the chest"));
-            spoils.Add(Spoil(icons.potion, $"{potionsThisLevel}x HEALING POTION", "Drunk on the spot to restore hearts"));
+            spoils.Add(Spoil(icons.gold, $"+{goldThisLevel}"));
+            if (potionsThisLevel > 0)
+                spoils.Add(Spoil(icons.potion, $"{potionsThisLevel}"));
             if (levelNeedsKey)
-                spoils.Add(Spoil(icons.key, "1x DUNGEON GATE KEY", "Used to unseal the exit door"));
+                spoils.Add(Spoil(icons.key, "1"));
+            spoils.Add(Spoil(icons.sword, $"{enemiesThisLevel}"));
 
-            var reward = root.Q<Label>("complete-reward");
-            bool hasReward = level != null && !string.IsNullOrEmpty(level.RewardDescription);
-            reward.text = hasReward ? level.RewardDescription.ToUpperInvariant() : "";
-            UISounds.Show(reward, hasReward);
-            root.Q<Label>("complete-stats").text = $"ENEMIES DEFEATED {enemiesThisLevel}   ·   GOLD FOUND {goldThisLevel}";
+            BuildTrack(number, levelCount);
+            int cleared = SaveManager.Instance.Progress.CompletedLevels.Count;
+            root.Q<Label>("progress-pct").text = $"{cleared} OF {levelCount} ROOMS CLEARED";
 
             LevelDefinition next = game.Catalog != null ? game.Catalog.Get(number + 1) : null;
             var nextButton = root.Q<Button>("next-level");
             UISounds.Show(nextButton, game.HasNextLevel);
             if (next != null)
-                nextButton.text = $"DESCENT TO LEVEL {next.Number}: {next.DisplayName.ToUpperInvariant()}  >";
+                nextButton.text = $"NEXT: {next.DisplayName.ToUpperInvariant()}  >";
         }
 
         private void BuildTrack(int current, int count)
@@ -439,25 +467,19 @@ namespace LostDungeon.Game.UI
             }
         }
 
-        private static VisualElement Spoil(Sprite icon, string name, string description)
+        /// <summary>A small chip: an icon and a number (gold found, potions drunk, key, enemies defeated).</summary>
+        private static VisualElement Spoil(Sprite icon, string amount)
         {
-            var row = new VisualElement();
-            row.AddToClassList("spoil");
+            var chip = new VisualElement();
+            chip.AddToClassList("spoil-chip");
             var image = new VisualElement();
-            image.AddToClassList("spoil-icon");
+            image.AddToClassList("spoil-chip-icon");
             image.style.backgroundImage = new StyleBackground(icon);
-            row.Add(image);
-
-            var text = new VisualElement();
-            var title = new Label(name);
-            title.AddToClassList("spoil-name");
-            var body = new Label(description);
-            body.AddToClassList("body");
-            body.AddToClassList("muted");
-            text.Add(title);
-            text.Add(body);
-            row.Add(text);
-            return row;
+            var label = new Label(amount);
+            label.AddToClassList("spoil-chip-text");
+            chip.Add(image);
+            chip.Add(label);
+            return chip;
         }
 
         private void OnConditionsChanged(string title, string description)
@@ -476,7 +498,10 @@ namespace LostDungeon.Game.UI
             if (itemId == ItemIds.Gold)
                 goldThisLevel += amount;
             else if (itemId == ItemIds.Potion)
+            {
                 potionsThisLevel += amount;
+                SetPouchSlot(ItemIds.Potion, potionsThisLevel);
+            }
         }
     }
 }

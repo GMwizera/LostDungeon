@@ -16,20 +16,24 @@ namespace LostDungeon.EditorTools
         private const string Folder = "Assets/_Project/Settings";
         private const string RendererPath = Folder + "/Dungeon3DRenderer.asset";
         private const string PipelinePath = Folder + "/Dungeon3DPipeline.asset";
+        private const string MobilePipelinePath = Folder + "/Dungeon3DPipeline_Mobile.asset";
         public const string ProfilePath = Folder + "/DungeonPostFX.asset";
         private const string PostProcessDataGuid = "41439944d30ece34e96484bdb6645b55"; // URP's default PostProcessData
 
         public static void Apply()
         {
             EnsureFolder(Folder);
-            UniversalRenderPipelineAsset pipeline = GetOrCreatePipeline();
+            UniversalRenderPipelineAsset pipeline = GetOrCreatePipeline(PipelinePath, mobile: false);
+            UniversalRenderPipelineAsset mobilePipeline = GetOrCreatePipeline(MobilePipelinePath, mobile: true);
 
+            // Quality level 0 is the phone profile: PlatformFeatures switches to it on Android/iOS
+            // with conditional compilation. Every other level uses the full desktop pipeline.
             GraphicsSettings.defaultRenderPipeline = pipeline;
             int current = QualitySettings.GetQualityLevel();
             for (int i = 0; i < QualitySettings.count; i++)
             {
                 QualitySettings.SetQualityLevel(i, false);
-                QualitySettings.renderPipeline = pipeline;
+                QualitySettings.renderPipeline = i == 0 ? mobilePipeline : pipeline;
             }
             QualitySettings.SetQualityLevel(current, false);
 
@@ -37,7 +41,7 @@ namespace LostDungeon.EditorTools
             AssetDatabase.SaveAssets();
         }
 
-        private static UniversalRenderPipelineAsset GetOrCreatePipeline()
+        private static UniversalRenderPipelineAsset GetOrCreatePipeline(string path, bool mobile)
         {
             var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(RendererPath);
             if (renderer == null)
@@ -55,26 +59,28 @@ namespace LostDungeon.EditorTools
             }
             EditorUtility.SetDirty(renderer);
 
-            var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(PipelinePath);
+            var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(path);
             if (pipeline == null)
             {
                 pipeline = UniversalRenderPipelineAsset.Create(renderer);
-                AssetDatabase.CreateAsset(pipeline, PipelinePath);
+                AssetDatabase.CreateAsset(pipeline, path);
             }
 
+            // Phones get a lighter profile for battery, heat and frame rate: no MSAA, fewer lights per
+            // object, hard and smaller shadows over a shorter distance, and a slightly lower resolution.
             var settings = new SerializedObject(pipeline);
             Set(settings, "m_SupportsHDR", 1);
-            Set(settings, "m_MSAA", 4);
-            Set(settings, "m_RenderScale", 1f);
+            Set(settings, "m_MSAA", mobile ? 1 : 4);
+            Set(settings, "m_RenderScale", mobile ? 0.85f : 1f);
             Set(settings, "m_MainLightRenderingMode", 1);
             Set(settings, "m_MainLightShadowsSupported", 1);
-            Set(settings, "m_MainLightShadowmapResolution", 2048);
+            Set(settings, "m_MainLightShadowmapResolution", mobile ? 1024 : 2048);
             Set(settings, "m_AdditionalLightsRenderingMode", 1);
-            Set(settings, "m_AdditionalLightsPerObjectLimit", 8);
+            Set(settings, "m_AdditionalLightsPerObjectLimit", mobile ? 4 : 8);
             Set(settings, "m_AdditionalLightShadowsSupported", 0);
-            Set(settings, "m_ShadowDistance", 30f);
+            Set(settings, "m_ShadowDistance", mobile ? 16f : 30f);
             Set(settings, "m_ShadowCascadeCount", 1);
-            Set(settings, "m_SoftShadowsSupported", 1);
+            Set(settings, "m_SoftShadowsSupported", mobile ? 0 : 1);
             Set(settings, "m_ShadowDepthBias", 1f);
             Set(settings, "m_ShadowNormalBias", 0.6f);
             Set(settings, "m_ColorGradingMode", 1); // HDR grading

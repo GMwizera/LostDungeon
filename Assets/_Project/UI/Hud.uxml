@@ -23,6 +23,10 @@
                     <ui:Label name="vitality-text" text="6/6" class="fe-caption" picking-mode="Ignore" />
                 </ui:VisualElement>
                 <ui:Label name="key-label" text="" class="fe-hidden" picking-mode="Ignore" />
+                <ui:VisualElement class="row fe-pouch-row" picking-mode="Ignore">
+                    <ui:Label text="POUCH" class="fe-caption" style="margin-right: 8px;" picking-mode="Ignore" />
+                    <ui:VisualElement name="inventory" class="fe-inventory" picking-mode="Ignore" />
+                </ui:VisualElement>
             </ui:VisualElement>
 
             <!-- Centre: room counter and enemies remaining -->
@@ -81,41 +85,17 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- Level complete: Expedition Debrief -->
+        <!-- Level complete: a short, focused debrief -->
         <ui:VisualElement name="complete-overlay" class="overlay">
-            <ui:VisualElement class="panel row" style="width: 92%; max-width: 1060px; align-items: flex-start;">
-                <ui:VisualElement style="width: 50%; margin-right: 20px;">
-                    <ui:Label text="EXPEDITION DEBRIEF" class="eyebrow" />
-                    <ui:Label name="sector-chip" text="SECTOR 01 TELEMETRY" class="chip chip--gold" style="align-self: flex-start; margin-top: 10px;" />
-                    <ui:Label name="complete-title" text="ROOM 1 CLEARED · EXIT UNSEALED" class="debrief-title" />
-                    <ui:Label name="complete-summary" class="body muted" />
-                    <ui:VisualElement class="card" style="margin-top: 14px;">
-                        <ui:VisualElement class="row">
-                            <ui:Label text="EXPEDITION PROGRESSION STATE" class="card-title" />
-                            <ui:VisualElement class="spacer" />
-                            <ui:Label name="progress-pct" text="20% COMPLETE" class="hud-mono" style="color: rgb(56, 189, 248);" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="track" class="track" style="margin-top: 12px;" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="card weather-card">
-                        <ui:VisualElement class="row">
-                            <ui:Label text="ATMOSPHERIC LINK ACTIVE" class="card-title" />
-                            <ui:VisualElement class="spacer" />
-                            <ui:Label name="debrief-temp" text="KIGALI" class="chip" />
-                        </ui:VisualElement>
-                        <ui:Label name="debrief-weather" class="body" style="margin-top: 6px;" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement style="flex-grow: 1;">
-                    <ui:VisualElement class="row" style="margin-bottom: 10px;">
-                        <ui:Label text="SPOILS ACQUIRED" class="heading" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="spoils" />
-                    <ui:Label name="complete-reward" class="chip chip--jade" style="align-self: flex-start; margin: 6px 0 14px 0;" />
-                    <ui:Label name="complete-stats" class="mono" />
-                    <ui:Button name="next-level" text="DESCENT TO LEVEL 2  >" class="btn-cta" style="margin-top: 14px;" />
-                    <ui:Button name="complete-menu" text="MAIN MENU" />
-                </ui:VisualElement>
+            <ui:VisualElement class="panel debrief">
+                <ui:Label text="EXPEDITION DEBRIEF" class="eyebrow debrief-center" />
+                <ui:Label name="complete-title" text="ROOM 1 CLEARED" class="debrief-title debrief-center" />
+                <ui:Label name="complete-reward" class="debrief-reward" />
+                <ui:VisualElement name="spoils" class="debrief-spoils" />
+                <ui:VisualElement name="track" class="track debrief-track" />
+                <ui:Label name="progress-pct" text="1 OF 5 ROOMS CLEARED" class="debrief-progress debrief-center" />
+                <ui:Button name="next-level" text="NEXT ROOM  >" class="btn-cta" />
+                <ui:Button name="complete-menu" text="MAIN MENU" />
             </ui:VisualElement>
         </ui:VisualElement>
 

@@ -30,6 +30,8 @@ namespace LostDungeon.Game.Enemies
 
         [Header("Strategies")]
         [SerializeField] private EnemyBehaviour behaviour;
+        [Tooltip("Seconds between raising the weapon and the hit landing. Gives the player time to see it and dash away.")]
+        [SerializeField, Min(0f)] private float windUpSeconds = 0.35f;
         [SerializeField] private AbilityDefinition attack;
 
         public string Id => id;
@@ -45,6 +47,7 @@ namespace LostDungeon.Game.Enemies
         public float PreferredDistance => preferredDistance;
         public float GuardRadius => guardRadius;
         public IEnemyBehaviour Behaviour => behaviour;
+        public float WindUpSeconds => windUpSeconds;
         public IAbility Attack => attack;
     }
 }

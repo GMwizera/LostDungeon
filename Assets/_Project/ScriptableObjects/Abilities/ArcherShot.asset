@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: ArcherShot
   m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Abilities.ProjectileAbility
   displayName: ArcherShot
-  cooldownSeconds: 1.8
+  cooldownSeconds: 1.4
   icon: {fileID: 0}
   animationTrigger: Attack
   castEffect: {fileID: 0}
   effectDistance: 0
   effectHeight: 0.6
   projectilePrefab: {fileID: 8220590269183816745, guid: a228b9acffcd4404d8afa04e82d1037c, type: 3}
-  speed: 6
+  speed: 7
   damage: 1
   spawnDistance: 0.4

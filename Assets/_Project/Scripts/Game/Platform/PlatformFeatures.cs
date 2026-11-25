@@ -57,7 +57,8 @@ namespace LostDungeon.Game.Platform
         private static void ApplyPerformanceSettings()
         {
 #if UNITY_ANDROID || UNITY_IOS
-            // Phones: steady 60 fps, keep the screen on, lighter quality for battery and heat.
+            // Phones: steady 60 fps, keep the screen on, and quality level 0, which uses the lighter
+            // mobile render pipeline (no MSAA, 4 lights per object, hard shorter shadows, 85% resolution).
             Application.targetFrameRate = 60;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             QualitySettings.SetQualityLevel(0, true);

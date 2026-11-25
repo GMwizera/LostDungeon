@@ -27,7 +27,7 @@ A 3D dungeon crawler with a 45 degree camera, made in Unity 6 for the Advanced C
 2. Run **Tools > Lost Dungeon > Build Game** once. It generates the levels, scenes, icons, sounds and Addressables entries.
 3. Open `Assets/_Project/Scenes/MainMenu.unity` and press Play.
 
-Tests: **Window > General > Test Runner**. EditMode has 74 unit tests; PlayMode has 5 tests that run the real game.
+Tests: **Window > General > Test Runner**. EditMode has 74 unit tests; PlayMode has 11 tests that run the real game.
 
 ## Features
 
@@ -191,7 +191,7 @@ JSON was chosen because it is readable (easy to check and debug), built into Uni
 |---|---|
 | `#if UNITY_WEBGL && !UNITY_EDITOR` save to `PlayerPrefs` (browser IndexedDB), otherwise a file in `persistentDataPath` | Browser builds can't rely on normal file writes |
 | `#if UNITY_WEBGL` hide the Exit button | A web page can't close its own tab |
-| `#if UNITY_ANDROID \|\| UNITY_IOS` 60 fps cap, screen stays on, lower quality level, touch controls on by default | Battery, heat and touch input on phones |
+| `#if UNITY_ANDROID \|\| UNITY_IOS` 60 fps cap, screen stays on, quality level 0 which uses a lighter mobile render pipeline (no MSAA, 4 lights per object, hard 1024 shadows over 16 m, 85% resolution), touch controls on by default | Battery, heat, frame rate and touch input on phones |
 | `#if UNITY_ANDROID \|\| UNITY_IOS` `Handheld.Vibrate()` when hurt | Only phones have a vibration motor |
 | `#elif UNITY_STANDALONE` vsync on | Smooth frame pacing on desktop monitors |
 
@@ -199,7 +199,7 @@ Input uses the Input System with keyboard/mouse, gamepad and on-screen touch con
 
 ## Tests
 
-74 EditMode unit tests (NUnit) and 5 PlayMode tests. The PlayMode tests start the real game from the main menu, play level 1 to the end (save, unlock and debrief screen), load every level through Addressables, check with real physics that walls and room corners are solid, and push the player into every wall while dashing to make sure it can't leave the room. The unit tests cover: damage calculation, health, inventory logic, level unlocking, save/load (including corrupt saves), state machine transitions, A* correctness, the min-heap, object pool behaviour, cooldowns, events, direction maths and weather rules.
+74 EditMode unit tests (NUnit) and 11 PlayMode tests. The PlayMode tests start the real game from the main menu, play level 1 to the end (save, unlock and debrief screen), load every level through Addressables, check with real physics that walls and room corners are solid, push the player into every wall while dashing to make sure it can't leave the room, and check each enemy type (including the ones a room spawns itself) chases the player and really attacks up close (written after a bug where a cornered archer never fired). The unit tests cover: damage calculation, health, inventory logic, level unlocking, save/load (including corrupt saves), state machine transitions, A* correctness, the min-heap, object pool behaviour, cooldowns, events, direction maths and weather rules.
 
 ## Credits
 

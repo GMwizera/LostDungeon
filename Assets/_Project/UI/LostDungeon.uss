@@ -1253,3 +1253,85 @@ Button:hover {
 .overlay { background-color: rgba(0, 0, 0, 0.62); }
 
 .stats { color: rgb(200, 185, 150); }
+
+/* Red glow around the screen edges when the hero is hurt */
+.hurt-flash {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    border-width: 28px;
+    border-color: rgba(220, 30, 20, 0.55);
+    background-color: rgba(180, 0, 0, 0.12);
+}
+
+/* Pouch strip under the vitality bar: one slot per carried item */
+.fe-pouch-row { margin-top: 6px; align-items: center; }
+.fe-inventory { flex-direction: row; }
+.fe-slot {
+    flex-direction: row;
+    align-items: center;
+    height: 26px;
+    padding: 0 8px 0 4px;
+    margin-right: 6px;
+    border-radius: 13px;
+    border-width: 1px;
+    border-color: rgba(214, 168, 76, 0.7);
+    background-color: rgba(40, 30, 10, 0.85);
+}
+.fe-slot--key { border-color: rgb(60, 220, 140); background-color: rgba(8, 50, 30, 0.85); }
+.fe-slot--potion { border-color: rgb(120, 230, 150); background-color: rgba(10, 40, 20, 0.85); }
+.fe-slot-icon { width: 18px; height: 18px; margin-right: 4px; -unity-background-scale-mode: scale-to-fit; }
+.fe-slot-count { font-size: 13px; -unity-font-style: bold; color: rgb(255, 230, 170); padding: 0; margin: 0; }
+
+/* Level complete: one compact, centred card */
+.overlay { background-color: rgba(0, 0, 0, 0.8); }
+
+.debrief {
+    width: 46%;
+    min-width: 420px;
+    max-width: 560px;
+    align-items: stretch;
+    padding: 24px 30px;
+}
+.debrief-center { -unity-text-align: middle-center; }
+.debrief .debrief-title {
+    font-size: 38px;
+    color: rgb(255, 224, 150);
+    margin: 6px 0 10px 0;
+}
+.debrief-reward {
+    align-self: center;
+    font-size: 14px;
+    -unity-font-style: bold;
+    letter-spacing: 2px;
+    color: rgb(150, 255, 200);
+    padding: 6px 16px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: rgb(60, 220, 140);
+    background-color: rgba(8, 50, 30, 0.85);
+}
+.debrief-spoils {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+.spoil-chip {
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 14px 6px 8px;
+    margin: 0 5px;
+    border-radius: 18px;
+    border-width: 1px;
+    border-color: rgba(214, 168, 76, 0.7);
+    background-color: rgba(40, 30, 10, 0.85);
+}
+.spoil-chip-icon { width: 24px; height: 24px; margin-right: 6px; -unity-background-scale-mode: scale-to-fit; }
+.spoil-chip-text { font-size: 18px; -unity-font-style: bold; color: rgb(255, 230, 170); padding: 0; margin: 0; }
+.debrief-track { align-self: center; margin: 0 0 6px 0; }
+.debrief-progress {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgb(200, 185, 150);
+    margin-bottom: 14px;
+}

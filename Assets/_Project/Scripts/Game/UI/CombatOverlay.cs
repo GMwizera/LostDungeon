@@ -35,6 +35,8 @@ namespace LostDungeon.Game.UI
         private readonly List<EnemyController> stale = new List<EnemyController>();
         private readonly List<FloatingNumber> numbers = new List<FloatingNumber>();
         private VisualElement layer;
+        private VisualElement hurtFlash;
+        private float hurtFlashLeft;
         private Camera view;
         private float nextScan;
 
@@ -44,6 +46,10 @@ namespace LostDungeon.Game.UI
             layer = new VisualElement { name = "world-layer", pickingMode = PickingMode.Ignore };
             layer.AddToClassList("world-layer");
             root.Insert(0, layer); // under every HUD panel and menu
+            hurtFlash = new VisualElement { pickingMode = PickingMode.Ignore };
+            hurtFlash.AddToClassList("hurt-flash");
+            hurtFlash.style.opacity = 0f;
+            layer.Add(hurtFlash);
             CombatFeedback.Hit += OnHit;
         }
 
@@ -72,6 +78,11 @@ namespace LostDungeon.Game.UI
 
             UpdatePlates();
             UpdateNumbers();
+            if (hurtFlashLeft > 0f)
+            {
+                hurtFlashLeft -= Time.deltaTime;
+                hurtFlash.style.opacity = Mathf.Clamp01(hurtFlashLeft / 0.35f);
+            }
         }
 
         private void UpdatePlates()
@@ -151,6 +162,8 @@ namespace LostDungeon.Game.UI
         {
             if (layer == null)
                 return;
+            if (playerHurt)
+                hurtFlashLeft = 0.35f; // red glow around the screen edges
             var label = new Label(critical ? $"-{amount} CRIT!" : $"-{amount}") { pickingMode = PickingMode.Ignore };
             label.AddToClassList("damage-number");
             if (critical) label.AddToClassList("damage-number--crit");

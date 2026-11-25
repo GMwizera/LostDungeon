@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GuardianBash
   m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Abilities.MeleeAttackAbility
   displayName: GuardianBash
-  cooldownSeconds: 1.7
+  cooldownSeconds: 1.4
   icon: {fileID: 0}
   animationTrigger: Attack
   castEffect: {fileID: 8246204470666496658, guid: d8e9faf17b4344f4c896787945d81e48, type: 3}

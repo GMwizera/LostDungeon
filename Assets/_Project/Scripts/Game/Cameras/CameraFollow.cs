@@ -1,3 +1,4 @@
+using LostDungeon.Core.Events;
 using UnityEngine;
 
 namespace LostDungeon.Game.Cameras
@@ -16,7 +17,13 @@ namespace LostDungeon.Game.Cameras
         [SerializeField] private float distance = 10.5f;
         [SerializeField] private float lookHeight = 0.8f;
 
+        [SerializeField] private float hurtShake = 0.18f;
+        [SerializeField] private float shakeSeconds = 0.25f;
+
         private Vector3 velocity;
+        private Vector3 followPosition;
+        private float shakeLeft;
+        private int lastHealth = -1;
 
         /// <summary>The camera's turn around the vertical axis. Player input uses it.</summary>
         public static float Yaw { get; private set; } = 45f;
@@ -25,6 +32,18 @@ namespace LostDungeon.Game.Cameras
         {
             Yaw = yaw;
             transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            followPosition = transform.position;
+        }
+
+        private void OnEnable() => GameEvents.PlayerHealthChanged += OnPlayerHealthChanged;
+        private void OnDisable() => GameEvents.PlayerHealthChanged -= OnPlayerHealthChanged;
+
+        /// <summary>A short shake whenever the hero loses health, so every hit is felt.</summary>
+        private void OnPlayerHealthChanged(int current, int max)
+        {
+            if (lastHealth >= 0 && current < lastHealth)
+                shakeLeft = shakeSeconds;
+            lastHealth = current;
         }
 
         public void SetTarget(Transform newTarget) => target = newTarget;
@@ -34,7 +53,8 @@ namespace LostDungeon.Game.Cameras
         {
             if (target == null)
                 return;
-            transform.SetPositionAndRotation(Goal(), Quaternion.Euler(pitch, yaw, 0f));
+            followPosition = Goal();
+            transform.SetPositionAndRotation(followPosition, Quaternion.Euler(pitch, yaw, 0f));
             velocity = Vector3.zero;
         }
 
@@ -42,7 +62,14 @@ namespace LostDungeon.Game.Cameras
         {
             if (target == null)
                 return;
-            transform.position = Vector3.SmoothDamp(transform.position, Goal(), ref velocity, smoothTime);
+            followPosition = Vector3.SmoothDamp(followPosition, Goal(), ref velocity, smoothTime);
+            Vector3 shake = Vector3.zero;
+            if (shakeLeft > 0f)
+            {
+                shakeLeft -= Time.deltaTime;
+                shake = Random.insideUnitSphere * (hurtShake * Mathf.Clamp01(shakeLeft / shakeSeconds));
+            }
+            transform.position = followPosition + shake;
         }
 
         private Vector3 Goal()

@@ -5,7 +5,10 @@ using UnityEngine;
 
 namespace LostDungeon.Game.Interaction
 {
-    /// <summary>A treasure chest: its lid swings open once and it gives its loot to whoever opened it.</summary>
+    /// <summary>
+    /// A treasure chest: its lid swings open once and it gives its loot to whoever opened it.
+    /// Chests holding a key glow from the start; the others light up when opened.
+    /// </summary>
     [RequireComponent(typeof(Collider))]
     public class Chest : MonoBehaviour, IInteractable
     {
@@ -31,8 +34,9 @@ namespace LostDungeon.Game.Interaction
         {
             if (lid != null)
                 closedRotation = lid.localRotation;
+            // A chest that holds the key glows gold before it is opened, so the player can find it.
             if (glow != null)
-                glow.enabled = false;
+                glow.enabled = loot.Exists(item => item.itemId == ItemIds.Key);
         }
 
         public bool CanInteract(GameObject actor) => !opened && actor.TryGetComponent(out PlayerInventory _);
