@@ -25,6 +25,20 @@ namespace LostDungeon.Core.World
         public static DungeonConditions Normal =>
             new DungeonConditions("Still air", "Nothing unusual in the dungeon today.", 1f, 1f, 1f);
 
+        /// <summary>Readable name for a WMO weather code, e.g. 61 -> "Rain".</summary>
+        public static string DescribeWeather(int weatherCode)
+        {
+            if (weatherCode == 0) return "Clear sky";
+            if (weatherCode <= 3) return "Partly cloudy";
+            if (weatherCode <= 48) return "Fog";
+            if (weatherCode <= 57) return "Drizzle";
+            if (weatherCode <= 67) return "Overcast & Rain";
+            if (weatherCode <= 77) return "Snow";
+            if (weatherCode <= 82) return "Rain showers";
+            if (weatherCode <= 86) return "Snow showers";
+            return "Thunderstorm";
+        }
+
         /// <param name="weatherCode">WMO weather code from Open-Meteo (0 clear ... 99 thunderstorm).</param>
         /// <param name="temperatureC">Air temperature in Celsius.</param>
         /// <param name="isDay">False after sunset.</param>

@@ -36,6 +36,9 @@ namespace LostDungeon.Core.Events
         /// <summary>Text of the current level objective.</summary>
         public static event Action<string> ObjectiveChanged;
 
+        /// <summary>(enemies defeated, enemies total, key required, key held, exit open) for the HUD chips.</summary>
+        public static event Action<int, int, bool, bool, bool> ObjectiveStatusChanged;
+
         /// <summary>Prompt for the nearest interactable, or null when there is none.</summary>
         public static event Action<string> InteractionPromptChanged;
 
@@ -61,6 +64,8 @@ namespace LostDungeon.Core.Events
         public static void RaiseGameStateChanged(GameState state) => GameStateChanged?.Invoke(state);
         public static void RaiseInventoryChanged(string itemId, int count) => InventoryChanged?.Invoke(itemId, count);
         public static void RaiseObjectiveChanged(string text) => ObjectiveChanged?.Invoke(text);
+        public static void RaiseObjectiveStatusChanged(int defeated, int total, bool requiresKey, bool hasKey, bool exitOpen) =>
+            ObjectiveStatusChanged?.Invoke(defeated, total, requiresKey, hasKey, exitOpen);
         public static void RaiseInteractionPromptChanged(string prompt) => InteractionPromptChanged?.Invoke(prompt);
         public static void RaiseLevelStarted(int level, string name) => LevelStarted?.Invoke(level, name);
         public static void RaiseLevelLoadProgress(float progress) => LevelLoadProgress?.Invoke(progress);
@@ -84,6 +89,7 @@ namespace LostDungeon.Core.Events
             InventoryChanged = null;
             ObjectiveChanged = null;
             InteractionPromptChanged = null;
+            ObjectiveStatusChanged = null;
             LevelStarted = null;
             LevelLoadProgress = null;
             LevelLoadFailed = null;

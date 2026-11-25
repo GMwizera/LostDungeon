@@ -32,6 +32,14 @@ namespace LostDungeon.Tests
             Assert.Less(conditions.EnemyDetectionMultiplier, 1f);
         }
 
+        [TestCase(0, "Clear sky")]
+        [TestCase(61, "Overcast & Rain")]
+        [TestCase(95, "Thunderstorm")]
+        public void DescribeWeather_GivesReadableName(int code, string expected)
+        {
+            Assert.AreEqual(expected, DungeonConditions.DescribeWeather(code));
+        }
+
         [Test]
         public void ClearDay_ChangesNothing()
         {
