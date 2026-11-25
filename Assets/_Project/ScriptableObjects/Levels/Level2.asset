@@ -18,4 +18,4 @@ MonoBehaviour:
   rewardUnlock: health.bonus
   rewardDescription: Your maximum health went up by 2 hearts!
   rewardTag: +2 EXTRA HEARTS
-  hostiles: Warriors and a sniping Archer
+  hostiles: Warriors and a Bone Archer

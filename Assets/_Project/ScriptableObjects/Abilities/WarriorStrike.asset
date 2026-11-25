@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: WarriorStrike
   m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Abilities.MeleeAttackAbility
   displayName: WarriorStrike
-  cooldownSeconds: 1
+  cooldownSeconds: 1.1
   icon: {fileID: 0}
-  playsActionAnimation: 0
+  animationTrigger: Attack
+  castEffect: {fileID: 8246204470666496658, guid: d8e9faf17b4344f4c896787945d81e48, type: 3}
+  effectDistance: 0.35
+  effectHeight: 0.55
   damage: 1
-  reach: 0.3
-  radius: 0.28
+  reach: 0.45
+  radius: 0.45
   critChance: 0
   critMultiplier: 2

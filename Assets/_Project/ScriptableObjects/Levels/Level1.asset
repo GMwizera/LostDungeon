@@ -18,4 +18,4 @@ MonoBehaviour:
   rewardUnlock: ability.fireball
   rewardDescription: Fireball unlocked! Press Q or right-click to throw it.
   rewardTag: FIREBALL GRANTED
-  hostiles: Fast Warriors
+  hostiles: Skeleton Warriors

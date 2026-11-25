@@ -18,4 +18,4 @@ MonoBehaviour:
   rewardUnlock: 
   rewardDescription: You found the armory's treasure.
   rewardTag: KEY VAULT
-  hostiles: Armoured Guardian and Archers
+  hostiles: Crypt Guardian and Bone Archers

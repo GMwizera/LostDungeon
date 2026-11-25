@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Abilities.MeleeAttackAbility
   displayName: Sword
-  cooldownSeconds: 0.4
+  cooldownSeconds: 0.45
   icon: {fileID: 0}
-  playsActionAnimation: 1
+  animationTrigger: Attack
+  castEffect: {fileID: 3139591242806828345, guid: 2eac37aac89ed4fb4bb8cbd27ad5797a, type: 3}
+  effectDistance: 0.35
+  effectHeight: 0.55
   damage: 1
-  reach: 0.3
-  radius: 0.3
-  critChance: 0.15
+  reach: 0.5
+  radius: 0.55
+  critChance: 0.2
   critMultiplier: 2

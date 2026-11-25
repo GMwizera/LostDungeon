@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: Guardian
   m_EditorClassIdentifier: LostDungeon.Game::LostDungeon.Game.Enemies.EnemyData
   id: Guardian
-  tint: {r: 0.55, g: 0.7, b: 1, a: 1}
-  scale: 1.2
+  displayName: Crypt Guardian
+  level: 5
+  tint: {r: 0.82, g: 0.88, b: 1, a: 1}
+  scale: 1.35
   maxHealth: 8
   armor: 1
-  moveSpeed: 1.1
-  detectionRange: 3
-  attackRange: 0.45
+  moveSpeed: 1.4
+  detectionRange: 4
+  attackRange: 0.95
   preferredDistance: 2
-  guardRadius: 1.8
+  guardRadius: 2.6
   behaviour: {fileID: 11400000, guid: 30cf5689eb6274852927069bd0030e6a, type: 2}
   attack: {fileID: 11400000, guid: 3ad66908e429b4e5ab03a499fb77264f, type: 2}

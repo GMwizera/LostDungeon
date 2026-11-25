@@ -15,8 +15,11 @@ MonoBehaviour:
   displayName: Fireball
   cooldownSeconds: 0.8
   icon: {fileID: 0}
-  playsActionAnimation: 1
+  animationTrigger: Cast
+  castEffect: {fileID: 8130729333663474767, guid: fbe03380ed0ef4336937a5c5d78b9476, type: 3}
+  effectDistance: 0.4
+  effectHeight: 0.7
   projectilePrefab: {fileID: 3719242340751483194, guid: ca52b8ce84f084e2985ad1be63ef14a2, type: 3}
-  speed: 6
+  speed: 7.5
   damage: 2
-  spawnDistance: 0.25
+  spawnDistance: 0.45

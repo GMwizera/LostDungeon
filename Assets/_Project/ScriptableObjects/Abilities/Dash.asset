@@ -15,6 +15,9 @@ MonoBehaviour:
   displayName: Dash
   cooldownSeconds: 1.2
   icon: {fileID: 0}
-  playsActionAnimation: 0
-  speed: 9
-  duration: 0.15
+  animationTrigger: 
+  castEffect: {fileID: 4844157029528238475, guid: b48a6cee4c8bd4c5bbbb731d39ab4a56, type: 3}
+  effectDistance: 0
+  effectHeight: 0.05
+  speed: 10
+  duration: 0.16
