@@ -42,24 +42,20 @@ Tests: **Window > General > Test Runner**. EditMode has 74 unit tests; PlayMode 
 - **UI**: main menu, level select, settings (music, effects, touch controls, reset progress), HUD (hearts, ability cooldowns, inventory, objective, level name, dungeon conditions), pause, level complete and game over screens.
 - **Audio**: music, combat, enemy, UI and level-complete sounds.
 
-## UI design (Google Stitch)
+## UI design
 
-The interface was designed in **Google Stitch** and then rebuilt in Unity UI Toolkit. The Stitch screens and the design system are in [`Docs/stitch`](Docs/stitch).
+The first UI concepts were made in **Google Stitch** (the early screens are in [`Docs/stitch`](Docs/stitch)). The final interface moved on from those flat black concepts to a warmer "temple" style that suits the 3D dungeon, built in Unity UI Toolkit (`UI/LostDungeon.uss`):
 
-The design system, "Abyssal Crypt", uses pure black panels, square corners and 1px borders, with one colour per meaning:
+- Translucent dark panels with rounded gold frames, so the 3D scene shows behind the menus.
+- One colour per meaning: **gold** for loot, rooms and the main action, **cyan** for weather and dash, **red** for health and enemies, **green** for the key, rewards and an open exit.
+- Each screen shows only what the player needs at that moment.
 
-| Colour | Meaning |
-|---|---|
-| Amber gold `#f59e0b` | Loot, keys, main buttons |
-| Frost cyan `#38bdf8` | Weather, dash, completed rooms |
-| Crimson `#ef4444` | Health, enemies, danger |
-| Jade `#10b981` | Rewards earned, exit open |
-
-Screens taken from the designs:
-- **Dungeon Hub** (main menu): live Kigali weather card, hero status (hearts, arsenal, pouch) and the menu.
-- **Dungeon Chamber Matrix** (level select): one card per room with a status icon, enemies and reward.
-- **Combat HUD**: hearts, key counter, gate chip, objective bar with foe count, weather banner, ability slots, touch controls.
-- **Expedition Debrief** (level complete): progress track, weather link, spoils list and the next-level button.
+Screens:
+- **Main menu:** title, live Kigali weather in one line, the hero standing in a lit 3D temple, a compact menu (Continue, New Game, Level Select, Settings, Exit) and a hearts and gold strip.
+- **Level select:** one card per room with a status icon (play, check or lock, never text), its enemies and its reward.
+- **Gameplay HUD:** element orbs and a vitality bar, a pouch strip, a room counter with dots for the enemies left, the objective banner, the weather, round ability buttons with cooldown rings, enemy name plates and floating damage numbers. On touch screens, a ring joystick.
+- **Level complete:** the room cleared, the reward earned, small spoil chips, the five-room track and the next-room button.
+- **Pause and game over** screens in the same style. The gameplay HUD hides while any of these screens is open.
 
 ## 3D presentation
 

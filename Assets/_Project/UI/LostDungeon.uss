@@ -1,8 +1,9 @@
 /*
-   Abyssal Crypt design system (from the Google Stitch designs in stitch_lost_dungeon_crawler).
-   Void black surfaces, square corners, 1px razor borders, luminous accents:
-   gold #f59e0b = loot and main actions, cyan #38bdf8 = weather and agility,
-   red #ef4444 = health and danger, jade #10b981 = completion.
+   Lost Dungeon UI styles.
+   The base rules below come from the first Google Stitch concept ("Abyssal Crypt": black panels,
+   thin borders). Later sections override them with the final "temple" look: translucent panels,
+   rounded gold frames, round ability buttons. Colours: gold = loot and main actions,
+   cyan = weather and dash, red = health and danger, green = key, rewards and open exit.
 */
 
 /* ---------- Base ---------- */
