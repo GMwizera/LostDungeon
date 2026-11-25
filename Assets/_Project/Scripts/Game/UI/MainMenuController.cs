@@ -80,15 +80,14 @@ namespace LostDungeon.Game.UI
 
             var continueButton = root.Q<Button>("continue");
             continueButton.SetEnabled(save.HasProgress);
-            continueButton.text = save.HasProgress ? $"CONTINUE  ·  {nextName}" : "CONTINUE";
+            continueButton.text = "CONTINUE";
+            var continueDetail = root.Q<Label>("continue-detail");
+            continueDetail.text = save.HasProgress
+                ? (progress.AllCompleted ? "All five chambers cleared" : $"Level {next} · {nextLevel?.DisplayName}")
+                : "No expedition yet";
             root.Q<Button>("levels-enter").text = $"ENTER {nextName}  >";
 
-            root.Q<Label>("floor-chip").text = progress.AllCompleted ? "ALL CLEARED" : $"FLOOR {next:00} READY";
             root.Q<Label>("cleared-chip").text = $"{progress.CompletedLevels.Count}/{progress.LevelCount} CLEARED";
-
-            PlayerStats stats = save.Data.stats;
-            root.Q<Label>("stats").text =
-                $"ENEMIES DEFEATED {stats.enemiesDefeated}   ·   GOLD FOUND {stats.goldCollected}   ·   DEATHS {stats.deaths}";
 
             FillHeroStatus(save);
             FillWeather();
@@ -99,9 +98,6 @@ namespace LostDungeon.Game.UI
         {
             bool bonus = save.HasUnlock(LevelManager.UnlockHealthBonus);
             int hearts = BaseHearts + (bonus ? LevelManager.HealthBonus : 0);
-            root.Q<Label>("vitality").text = bonus
-                ? $"VITALITY {hearts}/{hearts} HEARTS ({BaseHearts} BASE + {LevelManager.HealthBonus} CRYPT BONUS)"
-                : $"VITALITY {hearts}/{hearts} HEARTS";
 
             VisualElement heartRow = root.Q("hub-hearts");
             heartRow.Clear();
@@ -113,11 +109,6 @@ namespace LostDungeon.Game.UI
                 heartRow.Add(heart);
             }
 
-            VisualElement arsenal = root.Q("arsenal");
-            arsenal.Clear();
-            arsenal.Add(Slot(icons.sword, true));
-            arsenal.Add(Slot(icons.dash, true));
-            arsenal.Add(Slot(icons.fireball, save.HasUnlock(LevelManager.UnlockFireball)));
 
             int gold = 0;
             foreach (InventoryEntry entry in save.Data.inventory)
@@ -126,25 +117,11 @@ namespace LostDungeon.Game.UI
             root.Q<Label>("pouch-gold").text = gold.ToString();
         }
 
-        private static VisualElement Slot(Sprite icon, bool unlocked)
-        {
-            var slot = new VisualElement();
-            slot.AddToClassList("slot");
-            if (!unlocked)
-                slot.AddToClassList("slot--locked");
-            var image = new VisualElement();
-            image.AddToClassList("icon");
-            image.style.backgroundImage = new StyleBackground(icon);
-            slot.Add(image);
-            return slot;
-        }
-
         private void FillWeather()
         {
             WeatherService weather = WeatherService.Instance;
             root.Q<Label>("weather-temp").text = weather.Temperature.HasValue ? $"{weather.Temperature.Value:0}°C" : "--°C";
             root.Q<Label>("weather-name").text = weather.WeatherName + (weather.IsNight ? " · Night" : "");
-            root.Q<Label>("effect-title").text = weather.Conditions.Title.ToUpperInvariant();
             root.Q<Label>("effect-text").text = weather.Conditions.Description;
 
             var chip = root.Q<Label>("api-chip");

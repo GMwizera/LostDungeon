@@ -1335,3 +1335,52 @@ Button:hover {
     color: rgb(200, 185, 150);
     margin-bottom: 14px;
 }
+
+/* ---------- Slim main menu: title, weather line, compact menu, hero in the middle ---------- */
+.hub-left--slim { width: 30%; min-width: 320px; }
+
+.weather-pill {
+    margin-top: 6px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border-width: 1px;
+    border-color: rgba(80, 200, 240, 0.6);
+    background-color: rgba(6, 20, 30, 0.7);
+}
+.weather-pill .row { align-items: center; }
+.weather-pill-temp { font-size: 20px; -unity-font-style: bold; color: rgb(244, 244, 245); margin: 0 6px 0 6px; padding: 0; }
+.weather-pill-name { font-size: 15px; color: rgb(110, 225, 255); padding: 0; margin: 0; }
+.weather-pill-effect { font-size: 13px; color: rgb(200, 225, 235); white-space: normal; margin: 6px 0 0 0; padding: 0; }
+
+.status-strip {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 16px;
+    border-width: 1px;
+    border-color: rgba(214, 168, 76, 0.55);
+    background-color: rgba(10, 12, 10, 0.7);
+}
+.status-strip .hub-hearts { margin: 0; }
+.status-strip .hub-heart {
+    width: 22px; height: 22px; padding: 2px; margin-right: 4px;
+    border-width: 0; background-color: rgba(0, 0, 0, 0);
+}
+.status-gold { font-size: 18px; -unity-font-style: bold; color: rgb(255, 225, 150); margin: 0 0 0 6px; padding: 0; }
+
+.hub-right { justify-content: center; align-items: flex-end; }
+.menu-card {
+    width: 360px;
+    padding: 18px 20px;
+}
+.menu-card Button { height: 46px; margin: 4px 0; }
+.menu-card .btn-cta { height: 58px; margin-bottom: 0; }
+.continue-detail {
+    -unity-text-align: middle-center;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: rgb(220, 200, 160);
+    margin: 4px 0 10px 0;
+    padding: 0;
+}
+#levels-panel, #settings-panel { width: 100%; }

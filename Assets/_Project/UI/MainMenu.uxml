@@ -3,65 +3,40 @@
     <ui:VisualElement name="root" class="screen">
         <ui:VisualElement class="hub">
 
-            <!-- Left column: brand, live weather, hero status -->
-            <ui:VisualElement class="hub-left">
+            <!-- Left column: title, live weather in one line, slim hero status -->
+            <ui:VisualElement class="hub-left hub-left--slim">
                 <ui:VisualElement class="hub-brand">
                     <ui:Label text="CHRONICLES OF THE" class="eyebrow" />
                     <ui:Label text="LOST DUNGEON" class="title" />
                 </ui:VisualElement>
 
-                <ui:VisualElement class="card weather-card">
+                <ui:VisualElement class="weather-pill">
                     <ui:VisualElement class="row">
                         <ui:VisualElement name="weather-icon" class="icon" />
-                        <ui:Label text=" KIGALI LIVE WEATHER" class="card-title" />
+                        <ui:Label name="weather-temp" text="--°C" class="weather-pill-temp" />
+                        <ui:Label name="weather-name" text="Checking..." class="weather-pill-name" />
                         <ui:VisualElement class="spacer" />
                         <ui:Label name="api-chip" text="CONNECTING" class="chip" />
                     </ui:VisualElement>
-                    <ui:VisualElement class="row" style="margin-top: 8px;">
-                        <ui:Label name="weather-temp" text="--°C" class="weather-temp" />
-                        <ui:Label name="weather-name" text="Checking..." class="weather-name" />
-                    </ui:VisualElement>
-                    <ui:Label text="GEO ANCHOR: -1.94° S, 30.06° E" class="mono" />
-                    <ui:VisualElement class="card panel--raised" style="margin: 10px 0 0 0;">
-                        <ui:Label name="effect-title" text="DUNGEON CONDITIONS" class="effect-title" />
-                        <ui:Label name="effect-text" class="body" />
-                    </ui:VisualElement>
+                    <ui:Label name="effect-text" class="weather-pill-effect" />
                 </ui:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="row">
-                        <ui:Label text="HERO EXPEDITION STATUS" class="card-title" style="color: rgb(255, 193, 116);" />
-                        <ui:VisualElement class="spacer" />
-                        <ui:Label name="floor-chip" text="FLOOR 01 READY" class="chip chip--gold" />
-                    </ui:VisualElement>
-                    <ui:Label name="vitality" text="VITALITY 6/6 HEARTS" class="mono" style="margin-top: 10px;" />
+                <ui:VisualElement class="spacer" />
+
+                <ui:VisualElement class="status-strip">
                     <ui:VisualElement name="hub-hearts" class="hub-hearts" />
-                    <ui:VisualElement class="row">
-                        <ui:VisualElement>
-                            <ui:Label text="EQUIPPED ARSENAL" class="mono" />
-                            <ui:VisualElement name="arsenal" class="row" style="margin-top: 6px;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="spacer" />
-                        <ui:VisualElement>
-                            <ui:Label text="POUCH STASH" class="mono" />
-                            <ui:VisualElement class="row" style="margin-top: 10px;">
-                                <ui:VisualElement name="pouch-icon" class="icon" />
-                                <ui:Label name="pouch-gold" text="0" class="hud-mono hud-mono--gold" style="margin-left: 6px; font-size: 18px;" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
-                    </ui:VisualElement>
+                    <ui:VisualElement class="spacer" />
+                    <ui:VisualElement name="pouch-icon" class="icon" />
+                    <ui:Label name="pouch-gold" text="0" class="status-gold" />
                 </ui:VisualElement>
-
-                <ui:Label name="stats" class="stats" />
             </ui:VisualElement>
 
             <!-- Right column: menu, level select, settings -->
             <ui:VisualElement class="hub-right">
-                <ui:VisualElement name="main-panel" class="panel" style="flex-grow: 1; justify-content: center;">
-                    <ui:Label text="EXPEDITION" class="eyebrow" />
-                    <ui:Label text="Clear five chambers. Recover the keys. Escape the dungeon." class="body" style="margin: 4px 0 18px 0; font-size: 17px;" />
+                <ui:VisualElement name="main-panel" class="panel menu-card">
                     <ui:Button name="continue" text="CONTINUE" class="btn-cta" />
-                    <ui:Button name="start" text="START GAME" class="btn-primary" />
+                    <ui:Label name="continue-detail" text="" class="continue-detail" />
+                    <ui:Button name="start" text="NEW GAME" />
                     <ui:Button name="levels" text="LEVEL SELECT" />
                     <ui:Button name="settings" text="SETTINGS" />
                     <ui:Button name="exit" text="EXIT" />
