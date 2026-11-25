@@ -17,12 +17,13 @@ namespace LostDungeon.EditorTools
         public const string IconsAssetPath = "Assets/_Project/ScriptableObjects/UI/UIIcons.asset";
         private const int Size = 64;
 
-        private static readonly Color Gold = new Color(1f, 0.8f, 0.25f);
-        private static readonly Color Red = new Color(0.9f, 0.15f, 0.2f);
-        private static readonly Color Grey = new Color(0.35f, 0.33f, 0.38f);
-        private static readonly Color Light = new Color(0.92f, 0.9f, 0.88f);
-        private static readonly Color Green = new Color(0.35f, 0.9f, 0.45f);
-        private static readonly Color Blue = new Color(0.45f, 0.75f, 1f);
+        // Abyssal Crypt palette (Stitch design system).
+        private static readonly Color Gold = new Color(0.96f, 0.62f, 0.04f);      // #f59e0b
+        private static readonly Color Red = new Color(0.94f, 0.27f, 0.27f);       // #ef4444
+        private static readonly Color Grey = new Color(0.25f, 0.25f, 0.27f);      // #3f3f46
+        private static readonly Color Light = new Color(0.63f, 0.63f, 0.67f);     // #a1a1aa
+        private static readonly Color Dark = new Color(0.16f, 0.09f, 0f);         // #2a1700, sits on gold
+        private static readonly Color Blue = new Color(0.22f, 0.74f, 0.97f);      // #38bdf8
 
         public static UIIcons Build()
         {
@@ -40,13 +41,15 @@ namespace LostDungeon.EditorTools
             icons.heartEmpty = Icon("HeartEmpty", (x, y) => Heart(x, y) && !Heart(x * 1.35f, y * 1.35f + 0.08f) ? Grey : (Color?)null);
             icons.locked = Icon("Lock", Lock);
             icons.completed = Icon("Check", Check);
-            icons.available = Icon("Play", (x, y) => Triangle(x, y) ? Green : (Color?)null);
+            icons.available = Icon("Play", (x, y) => Triangle(x, y) ? Dark : (Color?)null);
             icons.gold = Icon("Coin", Coin);
             icons.key = Icon("Key", KeyShape);
             icons.potion = Icon("Potion", Potion);
             icons.sword = Icon("Sword", Sword);
             icons.dash = Icon("Dash", Dash);
             icons.fireball = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_Project/Art/Generated/Fireball.png");
+            icons.cloud = Icon("Cloud", Cloud);
+            icons.flag = Icon("Flag", Flag);
 
             EditorUtility.SetDirty(icons);
             AssetDatabase.SaveAssets();
@@ -77,8 +80,28 @@ namespace LostDungeon.EditorTools
         {
             bool shortStroke = DistanceToSegment(x, y, -0.65f, 0f, -0.15f, -0.55f) < 0.17f;
             bool longStroke = DistanceToSegment(x, y, -0.15f, -0.55f, 0.7f, 0.6f) < 0.17f;
-            return shortStroke || longStroke ? Gold : (Color?)null;
+            return shortStroke || longStroke ? Blue : (Color?)null;
         }
+
+        private static Color? Cloud(float x, float y)
+        {
+            bool puff = Circle(x, y, -0.35f, 0f, 0.32f) || Circle(x, y, 0.05f, 0.2f, 0.42f) || Circle(x, y, 0.42f, -0.02f, 0.3f);
+            bool body = y > -0.3f && y < 0.05f && x > -0.62f && x < 0.7f;
+            bool drop = (DistanceToSegment(x, y, -0.3f, -0.45f, -0.4f, -0.75f) < 0.06f) ||
+                        (DistanceToSegment(x, y, 0.05f, -0.45f, -0.05f, -0.75f) < 0.06f) ||
+                        (DistanceToSegment(x, y, 0.4f, -0.45f, 0.3f, -0.75f) < 0.06f);
+            return (puff || body) && y > -0.32f || drop ? Blue : (Color?)null;
+        }
+
+        private static Color? Flag(float x, float y)
+        {
+            bool pole = x > -0.62f && x < -0.48f && y > -0.85f && y < 0.8f;
+            bool cloth = x >= -0.48f && x < 0.62f && y > 0.05f && y < 0.75f && !(x > 0.25f && Mathf.Abs(y - 0.4f) < (x - 0.25f) * 0.9f);
+            return pole || cloth ? Gold : (Color?)null;
+        }
+
+        private static bool Circle(float x, float y, float cx, float cy, float r) =>
+            (x - cx) * (x - cx) + (y - cy) * (y - cy) < r * r;
 
         private static bool Triangle(float x, float y) => x > -0.45f && Mathf.Abs(y) < (0.65f - x) * 0.75f && x < 0.7f;
 

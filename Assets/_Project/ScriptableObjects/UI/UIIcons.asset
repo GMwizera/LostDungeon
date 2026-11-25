@@ -23,3 +23,5 @@ MonoBehaviour:
   sword: {fileID: 712035800519618848, guid: e92adb14a8b96428cab8e021d699056f, type: 3}
   dash: {fileID: -7848039375673857549, guid: 506413368c16941c081a88ca257db683, type: 3}
   fireball: {fileID: -6607481912129624618, guid: c3b2cb3369c0e4eb3845943667a7ea01, type: 3}
+  cloud: {fileID: 3349391187094723686, guid: 01080855350eb49fd8ead711fe04dc42, type: 3}
+  flag: {fileID: 1805158079502305607, guid: 9026eb393a8b04afcb9e07a07227ea3a, type: 3}

@@ -17,3 +17,5 @@ MonoBehaviour:
   addressKey: Level5
   rewardUnlock: 
   rewardDescription: You escaped the Lost Dungeon. Well done!
+  rewardTag: FINAL BREACH
+  hostiles: Two Guardians and the full garrison

@@ -49,6 +49,8 @@ namespace LostDungeon.EditorTools
             public Vector2Int[] Traps = new Vector2Int[0];
             public string RewardUnlock = "";
             public string RewardText;
+            public string RewardTag;
+            public string Hostiles;
         }
 
         private static readonly Layout[] Layouts =
@@ -64,6 +66,7 @@ namespace LostDungeon.EditorTools
                 Barrels = new[] { new Vector2Int(0, 7), new Vector2Int(7, 4) },
                 RewardUnlock = LevelManager.UnlockFireball,
                 RewardText = "Fireball unlocked! Press Q or right-click to throw it.",
+                RewardTag = "FIREBALL GRANTED", Hostiles = "Fast Warriors",
             },
             new Layout
             {
@@ -78,6 +81,7 @@ namespace LostDungeon.EditorTools
                 Traps = new[] { new Vector2Int(5, 2) },
                 RewardUnlock = LevelManager.UnlockHealthBonus,
                 RewardText = "Your maximum health went up by 2 hearts!",
+                RewardTag = "+2 EXTRA HEARTS", Hostiles = "Warriors and a sniping Archer",
             },
             new Layout
             {
@@ -91,6 +95,7 @@ namespace LostDungeon.EditorTools
                 Barrels = new[] { new Vector2Int(0, 4), new Vector2Int(9, 5) },
                 Traps = new[] { new Vector2Int(4, 3), new Vector2Int(5, 7) },
                 RewardText = "You found the armory's treasure.",
+                RewardTag = "KEY VAULT", Hostiles = "Armoured Guardian and Archers",
             },
             new Layout
             {
@@ -111,6 +116,7 @@ namespace LostDungeon.EditorTools
                 Barrels = new[] { new Vector2Int(0, 9), new Vector2Int(11, 6) },
                 Traps = new[] { new Vector2Int(6, 4), new Vector2Int(2, 2) },
                 RewardText = "The halls are clear. One vault remains.",
+                RewardTag = "MAZE GOLD", Hostiles = "Warriors and Archers in a maze",
             },
             new Layout
             {
@@ -128,6 +134,7 @@ namespace LostDungeon.EditorTools
                 Barrels = new[] { new Vector2Int(0, 11), new Vector2Int(11, 0), new Vector2Int(5, 0) },
                 Traps = new[] { new Vector2Int(6, 6), new Vector2Int(4, 10) },
                 RewardText = "You escaped the Lost Dungeon. Well done!",
+                RewardTag = "FINAL BREACH", Hostiles = "Two Guardians and the full garrison",
             },
         };
 
@@ -195,7 +202,9 @@ namespace LostDungeon.EditorTools
                 ("displayName", layout.Name),
                 ("addressKey", $"Level{number}"),
                 ("rewardUnlock", layout.RewardUnlock ?? ""),
-                ("rewardDescription", layout.RewardText ?? ""));
+                ("rewardDescription", layout.RewardText ?? ""),
+                ("rewardTag", layout.RewardTag ?? ""),
+                ("hostiles", layout.Hostiles ?? ""));
             return definition;
         }
 
@@ -234,6 +243,11 @@ namespace LostDungeon.EditorTools
             Tilemap floor = TestRoomBuilder.CreateTilemap(grid, "Floor", TestRoomBuilder.FloorOrder, TilemapRenderer.Mode.Individual);
             Tilemap walls = TestRoomBuilder.CreateTilemap(grid, "Walls", TestRoomBuilder.ObjectOrder, TilemapRenderer.Mode.Individual);
             TestRoomBuilder.AddWallCollision(walls.gameObject);
+
+            // Obsidian mood from the Stitch design: darker, cooler stone. A tint works on every platform,
+            // unlike 2D lights, which the WebGL build did not apply.
+            floor.color = new Color(0.55f, 0.55f, 0.62f);
+            walls.color = new Color(0.62f, 0.62f, 0.7f);
             SetValues(grid.gameObject.AddComponent<TilemapNavigationGrid>(), ("floor", floor), ("walls", walls));
 
             PaintFloor(floor, layout, tiles, number);

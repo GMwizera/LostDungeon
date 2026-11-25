@@ -17,3 +17,5 @@ MonoBehaviour:
   addressKey: Level1
   rewardUnlock: ability.fireball
   rewardDescription: Fireball unlocked! Press Q or right-click to throw it.
+  rewardTag: FIREBALL GRANTED
+  hostiles: Fast Warriors

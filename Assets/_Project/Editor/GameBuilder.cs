@@ -142,10 +142,12 @@ namespace LostDungeon.EditorTools
             var lightObject = new GameObject("Global Light 2D");
             var light = lightObject.AddComponent<Light2D>();
             light.lightType = Light2D.LightType.Global;
-            light.intensity = 1f;
+            light.intensity = 0.7f;                       // dim, cold "obsidian crypt" mood
+            light.color = new Color(0.78f, 0.84f, 1f);
 
             GameObject player = TestRoomBuilder.CreatePlayer(Vector3.zero);
             SetUpPlayer(player);
+            AddTorch(player);
             SetValues(follow, ("target", player.transform));
             player.SetActive(false); // the LevelManager enables it once the level has loaded
 
@@ -157,6 +159,20 @@ namespace LostDungeon.EditorTools
                 ("icons", icons), ("playerInput", player.GetComponent<PlayerInputReader>()));
 
             EditorSceneManager.SaveScene(scene, GameScenePath);
+        }
+
+        /// <summary>A warm light around the player, so the dark dungeon is lit where the hero walks.</summary>
+        private static void AddTorch(GameObject player)
+        {
+            var torch = new GameObject("Torch");
+            torch.transform.SetParent(player.transform, false);
+            torch.transform.localPosition = new Vector3(0f, 0.3f, 0f);
+            var light = torch.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.color = new Color(1f, 0.76f, 0.48f);
+            light.intensity = 1.2f;
+            light.pointLightInnerRadius = 0.6f;
+            light.pointLightOuterRadius = 3.8f;
         }
 
         private static Camera CreateCamera(Color background)

@@ -17,3 +17,5 @@ MonoBehaviour:
   addressKey: Level3
   rewardUnlock: 
   rewardDescription: You found the armory's treasure.
+  rewardTag: KEY VAULT
+  hostiles: Armoured Guardian and Archers

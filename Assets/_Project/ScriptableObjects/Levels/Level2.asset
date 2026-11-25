@@ -17,3 +17,5 @@ MonoBehaviour:
   addressKey: Level2
   rewardUnlock: health.bonus
   rewardDescription: Your maximum health went up by 2 hearts!
+  rewardTag: +2 EXTRA HEARTS
+  hostiles: Warriors and a sniping Archer

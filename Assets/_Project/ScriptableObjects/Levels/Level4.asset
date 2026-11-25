@@ -17,3 +17,5 @@ MonoBehaviour:
   addressKey: Level4
   rewardUnlock: 
   rewardDescription: The halls are clear. One vault remains.
+  rewardTag: MAZE GOLD
+  hostiles: Warriors and Archers in a maze
